@@ -1,0 +1,46 @@
+﻿<controls:MetroWindow
+    x:Class="UI_Interface.Views.LogInWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:properties="clr-namespace:UI_Interface.Properties"
+    xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+    xmlns:viewmodels="clr-namespace:UI_Interface.ViewModels.ViewModelsForPages"
+    d:DataContext="{d:DesignInstance Type=viewmodels:LogInViewModel}"
+    Style="{StaticResource CustomMetroWindow}"
+    mc:Ignorable="d"
+    WindowStartupLocation="CenterScreen"
+    ShowTitleBar="False"
+    MinWidth="350"
+    MinHeight="350"
+    BorderBrush="{StaticResource MahApps.Brushes.AccentBase}"
+    ResizeMode="CanResizeWithGrip"
+    d:DesignHeight="350" d:DesignWidth="350">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            Style="{StaticResource PageTitleStyle}"
+            Margin="{StaticResource SmallLeftTopRightBottomMargin}"
+            Text="{x:Static properties:Resources.LogInPageTitle}" />
+
+        <Button
+            Grid.Row="1"
+            MaxWidth="120"
+            Style="{StaticResource MahApps.Styles.Button.Dialogs.Accent}"
+            Content="{x:Static properties:Resources.LogInButton}"
+            AutomationProperties.Name="{x:Static properties:Resources.LogInButton}"
+            Command="{Binding LoginCommand}" />
+
+        <TextBlock
+            Grid.Row="2"
+            Margin="{StaticResource MediumLeftTopRightBottomMargin}"
+            Text="{Binding StatusMessage}"
+            Style="{StaticResource BodyTextStyle}" />
+    </Grid>
+</controls:MetroWindow>

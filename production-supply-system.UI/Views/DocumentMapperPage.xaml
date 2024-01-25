@@ -1,0 +1,98 @@
+﻿<Page x:Class="UI_Interface.Views.DocumentMapperPage"
+      Style="{DynamicResource MahApps.Styles.Page}"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:properties="clr-namespace:UI_Interface.Properties"
+      xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+      xmlns:behaviors="clr-namespace:UI_Interface.Behaviors"
+      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+      xmlns:viewmodels="clr-namespace:UI_Interface.ViewModels.ViewModelsForPages"
+      xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+      d:DataContext="{d:DesignInstance Type=viewmodels:DocumentMapperViewModel}"
+      mah:DialogParticipation.Register="{Binding}"
+      mc:Ignorable="d" 
+      d:DesignHeight="700" d:DesignWidth="1200">
+
+    <Page.Resources>
+        <Style x:Key="AccentCircleButtonStyle"
+                           BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
+                           TargetType="{x:Type ButtonBase}">
+            <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.Accent}" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Accent}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <DataTemplate x:Key="contentGridItemTemplate">
+            <Grid
+                Width="160"
+                Height="160"
+                Background="{DynamicResource MahApps.Brushes.Gray10}">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{StaticResource MediumLeftTopRightBottomMargin}">
+                    <TextBlock
+                        Margin="{StaticResource XXSmallTopMargin}"
+                        HorizontalAlignment="Center"
+                        Style="{StaticResource BodyTextStyle}"
+                        Text="{Binding DocmapperName}" />
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="58" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock
+            HorizontalAlignment="Left"
+            Style="{StaticResource PageTitleStyle}"
+            Margin="{StaticResource MediumLeftMargin}"
+            Text="{x:Static properties:Resources.ShellDocumentMapperPage}" />
+
+        <TextBox 
+            MinWidth="300"
+            HorizontalAlignment="Right" 
+            Margin="{StaticResource SmallLeftTopRightBottomMargin}" 
+            mah:TextBoxHelper.Watermark="Поиск шаблона..."                                             
+            Style="{StaticResource MahApps.Styles.TextBox.Search}"
+            TextWrapping="Wrap"
+            Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+
+        <Grid Grid.Row="1" >
+            <ListView
+                Margin="{StaticResource SmallLeftMargin}"
+                SelectionMode="Single"
+                ItemsSource="{Binding Source}"
+                Style="{StaticResource ContentGridListViewStyle}"
+                ItemTemplate="{StaticResource contentGridItemTemplate}">
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
+                <i:Interaction.Behaviors>
+                    <behaviors:ListViewItemSelectionBehavior Command="{Binding NavigateToDetailCommand}" />
+                </i:Interaction.Behaviors>
+            </ListView>
+            <Button 
+                Width="160" 
+                Height="160" 
+                VerticalAlignment="Top" 
+                HorizontalAlignment="Left" 
+                Margin="{StaticResource SmallLeftMargin}" 
+                ToolTip="Добавить новый шаблон"
+                Command="{Binding NavigateToDetailCommand}"
+                BorderThickness="0">
+                <iconPacks:PackIconModern Kind="Add" />
+            </Button>
+        </Grid>
+
+    </Grid>
+</Page>

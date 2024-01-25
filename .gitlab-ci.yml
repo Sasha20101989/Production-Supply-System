@@ -1,0 +1,42 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  DOTNET_SDK_VERSION: '5.0'
+
+before_script:
+  - dotnet --version
+
+build:
+  stage: build
+  tags:
+    - windows
+  script:
+    - echo "Restore the code..."
+    - dotnet restore production-supply-system.UI/production-supply-system.UI.csproj
+    - echo "Restore complete."
+    - echo "Buildind the code..."
+    - dotnet build production-supply-system.UI/production-supply-system.UI.csproj --configuration Release
+    - echo "Buildind complete."
+
+test:
+  stage: test
+  tags:
+    - windows
+  script:
+    - echo "Test the code..."
+    - dotnet test production-supply-system.TEST/production-supply-system.TEST.csproj
+    - echo "Test complete."
+
+deploy:
+  stage: deploy
+  tags:
+    - windows
+  only:
+    - Delivery-page
+  script:
+    - echo "Deploing application..."
+    - dotnet publish production-supply-system.UI/production-supply-system.UI.csproj --configuration Release --output publish/
+    - echo "Deploing complete."
