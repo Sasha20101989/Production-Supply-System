@@ -24,6 +24,18 @@
         /// <summary>
         /// Схема "Master".
         /// </summary>
-        Master
+        Master,
+        /// <summary>
+        /// Схема "Partscontrol".
+        /// </summary>
+        Partscontrol,
+        /// <summary>
+        /// Схема "Customs".
+        /// </summary>
+        Customs,
+        /// <summary>
+        /// Схема "Planning".
+        /// </summary>
+        Planning
     }
 }

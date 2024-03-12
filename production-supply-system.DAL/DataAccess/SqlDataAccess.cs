@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
-using DAL.Data.StoredProcedures;
 using DAL.Helpers.Contracts;
 using DAL.DataAccess.Contracts;
 using System;
+using Dapper;
+using DAL.Extensions;
 
 namespace DAL.DbAccess
 {
@@ -25,49 +26,70 @@ namespace DAL.DbAccess
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<T>> LoadDataWithReturn<T>(
+        public async Task<IEnumerable<T>> LoadDataWithReturnAsync<T>(
             Enum storedProcedure,
             object parameters = null,
             string connectionId = "Default")
         {
             string connectionString = _configWrapper.GetConnectionString(connectionId);
-            using IDbConnection connection = new SqlConnection(connectionString);
+            using SqlConnection connection = new(connectionString);
 
             return await _sqlMapper.QueryAsync<T>(
                 connection,
-                StoredProcedures.Map[storedProcedure.GetType()].Invoke(storedProcedure),
+                StoredProceduresExtensions.Map[storedProcedure.GetType()].Invoke(storedProcedure),
                 parameters,
                 commandType: CommandType.StoredProcedure);
         }
 
         /// <inheritdoc />
-        public async Task SaveData(
+        public async Task SaveDataAsync(
             Enum storedProcedure,
             object parameters = null,
             string connectionId = "Default")
         {
-            using IDbConnection connection = new SqlConnection(_configWrapper.GetConnectionString(connectionId));
+            using SqlConnection connection = new(_configWrapper.GetConnectionString(connectionId));
 
             await _sqlMapper.ExecuteAsync(
                 connection,
-                StoredProcedures.Map[storedProcedure.GetType()].Invoke(storedProcedure),
+                StoredProceduresExtensions.Map[storedProcedure.GetType()].Invoke(storedProcedure),
                 parameters,
                 commandType: CommandType.StoredProcedure);
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<T>> LoadData<T>(
+        public async Task<IEnumerable<T>> LoadDataAsync<T>(
             Enum storedProcedure,
             object parameters = null,
             string connectionId = "Default"
         )
         {
-            using IDbConnection connection = new SqlConnection(_configWrapper.GetConnectionString(connectionId));
+            using SqlConnection connection = new(_configWrapper.GetConnectionString(connectionId));
             return await _sqlMapper.QueryAsync<T>(
                 connection,
-                StoredProcedures.Map[storedProcedure.GetType()].Invoke(storedProcedure),
+                StoredProceduresExtensions.Map[storedProcedure.GetType()].Invoke(storedProcedure),
                 parameters,
                 commandType: CommandType.StoredProcedure);
         }
+
+        public async Task<bool> TestConnectionAsync(string connectionId = "Default")
+        {
+            try
+            {
+                using SqlConnection connection = new(_configWrapper.GetConnectionString(connectionId));
+
+                await connection.OpenAsync();
+
+                const string sqlQuery = "SELECT 1";
+
+                int result = await connection.QueryFirstOrDefaultAsync<int>(sqlQuery);
+
+                return result == 1;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
     }
 }
+

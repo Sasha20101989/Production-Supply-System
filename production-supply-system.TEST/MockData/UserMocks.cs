@@ -13,12 +13,10 @@ namespace production_supply_system.TEST.MockData
                 Surname = "Test Surname",
                 Patronymic = "Test Patronymic",
                 Account = "Test Account",
-                Department = "Test Department",
-                Mail = "Test Mail",
                 SectionId = 1,
                 Section = new()
                 {
-                    SectionId = 1,
+                    Id = 1,
                     SectionName = "Test_Section"
                 }
         };

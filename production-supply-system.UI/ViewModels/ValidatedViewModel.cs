@@ -4,6 +4,10 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using BLL.Helpers;
+
+using DAL.Models.Document;
+
+using Microsoft.Extensions.Logging;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 
 namespace UI_Interface.ViewModels
@@ -16,6 +20,8 @@ namespace UI_Interface.ViewModels
     /// <typeparam name="TModelCollection">Тип коллекции моделей, используемых для валидации свойств ViewModel.</typeparam>
     public class ValidatedViewModel<TViewModel, TModelCollection> : ObservableObject, IDataErrorInfo
     {
+        private readonly ILogger _logger;
+
         private bool _hasErrors;
 
         private readonly Dictionary<string, string> ErrorsByPropertyName = new();
@@ -24,8 +30,10 @@ namespace UI_Interface.ViewModels
         /// Инициализирует новый экземпляр <see cref="ValidatedViewModel"/> class.
         /// </summary>
         /// <param name="models">Список типов моделей, используемых для валидации свойств ViewModel.</param>
-        public ValidatedViewModel(List<Type> models)
+        public ValidatedViewModel(List<Type> models, ILogger logger)
         {
+            _logger = logger;
+
             Models = models;
         }
 
@@ -59,9 +67,9 @@ namespace UI_Interface.ViewModels
         {
             get
             {
-                List<string> errors = new();
+                List<CustomError> customErrors = new();
 
-                List<string> validatedCollection = new();
+                List<CustomError> validatedCollection = new();
 
                 PropertyInfo propertyViewModelInfo = typeof(TViewModel).GetProperty(columnName);
 
@@ -69,37 +77,50 @@ namespace UI_Interface.ViewModels
                 {
                     object propertyValue = propertyViewModelInfo.GetValue(this);
 
-                    foreach (Type model in Models)
+                    if (propertyValue is not null)
                     {
-                        PropertyInfo propertyModelInfo = model.GetProperty(columnName.ToString());
+                        _logger.LogInformation($"The beginning of value validation: '{propertyValue}' in column '{columnName}'");
 
-                        if (propertyModelInfo is not null)
+                        validatedCollection = ValidationHelper.ValidatePropertyInCollection(columnName, propertyValue, Models);
+
+                        if (validatedCollection is not null)
                         {
-                            validatedCollection = ValidationHelper.ValidateProperty(columnName, propertyValue, propertyModelInfo);
+                            customErrors.AddRange(validatedCollection);
                         }
-                    }
 
-                    if (validatedCollection is not null)
-                    {
-                        errors.AddRange(validatedCollection);
-                    }
-
-                    if (errors.Count > 0)
-                    {
-                        foreach (string error in errors)
+                        if (customErrors.Count > 0)
                         {
-                            AddError(columnName, error);
+                            foreach (CustomError error in customErrors)
+                            {
+                                AddError(columnName, error.ErrorMessage);
+                            }
                         }
-                    }
-                    else
-                    {
-                        ClearError(columnName);
+                        else
+                        {
+                            ClearError(columnName);
+
+                            _logger.LogInformation($"Value validation: '{propertyValue}' in column '{columnName}' completed.");
+                        }
                     }
                 }
 
                 HasErrorsUpdated?.Invoke(this, HasErrors);
 
-                return string.Join(Environment.NewLine, errors);
+                List<string> errors = new();
+
+                foreach (CustomError customError in customErrors)
+                {
+                    errors.Add(customError.ErrorMessage);
+                }
+
+                string result = string.Join(Environment.NewLine, errors);
+
+                if (!string.IsNullOrEmpty(result))
+                {
+                    _logger.LogWarning($"Value validation in column '{columnName}' completed with warning: '{result}'.");
+                }
+
+                return result;
             }
         }
 
@@ -116,16 +137,16 @@ namespace UI_Interface.ViewModels
         /// </summary>
         /// <param name="propertyName">Имя свойства, к которому добавляется ошибка.</param>
         /// <param name="message">Строковое представление ошибки валидации.</param>
-        private void AddError(string propertyName, string message)
+        private void AddError(string propertyName, string customError)
         {
             if (!ErrorsByPropertyName.ContainsKey(propertyName))
             {
                 ErrorsByPropertyName[propertyName] = string.Empty;
             }
 
-            if (!ErrorsByPropertyName[propertyName].Contains(message))
+            if (!ErrorsByPropertyName[propertyName].Contains(customError))
             {
-                ErrorsByPropertyName[propertyName] = message;
+                ErrorsByPropertyName[propertyName] = customError;
                 OnErrorsChanged(propertyName);
             }
 

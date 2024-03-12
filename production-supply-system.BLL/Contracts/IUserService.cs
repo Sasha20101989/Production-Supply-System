@@ -18,5 +18,11 @@ namespace BLL.Contracts
         /// <param name="userAccount">Учетная запись пользователя для получения информации.</param>
         /// <returns>Задача, представляющая асинхронную операцию, возвращающую информацию о пользователе.</returns>
         Task<User> GetUserInfoAsync(string userAccount);
+
+        /// <summary>
+        /// Тестирование соединения с базой данных
+        /// </summary>
+        /// <returns>Если соединение присутствует возвращает true, в противном случае false</returns>
+        Task<bool> IsAccessAllowedAsync();
     }
 }

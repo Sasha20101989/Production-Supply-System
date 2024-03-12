@@ -8,6 +8,7 @@
         Success,
         Unauthorized,
         CancelledByUser,
-        UnknownError
+        UnknownError,
+        NotConnectionToDb
     }
 }

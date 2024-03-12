@@ -120,11 +120,152 @@
   <data name="AppDisplayName" xml:space="preserve">
     <value>Production Supply System</value>
   </data>
+  <data name="ArrivalLocation" xml:space="preserve">
+    <value>Место прибытия лота</value>
+  </data>
+  <data name="ATA" xml:space="preserve">
+    <value>Фактическая дата прибытия</value>
+  </data>
+  <data name="ATD" xml:space="preserve">
+    <value>Фактическая дата доставки</value>
+  </data>
+  <data name="BllAddNewDocument" xml:space="preserve">
+    <value>Сохранение документа</value>
+  </data>
+  <data name="BllAddNewDocumentColumn" xml:space="preserve">
+    <value>Добавление новой колонки</value>
+  </data>
+  <data name="BllAddNewDocumentSuccess" xml:space="preserve">
+    <value>Сохранение документа успешно завершено</value>
+  </data>
+  <data name="BllDownloadContainers" xml:space="preserve">
+    <value>Загрузка контейнеров</value>
+  </data>
+  <data name="BllDownloadLot" xml:space="preserve">
+    <value>Процесс формирования лота</value>
+  </data>
+  <data name="BllDownloadLots" xml:space="preserve">
+    <value>Загрузка списка лотов</value>
+  </data>
+  <data name="BllExportAllTracing" xml:space="preserve">
+    <value>Выгрузка файла трейсинга</value>
+  </data>
+  <data name="BllFilterDocuments" xml:space="preserve">
+    <value>Фильтрация документов</value>
+  </data>
+  <data name="BllGetAllDocumentColumns" xml:space="preserve">
+    <value>Загрузка колонок доступных для документа</value>
+  </data>
+  <data name="BllGetDocument" xml:space="preserve">
+    <value>Получение документа</value>
+  </data>
+  <data name="BllGetProcessSteps" xml:space="preserve">
+    <value>Загрузка шагов процесса</value>
+  </data>
+  <data name="BllLoadPartsForContainer" xml:space="preserve">
+    <value>Загрузка деталей для контейнера</value>
+  </data>
+  <data name="BllLoadStaticData" xml:space="preserve">
+    <value>Загрузка статических данных</value>
+  </data>
+  <data name="BllUpdateDocument" xml:space="preserve">
+    <value>Обновление документа</value>
+  </data>
+  <data name="BllUpdateDocumentSuccess" xml:space="preserve">
+    <value>Обновление документа успешно завершено</value>
+  </data>
+  <data name="BllUploadLot" xml:space="preserve">
+    <value>Процесс загрузки лота</value>
+  </data>
+  <data name="BllValidationFileColumns" xml:space="preserve">
+    <value>Валидация колонок документа</value>
+  </data>
+  <data name="CarrierName" xml:space="preserve">
+    <value>Перевозчик</value>
+  </data>
+  <data name="CaseNumber" xml:space="preserve">
+    <value>Номер кейса</value>
+  </data>
+  <data name="CloseDate" xml:space="preserve">
+    <value>Дата закрытия лота</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Комментарий</value>
+  </data>
+  <data name="Container" xml:space="preserve">
+    <value>Контейнер</value>
+  </data>
+  <data name="ContainerType" xml:space="preserve">
+    <value>Тип контейнера</value>
+  </data>
+  <data name="CustomsLocation" xml:space="preserve">
+    <value>Таможенный терминал</value>
+  </data>
   <data name="DefaultAvatar" xml:space="preserve">
     <value>DefaultIcon.png</value>
   </data>
+  <data name="DefaultFolder" xml:space="preserve">
+    <value>Папка по умолчанию</value>
+  </data>
   <data name="DeliveryPageTitle" xml:space="preserve">
-    <value>Доставка</value>
+    <value>Журнал лотов</value>
+  </data>
+  <data name="DeliveryTerm" xml:space="preserve">
+    <value>Условия поставки</value>
+  </data>
+  <data name="DepartureLocation" xml:space="preserve">
+    <value>Место отправления лота</value>
+  </data>
+  <data name="DocumentColumnElementName" xml:space="preserve">
+    <value>Название колонки</value>
+  </data>
+  <data name="DocumentColumnNumber" xml:space="preserve">
+    <value>Номер колонки</value>
+  </data>
+  <data name="DocumentColumnSystemColumnName" xml:space="preserve">
+    <value>Системное название</value>
+  </data>
+  <data name="DocumentName" xml:space="preserve">
+    <value>Имя шаблона</value>
+  </data>
+  <data name="DocumentNewContent" xml:space="preserve">
+    <value>Новый элемент контента</value>
+  </data>
+  <data name="DocumentNewContentTitle" xml:space="preserve">
+    <value>Тут вы можете добавить новый элемент контента.</value>
+  </data>
+  <data name="DocumentRowNumber" xml:space="preserve">
+    <value>Номер строки</value>
+  </data>
+  <data name="DocumentTooltip" xml:space="preserve">
+    <value>Добавить новый шаблон</value>
+  </data>
+  <data name="EditDeliveryPageTitle" xml:space="preserve">
+    <value>Редактирование лота</value>
+  </data>
+  <data name="ETA" xml:space="preserve">
+    <value>Ожидаемая дата прибытия</value>
+  </data>
+  <data name="ETD" xml:space="preserve">
+    <value>Ожидаемая дата доставки</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Фильтр</value>
+  </data>
+  <data name="FirstDataRow" xml:space="preserve">
+    <value>Номер строки с которой начинаются данные</value>
+  </data>
+  <data name="GrossWeight" xml:space="preserve">
+    <value>Вес брутто</value>
+  </data>
+  <data name="IMO" xml:space="preserve">
+    <value>Признак опасности груза</value>
+  </data>
+  <data name="InvoiceNumber" xml:space="preserve">
+    <value>Номер счета</value>
+  </data>
+  <data name="ListOfContainers" xml:space="preserve">
+    <value>Список контейнеров</value>
   </data>
   <data name="LogInButton" xml:space="preserve">
     <value>Вход</value>
@@ -132,8 +273,47 @@
   <data name="LogInPageTitle" xml:space="preserve">
     <value>Авторизация</value>
   </data>
+  <data name="LotNumber" xml:space="preserve">
+    <value>Номер лота</value>
+  </data>
+  <data name="LotOrder" xml:space="preserve">
+    <value>Заказ лота</value>
+  </data>
+  <data name="LotOrderToolTip" xml:space="preserve">
+    <value>Если заказов нет в списке, попробуйте сначала выбрать отправителя.</value>
+  </data>
   <data name="MainPageTitle" xml:space="preserve">
     <value>Главная страница</value>
+  </data>
+  <data name="MasterUploadFile" xml:space="preserve">
+    <value>Мастер загрузки файлов</value>
+  </data>
+  <data name="NetWeight" xml:space="preserve">
+    <value>Вес нетто</value>
+  </data>
+  <data name="NewDeliveryPageTitle" xml:space="preserve">
+    <value>Добавление лота</value>
+  </data>
+  <data name="PackingType" xml:space="preserve">
+    <value>Тип упаковки</value>
+  </data>
+  <data name="PartNameEng" xml:space="preserve">
+    <value>Английское имя детали</value>
+  </data>
+  <data name="PartNumber" xml:space="preserve">
+    <value>Номер детали</value>
+  </data>
+  <data name="Position" xml:space="preserve">
+    <value>Позиция</value>
+  </data>
+  <data name="Quantity" xml:space="preserve">
+    <value>Колличество</value>
+  </data>
+  <data name="QuantityContainers" xml:space="preserve">
+    <value>Колличество контейнеров</value>
+  </data>
+  <data name="SealNumber" xml:space="preserve">
+    <value>Номер пломбы</value>
   </data>
   <data name="SettingsPageAboutText" xml:space="preserve">
     <value>Production Supply System - это приложение...</value>
@@ -165,11 +345,29 @@
   <data name="SettingsPageUserTitle" xml:space="preserve">
     <value>О пользователе</value>
   </data>
+  <data name="SheetName" xml:space="preserve">
+    <value>Название листа</value>
+  </data>
+  <data name="ShellActive" xml:space="preserve">
+    <value>Активен</value>
+  </data>
+  <data name="ShellAdd" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
   <data name="ShellCancelButton" xml:space="preserve">
     <value>Отменить</value>
   </data>
+  <data name="ShellClose" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="ShellDelete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
   <data name="ShellDeliveryPage" xml:space="preserve">
-    <value>Доставка</value>
+    <value>Журнал лотов</value>
+  </data>
+  <data name="ShellDetails" xml:space="preserve">
+    <value>Общая информация</value>
   </data>
   <data name="ShellDocumentMapperEditPage" xml:space="preserve">
     <value>Изменение шаблона</value>
@@ -180,6 +378,21 @@
   <data name="ShellDocumentMapperPage" xml:space="preserve">
     <value>Управление шаблонами</value>
   </data>
+  <data name="ShellEdit" xml:space="preserve">
+    <value>Редактировать</value>
+  </data>
+  <data name="ShellEditDeliveryPage" xml:space="preserve">
+    <value>Редактирование лота</value>
+  </data>
+  <data name="ShellEmptyLotList" xml:space="preserve">
+    <value>Список лотов пуст. Нажмите на кнопку 'Подгрузить список лотов' для обновления списка.</value>
+  </data>
+  <data name="ShellError" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="ShellFileName" xml:space="preserve">
+    <value>Имя файла</value>
+  </data>
   <data name="ShellGoBackButton" xml:space="preserve">
     <value>Go back</value>
   </data>
@@ -189,17 +402,62 @@
   <data name="ShellMainPage" xml:space="preserve">
     <value>Главная</value>
   </data>
+  <data name="ShellNewDeliveryPage" xml:space="preserve">
+    <value>Добавление лота</value>
+  </data>
+  <data name="ShellNoActive" xml:space="preserve">
+    <value>Не активен</value>
+  </data>
+  <data name="ShellProcessForbidden" xml:space="preserve">
+    <value>Вы не обладаете необходимыми правами для выполнения этого процесса</value>
+  </data>
   <data name="ShellSaveButton" xml:space="preserve">
     <value>Сохранить</value>
   </data>
+  <data name="ShellSearch" xml:space="preserve">
+    <value>Поиск</value>
+  </data>
+  <data name="ShellSelectDate" xml:space="preserve">
+    <value>Выберите дату</value>
+  </data>
+  <data name="ShellUploadButton" xml:space="preserve">
+    <value>Загрузить</value>
+  </data>
+  <data name="ShellUploadSuccess" xml:space="preserve">
+    <value>Загрузка успешно завершена. </value>
+  </data>
+  <data name="ShellUse" xml:space="preserve">
+    <value>Использовать</value>
+  </data>
+  <data name="ShellWait" xml:space="preserve">
+    <value>Пожалуйста подождите...</value>
+  </data>
+  <data name="ShipperName" xml:space="preserve">
+    <value>Отправитель</value>
+  </data>
   <data name="StatusLoginFails" xml:space="preserve">
     <value>Ошибка авторизации</value>
+  </data>
+  <data name="StatusNotConnectionToDb" xml:space="preserve">
+    <value>Нет соединения с базой данных</value>
   </data>
   <data name="StatusUnauthorized" xml:space="preserve">
     <value>Не авторизован</value>
   </data>
   <data name="StatusUnknownError" xml:space="preserve">
     <value>Не предвиденная ошибка</value>
+  </data>
+  <data name="TitlePartsForContainer" xml:space="preserve">
+    <value>Список деталей для контейнера </value>
+  </data>
+  <data name="TransportDocument" xml:space="preserve">
+    <value>Документ транспорта</value>
+  </data>
+  <data name="TransportName" xml:space="preserve">
+    <value>Название транспорта</value>
+  </data>
+  <data name="TransportType" xml:space="preserve">
+    <value>Тип перевозки</value>
   </data>
   <data name="ValidationPageTitle" xml:space="preserve">
     <value>Валидация документа</value>

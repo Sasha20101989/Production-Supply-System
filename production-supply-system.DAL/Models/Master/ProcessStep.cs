@@ -1,6 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using DAL.Models.Docmapper;
+
+using DAL.Enums;
+using DAL.Models.Contracts;
+using DAL.Models.Document;
 
 namespace DAL.Models.Master
 {
@@ -8,30 +12,41 @@ namespace DAL.Models.Master
     /// Представляет информацию о шаге в процессе.
     /// </summary>
     [Table("tbd_Processes_Steps", Schema = "Master")]
-    public class ProcessStep
+    public class ProcessStep : IEntity
     {
         [Key]
-        public int ProcessStepId { get; set; }
+        public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Process Id is required.")]
+        [Column("Process_Id")]
         public int ProcessId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Step is required.")]
+        [Column("Step")]
         public int Step { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Docmapper Id is required.")]
+        [Column("Docmapper_Id")]
         public int DocmapperId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Section Id is required.")]
+        [Column("Section_Id")]
         public int SectionId { get; set; }
 
-        [ForeignKey("Process_Id")]
-        public virtual Process Process { get; set; }
+        [Required(ErrorMessage = "Step name is required.")]
+        [Column("Step_Name")]
+        [MaxLength(50, ErrorMessage = "Step name must not exceed 50 characters.")]
+        public Steps StepName { get; set; }
 
-        [ForeignKey("Docmapper_Id")]
-        public virtual Document Document { get; set; }
+        [ForeignKey("DocmapperId")]
+        public virtual Docmapper Docmapper { get; set; } = null!;
 
-        [ForeignKey("Section_Id")]
-        public virtual Section Section { get; set; }
+        [ForeignKey("ProcessId")]
+        public virtual Process Process { get; set; } = null!;
+
+        [ForeignKey("SectionId")]
+        public virtual Section Section { get; set; } = null!;
+
+        public virtual Dictionary<string, CellInfo> ValidationErrors { get; set; } = new();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using DAL.Models.Contracts;
 
 namespace DAL.Models
 {
@@ -7,42 +8,35 @@ namespace DAL.Models
     /// Представляет информацию о пользователе.
     /// </summary>
     [Table("tbd_users", Schema = "Users")]
-    public class User
+    public class User : IEntity
     {
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required]
-        [MaxLength(30)]
-        public string Name { get; set; }
+        [Required(ErrorMessage = "Account is required.")]
+        [StringLength(10, ErrorMessage = "The length of Account should not exceed 10 characters.")]
+        public string Account { get; set; } = null!;
 
-        [Required]
-        [MaxLength(30)]
-        public string Surname { get; set; }
+        [Required(ErrorMessage = "Name is required.")]
+        [MaxLength(30, ErrorMessage = "The length of Name should not exceed 30 characters.")]
+        public string Name { get; set; } = null!;
 
-        [MaxLength(30)]
-        public string Patronymic { get; set; }
+        [Required(ErrorMessage = "Surname is required.")]
+        [MaxLength(30, ErrorMessage = "The length of Surname should not exceed 30 characters.")]
+        public string Surname { get; set; } = null!;
 
-        [Required]
-        [MaxLength(10)]
-        public string Account { get; set; }
+        [Required(ErrorMessage = "Patronymic is required.")]
+        [MaxLength(30, ErrorMessage = "The length of Patronymic should not exceed 30 characters.")]
+        public string Patronymic { get; set; } = null!;
 
-        [Required]
+        [Required(ErrorMessage = "Section Id is required.")]
+        [Column("Section_Id")]
         public int SectionId { get; set; }
-
-        [NotMapped]
-        public string? Mail { get; set; }
-
-        [NotMapped]
-        public string? MobilePhone { get; set; }
-
-        [NotMapped]
-        public object Department { get; set; }
 
         [NotMapped]
         public string? Photo { get; set; }
 
-        [ForeignKey("Section_Id")]
-        public virtual Section Section { get; set; }
+        [ForeignKey("SectionId")]
+        public virtual Section? Section { get; set; }
     }
 }

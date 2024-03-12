@@ -1,17 +1,21 @@
 ﻿namespace DAL.Enums
 {
     /// <summary>
-    /// Перечисление представляющее набор процессов приложения
+    /// Перечисление представляющее набор процессов приложения(отражение таблицы tbd_Processes)
     /// </summary>
     public enum AppProcess
     {
         /// <summary>
         /// Загрузка инвойсов
         /// </summary>
-        UploadInvoices,
+        UploadInvoicesPartner2,
+        /// <summary>
+        /// Загрузка типов контейнеров
+        /// </summary>
+        UploadContainerTypesPartner2,
         /// <summary>
         /// Загрузка локальных VIN
         /// </summary>
-        UploadLocalVins
+        UploadLocalVinsPartner2
     }
 }

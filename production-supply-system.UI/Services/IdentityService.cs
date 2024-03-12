@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
+using System.Windows;
 
 using BLL.Contracts;
-
 using DAL.Models;
+
+using Microsoft.Extensions.Logging;
 
 using UI_Interface.Contracts.Services;
 using UI_Interface.Helpers;
@@ -16,15 +18,18 @@ namespace UI_Interface.Services
     public class IdentityService : IIdentityService
     {
         private readonly IUserService _userService;
+        private readonly ILogger<IdentityService> _logger;
         private User _user;
 
         /// <summary>
         /// Инициализирует новый экземпляр службы аутентификации.
         /// </summary>
         /// <param name="userService">Служба пользователей.</param>
-        public IdentityService(IUserService userService)
+        /// <param name="logger">Служба логирования.</param>
+        public IdentityService(IUserService userService, ILogger<IdentityService> logger)
         {
             _userService = userService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -49,9 +54,16 @@ namespace UI_Interface.Services
 
         /// <inheritdoc />
         public async Task<LoginResultType> LoginAsync()
-        {
+        {  
             try
             {
+                bool isAccessAllowed = await _userService.IsAccessAllowedAsync();
+
+                if (!isAccessAllowed)
+                {
+                    return LoginResultType.NotConnectionToDb;
+                }
+
                 if (!await IsUserExistsAsync())
                 {
                     return LoginResultType.Unauthorized;
@@ -61,8 +73,10 @@ namespace UI_Interface.Services
 
                 return LoginResultType.Success;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
+
                 return LoginResultType.UnknownError;
             }
         }

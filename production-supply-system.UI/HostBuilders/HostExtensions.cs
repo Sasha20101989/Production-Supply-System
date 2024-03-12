@@ -29,11 +29,9 @@ namespace UI_Interface.HostBuilders
 
             pageService.Configure<DocumentMapperDetailViewModel, DocumentMapperDetailPage>();
 
-            pageService.Configure<DeliveryPageViewModel, DeliveryPage>();
+            pageService.Configure<DeliveryViewModel, DeliveryPage>();
 
-            pageService.Configure<MasterViewModel, MasterPage>();
-
-            pageService.Configure<FileValidationViewModel, FileValidationPage>();
+            pageService.Configure<EditDeliveryViewModel, EditDeliveryPage>();
         }
     }
 }

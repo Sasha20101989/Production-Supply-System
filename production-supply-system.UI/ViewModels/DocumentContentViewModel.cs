@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using DAL.Models.Docmapper;
+using DAL.Models.Document;
+
+using Microsoft.Extensions.Logging;
 
 namespace UI_Interface.ViewModels
 {
@@ -11,14 +13,14 @@ namespace UI_Interface.ViewModels
     /// </summary>
     public class DocumentContentViewModel : ValidatedViewModel<DocumentContentViewModel, List<Type>>
     {
-        private Document _document;
+        private Docmapper _document;
 
-        private DocumentColumn _documentColumn;
+        private DocmapperColumn _documentColumn;
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="DocumentContentViewModel"/>.
         /// </summary>
-        public DocumentContentViewModel(List<Type> models) : base(models)
+        public DocumentContentViewModel(List<Type> models, ILogger logger) : base(models, logger)
         {
 
         }
@@ -26,15 +28,15 @@ namespace UI_Interface.ViewModels
         /// <summary>
         /// Возвращает или задает контент документа.
         /// </summary>
-        public DocumentContent DocumentContent { get; set; } = new();
+        public DocmapperContent DocumentContent { get; set; } = new();
 
         /// <summary>
         /// Возвращает или задает уникальный идентификатор контента документа.
         /// </summary>
         public int DocmapperContentId
         {
-            get => DocumentContent.DocmapperContentId;
-            set => _ = SetProperty(DocumentContent.DocmapperContentId, value, DocumentContent, (model, docmapperContentId) => model.DocmapperContentId = docmapperContentId);
+            get => DocumentContent.Id;
+            set => _ = SetProperty(DocumentContent.Id, value, DocumentContent, (model, docmapperContentId) => model.Id = docmapperContentId);
         }
 
         /// <summary>
@@ -60,8 +62,8 @@ namespace UI_Interface.ViewModels
         /// </summary>
         public int? RowNumber
         {
-            get => DocumentContent.RowNumber;
-            set => _ = SetProperty(DocumentContent.RowNumber, value, DocumentContent, (model, row) => model.RowNumber = row);
+            get => DocumentContent.RowNr;
+            set => _ = SetProperty(DocumentContent.RowNr, value, DocumentContent, (model, row) => model.RowNr = row);
         }
 
         /// <summary>
@@ -69,14 +71,14 @@ namespace UI_Interface.ViewModels
         /// </summary>
         public int ColumnNumber
         {
-            get => DocumentContent.ColumnNumber;
-            set => _ = SetProperty(DocumentContent.ColumnNumber, value, DocumentContent, (model, col) => model.ColumnNumber = col);
+            get => DocumentContent.ColumnNr;
+            set => _ = SetProperty(DocumentContent.ColumnNr, value, DocumentContent, (model, col) => model.ColumnNr = col);
         }
 
         /// <summary>
         /// Возвращает или задает значение документа.
         /// </summary>
-        public Document Document
+        public Docmapper Document
         {
             get => _document;
             set => _ = SetProperty(ref _document, value);
@@ -85,7 +87,7 @@ namespace UI_Interface.ViewModels
         /// <summary>
         /// Возвращает или задает значение колонки.
         /// </summary>
-        public DocumentColumn DocumentColumn
+        public DocmapperColumn DocumentColumn
         {
             get => _documentColumn;
             set => _ = SetProperty(ref _documentColumn, value);

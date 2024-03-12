@@ -1,5 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
+using DAL.Attributes;
+using DAL.Enums;
+using DAL.Models.Contracts;
 
 namespace DAL.Models
 {
@@ -7,34 +13,49 @@ namespace DAL.Models
     /// Представляет информацию о таможеном обозначении детали.
     /// </summary>
     [Table("tbd_Customs_Parts", Schema = "Customs")]
-    public class CustomsPart
+    public class CustomsPart : IEntity
     {
+        private TypesOfPart _partType;
+
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("Part_Number_Id")]
-        public int PartNumberId { get; set; }
+        public int Id { get; set; }
 
-        [Required(ErrorMessage = "Поле 'Part_Number' обязательно для заполнения.")]
+        [Required(ErrorMessage = "Part Number is required.")]
+        [MaxLength(50, ErrorMessage = "Part Number must not exceed 50 characters.")]
         [Column("Part_Number")]
-        [MaxLength(50, ErrorMessage = "Максимальная длина 'Part_Number' - 50 символов.")]
         public string PartNumber { get; set; }
 
-        [Required(ErrorMessage = "Поле 'Part_Name_Eng' обязательно для заполнения.")]
+        [Required(ErrorMessage = "Part Name (English) is required.")]
+        [MaxLength(150, ErrorMessage = "Part Name (English) must not exceed 150 characters.")]
         [Column("Part_Name_Eng")]
-        [MaxLength(150, ErrorMessage = "Максимальная длина 'Part_Name_Eng' - 150 символов.")]
         public string PartNameEng { get; set; }
 
         [Column("Part_Name_Rus")]
-        [MaxLength(ErrorMessage = "Максимальная длина 'Part_Name_Rus' - 50 символов.")]
         public string? PartNameRus { get; set; }
 
+        [MaxLength(10, ErrorMessage = "HS Code must not exceed 10 characters.")]
         [Column("Hs_Code")]
-        [MaxLength(10, ErrorMessage = "Максимальная длина 'Hs_Code' - 10 символов.")]
         public string? HsCode { get; set; }
 
-        [Column("Part_Type_Id")]
-        public int? PartTypeId { get; set; }
+        [ForeignKey("PartTypeId")]
+        public int PartTypeId { get; set; }
 
-        [ForeignKey("Part_Type_Id")]
-        public TypeOfPart TypeOfPart { get; set; }
+        [Column("Date_Add")]
+        public DateTime CreatedAt { get; set; }
+
+        public virtual TypesOfPart PartType
+        {
+            get => _partType;
+            set
+            {
+                _partType = value;
+                PartTypeId = value?.Id ?? 0;
+            }
+        }
+
+        [Required(ErrorMessage = "Part Number id is required.")]
+        [Min(1)]
+        public int PartNumberId { get; set; }
     }
 }

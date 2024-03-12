@@ -1,7 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
 using DAL.Enums;
+using DAL.Models.Contracts;
 
 namespace DAL.Models.Master
 {
@@ -9,13 +10,15 @@ namespace DAL.Models.Master
     /// Представляет информацию о процессе.
     /// </summary>
     [Table("tbd_Processes", Schema = "Master")]
-    public class Process
+    public class Process : IEntity
     {
         [Key]
-        public int ProcessId { get; set; }
+        public int Id { get; set; }
 
         [Required]
-        [MaxLength(300, ErrorMessage ="Колличество символов не должно превышать 300")]
+        [MaxLength(300, ErrorMessage = "Process Namemust not exceed 300 characters.")]
         public AppProcess ProcessName { get; set; }
+
+        public virtual ICollection<ProcessStep> ProcessSteps { get; set; }
     }
 }

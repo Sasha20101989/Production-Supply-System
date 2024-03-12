@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using DAL.Models.Docmapper;
+using DAL.Models.Document;
+
+using Microsoft.Extensions.Logging;
 
 namespace UI_Interface.ViewModels
 {
@@ -14,7 +16,7 @@ namespace UI_Interface.ViewModels
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="DocumentColumnViewModel"/>.
         /// </summary>
-        public DocumentColumnViewModel(List<Type> models) : base(models)
+        public DocumentColumnViewModel(List<Type> models, ILogger logger) : base(models, logger)
         {
 
         }
@@ -22,7 +24,7 @@ namespace UI_Interface.ViewModels
         /// <summary>
         /// Получает или задает колонку контента документа.
         /// </summary>
-        public DocumentColumn DocumentColumn { get; set; } = new();
+        public DocmapperColumn DocumentColumn { get; set; } = new();
 
         /// <summary>
         /// Получает или задает значение названия.

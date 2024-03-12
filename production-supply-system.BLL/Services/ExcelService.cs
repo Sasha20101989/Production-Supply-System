@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-
 using BLL.Contracts;
+using ClosedXML.Excel;
 
-using DAL.Models.Docmapper;
 
+using DAL.Models;
+using DAL.Models.Document;
+
+using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
-
 using Microsoft.Extensions.Logging;
-
 using Newtonsoft.Json;
 
 namespace BLL.Services
@@ -32,12 +34,74 @@ namespace BLL.Services
             _logger = logger;
         }
 
+        private static int GetColumnIndexFromCellReference(string cellReference)
+        {
+            string columnName = Regex.Replace(cellReference, @"\d", string.Empty);
+
+            int index = 0;
+
+            int multiplier = 1;
+
+            foreach (char c in columnName.Reverse())
+            {
+                index += multiplier * (c - 'A' + 1);
+
+                multiplier *= 26;
+            }
+
+            return index;
+        }
+
+        /// <inheritdoc />
+        public void ColorCellsInDocument(Dictionary<string, CellInfo> validationErrors, string sheetName, string ngFilePath, string destinationFilePath)
+        {
+            _logger.LogInformation($"The beginning of filling in the cells in the document '{ngFilePath}' on sheet name '{sheetName}'.");
+
+            using XLWorkbook workbook = new(destinationFilePath);
+            XLWorkbook nGWorkbook = null;
+
+            IXLWorksheet nGWorksheet = null;
+
+            if (!File.Exists(ngFilePath))
+            {
+                workbook.SaveAs(ngFilePath);
+            }
+
+            nGWorkbook = new XLWorkbook(ngFilePath);
+
+            nGWorksheet = nGWorkbook.Worksheet(sheetName);
+
+            if (nGWorksheet is null)
+            {
+                throw new Exception($"Не найден лист '{sheetName}' для  того чтобы на нём отметить NG ячейки.");
+            }
+
+            foreach (KeyValuePair<string, CellInfo> validationError in validationErrors)
+            {
+                foreach (CustomError error in validationError.Value.Errors)
+                {
+                    HighlightCell(nGWorksheet, error.Row, error.Column, XLColor.Red);
+                    AddCommentToCell(nGWorksheet, error.Row, error.Column, error.ErrorMessage);
+                }
+            }
+
+            _logger.LogInformation($"Filling in the cells in the document '{ngFilePath}' on sheet name '{sheetName}' completed.");
+
+            nGWorkbook.Save();
+        }
+
+        /// <inheritdoc />
+        public void ExportFile<T>(IEnumerable<T> data, string filePath)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <inheritdoc />
         public object[,] ReadExcelFile(string filePath, string sheetName)
         {
             try
             {
-                _logger.LogInformation($"Начало парсинга файла '{filePath}' с листа '{sheetName}'.");
+                _logger.LogInformation($"The beginning of parsing a file '{filePath}' from a sheet '{sheetName}'.");
 
                 using SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Open(filePath, false);
                 WorkbookPart workbookPart = spreadsheetDocument.WorkbookPart;
@@ -72,8 +136,6 @@ namespace BLL.Services
                         {
                             int currentColumnIndex = GetColumnIndexFromCellReference(cell.CellReference.Value);
 
-                            // Заполняем пустые колонки, если есть смещение
-
                             for (int i = lastColumnIndex + 1; i < currentColumnIndex; i++)
                             {
                                 dataArray[rowIdx, colIdx++] = null;
@@ -91,15 +153,13 @@ namespace BLL.Services
                         rowIdx++;
                     }
 
-                    _logger.LogInformation($"Парсинг файла '{filePath}' с листа '{sheetName}' успешно завершён.");
+                    _logger.LogInformation($"Parsing a file '{filePath}' from a sheet '{sheetName}' completed.");
 
                     return dataArray;
                 }
                 else
                 {
-                    string message = $"Лист '{sheetName}' не найден в документе '{filePath}'.";
-
-                    throw new Exception(message);
+                    throw new Exception($"Sheet '{sheetName}' not found in the document '{filePath}'.");
                 }
             }
             catch (Exception ex)
@@ -111,59 +171,41 @@ namespace BLL.Services
         }
 
         /// <inheritdoc />
-        public bool ValidateExcelDataHeaders(object[,] excelData, int firstRow, List<DocumentContent> content)
+        public bool ValidateExcelDataHeaders(object[,] excelData, int firstRow, List<DocmapperContent> content)
         {
             bool hasError = false;
 
             int row = firstRow - 1;
 
-            _logger.LogInformation($"Начало валидации заголовков на строке №'{row}' в массиве данных '{JsonConvert.SerializeObject(excelData)}");
+            _logger.LogInformation($"The beginning of header validation on a line №'{firstRow}'");
 
-            content = content.OrderBy(item => item.ColumnNumber).ToList();
+            content = content.OrderBy(item => item.ColumnNr).ToList();
 
             for (int i = 0; i < content.Count; i++)
             {
-                DocumentContent contentItem = content[i];
+                DocmapperContent contentItem = content[i];
 
-                if (contentItem.RowNumber is not null)
+                if (contentItem.RowNr is not null)
                 {
                     continue;
                 }
 
-                object cell = excelData[row, contentItem.ColumnNumber - 1];
+                object cell = excelData[row, contentItem.ColumnNr - 1];
 
                 if (cell is not null)
                 {
-                    if (cell.ToString() != contentItem.DocumentColumn.ElementName)
+                    if (!string.Equals(cell?.ToString(), contentItem?.DocmapperColumn?.ElementName, StringComparison.OrdinalIgnoreCase))
                     {
-                        hasError = true;
+                        _logger.LogInformation($"Validation of headers in the file was completed with an error: in place of the expected '{contentItem?.DocmapperColumn?.ElementName}' is located '{cell?.ToString()}'");
 
-                        break;
+                        throw new Exception($"Validation of headers in the file was completed with an error: in place of the expected '{contentItem?.DocmapperColumn?.ElementName}' is located '{cell?.ToString()}'");
                     }
                 }
             }
 
-            _logger.LogInformation($"Валидация завершена с результатом '{!hasError}'.");
+            _logger.LogInformation($"Header validation on a line №'{firstRow}' completed.");
 
             return hasError;
-        }
-
-        private static int GetColumnIndexFromCellReference(string cellReference)
-        {
-            string columnName = Regex.Replace(cellReference, @"\d", string.Empty);
-
-            int index = 0;
-
-            int multiplier = 1;
-
-            foreach (char c in columnName.Reverse())
-            {
-                index += multiplier * (c - 'A' + 1);
-
-                multiplier *= 26;
-            }
-
-            return index;
         }
 
         /// <summary>
@@ -174,18 +216,20 @@ namespace BLL.Services
         /// <returns>Объект WorksheetPart, представляющий лист.</returns>
         private WorksheetPart GetWorksheetPartByName(SpreadsheetDocument spreadsheetDocument, string sheetName)
         {
-            _logger.LogInformation($"Поиск листа '{sheetName}' в документе.");
+            _logger.LogInformation($"Search for the sheet '{sheetName}' in the document.");
 
             IEnumerable<Sheet> sheets = spreadsheetDocument.WorkbookPart.Workbook.Descendants<Sheet>().Where(s => s.Name == sheetName);
 
             if (sheets.Any())
             {
-                _logger.LogInformation($"Лист '{sheetName}' обнаружен.");
+                _logger.LogInformation($"The sheet '{sheetName}' is detected.");
 
                 string relationshipId = sheets.First().Id;
 
                 return (WorksheetPart)spreadsheetDocument.WorkbookPart.GetPartById(relationshipId);
             }
+
+            _logger.LogInformation($"The sheet '{sheetName}' is not detected.");
 
             return null;
         }
@@ -210,6 +254,41 @@ namespace BLL.Services
             {
                 return cell.InnerText;
             }
+        }
+
+        /// <summary>
+        /// Закрашивает ячейку
+        /// </summary>
+        /// <param name="worksheet">Лист документа</param>
+        /// <param name="row">Строка</param>
+        /// <param name="column">Колонка</param>
+        /// <param name="color">Цвет</param>
+        private void HighlightCell(IXLWorksheet worksheet, int row, int column, XLColor color)
+        {
+            _logger.LogInformation($"Starting to fill row '{row}' and column '{column}'");
+
+            worksheet.Cell(row, column).Style.Fill.BackgroundColor = color;
+
+            _logger.LogInformation($"Filling row '{row}' and column '{column}' completed.");
+        }
+
+        /// <summary>
+        /// Добавляет выноску к ячейке с текстом
+        /// </summary>
+        /// <param name="worksheet">Лист документа</param>
+        /// <param name="row">Строка</param>
+        /// <param name="column">Колонка</param>
+        /// <param name="commentText">Комментарий</param>
+        private void AddCommentToCell(IXLWorksheet worksheet, int row, int column, string commentText)
+        {
+            _logger.LogInformation($"Starting to add comment '{commentText}' to row '{row}' and column '{column}'");
+
+            IXLComment comment = worksheet.Cell(row, column).CreateComment();
+            _ = comment.AddText(commentText);
+            _ = comment.SetVisible();
+            comment.FontSize = 10;
+
+            _logger.LogInformation($"Adding comment '{commentText}' to row '{row}' and column '{column}' completed.");
         }
     }
 }

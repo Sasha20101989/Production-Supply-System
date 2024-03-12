@@ -1,5 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using DAL.Models.Contracts;
 
 namespace DAL.Models
 {
@@ -7,35 +9,51 @@ namespace DAL.Models
     /// Представляет информацию о грузосместе.
     /// </summary>
     [Table("tbd_Cases", Schema = "Inbound")]
-    public class Case
+    public class Case : IEntity
     {
+        private TypesOfPacking _packingType;
+
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("Case_Id")]
-        public int CaseId { get; set; }
+        public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Case Number is required.")]
+        [MaxLength(10, ErrorMessage = "Case Number must not exceed 10 characters.")]
         [Column("Case_No")]
-        [MaxLength(10)]
-        public string CaseNo { get; set; }
+        public string CaseNo { get; set; } = null!;
 
+        [Required(ErrorMessage = "Net Weight is required.")]
         [Column("Net_Weight")]
-        public decimal? NetWeight { get; set; }
+        public decimal NetWeight { get; set; }
 
-        [Column("Gross_Wheight")]
-        public decimal? GrossWheight { get; set; }
+        [Required(ErrorMessage = "Gross Weight is required.")]
+        [Column("Gross_Weight")]
+        public decimal GrossWeight { get; set; }
+
+        [Column("Length")]
+        public decimal? Length { get; set; }
+
+        [Column("Width")]
+        public decimal? Width { get; set; }
+
+        [Column("Height")]
+        public decimal? Height { get; set; }
+
+        [Column("Volume")]
+        public decimal? Volume { get; set; }
 
         [Column("Packing_Type_Id")]
         public int? PackingTypeId { get; set; }
 
-        public decimal? Length { get; set; }
-
-        public decimal? Width { get; set; }
-
-        public decimal? Height { get; set; }
-
-        public decimal? Volume { get; set; }
-
-        [ForeignKey("Packing_Type_Id")]
-        public virtual TypeOfPacking TypeOfPacking { get; set; }
+        [ForeignKey("PackingTypeId")]
+        public virtual TypesOfPacking PackingType
+        {
+            get => _packingType;
+            set
+            {
+                _packingType = value;
+                PackingTypeId = value?.Id ?? null;
+            }
+        }
     }
 }

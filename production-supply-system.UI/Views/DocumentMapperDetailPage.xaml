@@ -11,21 +11,25 @@
       xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
       mah:DialogParticipation.Register="{Binding}"
       d:DataContext="{d:DesignInstance Type=viewmodels:DocumentMapperDetailViewModel}"
-      mc:Ignorable="d" 
-      d:DesignHeight="700" d:DesignWidth="1200">
+      mc:Ignorable="d"
+      d:DesignHeight="700"
+      d:DesignWidth="1200">
 
     <Page.Resources>
         <ResourceDictionary>
-            <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+            <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
             <converters:StringToNullableIntConverter x:Key="StringToNullableIntConverter" />
-            <converters:StringToIntConverter x:Key="StringToIntConverter" /> 
+            <converters:StringToIntConverter x:Key="StringToIntConverter" />
             <Style x:Key="AccentCircleButtonStyle"
-                                BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
-                                TargetType="{x:Type ButtonBase}">
-                <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.Accent}" />
+                   BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
+                   TargetType="{x:Type ButtonBase}">
+                <Setter Property="Foreground"
+                        Value="{DynamicResource MahApps.Brushes.Accent}" />
                 <Style.Triggers>
-                    <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Accent}" />
+                    <Trigger Property="IsMouseOver"
+                             Value="True">
+                        <Setter Property="BorderBrush"
+                                Value="{DynamicResource MahApps.Brushes.Accent}" />
                     </Trigger>
                 </Style.Triggers>
             </Style>
@@ -33,66 +37,79 @@
             <DataTemplate x:Key="ItemTemplate">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
                     </Grid.ColumnDefinitions>
 
                     <mah:MetroHeader Grid.Column="0"
-                        Margin="{StaticResource SmallLeftMargin}" 
-                        Header="Название колонки" 
-                        VerticalAlignment="Center">
-                        <TextBox IsEnabled="False" Text="{Binding DocumentColumn.ElementName}" TextWrapping="WrapWithOverflow"/>
+                                     Margin="{StaticResource SmallLeftMargin}"
+                                     Header="{x:Static properties:Resources.DocumentColumnElementName}"
+                                     VerticalAlignment="Center">
+                        <TextBox IsEnabled="False"
+                                 Text="{Binding DocumentColumn.ElementName}"
+                                 TextWrapping="WrapWithOverflow" />
                     </mah:MetroHeader>
                     <mah:MetroHeader Grid.Column="1"
-                        Margin="{StaticResource SmallLeftMargin}" 
-                        Header="Системное название" 
-                        VerticalAlignment="Center">
-                        <TextBox IsEnabled="False" Text="{Binding DocumentColumn.SystemColumnName}" TextWrapping="WrapWithOverflow"/>
+                                     Margin="{StaticResource SmallLeftMargin}"
+                                     Header="{x:Static properties:Resources.DocumentColumnSystemColumnName}"
+                                     VerticalAlignment="Center">
+                        <TextBox IsEnabled="False"
+                                 Text="{Binding DocumentColumn.SystemColumnName}"
+                                 TextWrapping="WrapWithOverflow" />
                     </mah:MetroHeader>
                     <mah:MetroHeader Grid.Column="2"
-                        Margin="{StaticResource SmallLeftMargin}" 
-                        Header="Номер колонки"
-                        VerticalAlignment="Center">
+                                     Margin="{StaticResource SmallLeftMargin}"
+                                     Header="{x:Static properties:Resources.DocumentColumnNumber}"
+                                     VerticalAlignment="Center">
                         <mah:MetroHeader.HeaderTemplate>
                             <DataTemplate>
-                                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                    <iconPacks:PackIconMaterial VerticalAlignment="Center" Kind="RenameBox" />
+                                <StackPanel VerticalAlignment="Center"
+                                            Orientation="Horizontal">
+                                    <iconPacks:PackIconMaterial VerticalAlignment="Center"
+                                                                Kind="RenameBox" />
                                     <TextBlock Margin="{StaticResource SmallLeftMargin}"
                                                VerticalAlignment="Center"
                                                Text="{Binding}" />
                                 </StackPanel>
                             </DataTemplate>
                         </mah:MetroHeader.HeaderTemplate>
-                        <TextBox SpellCheck.IsEnabled="True" Text="{Binding ColumnNumber, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToNullableIntConverter}, ValidatesOnDataErrors=True}" />
+                        <TextBox SpellCheck.IsEnabled="True"
+                                 Text="{Binding ColumnNumber, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToNullableIntConverter}, ValidatesOnDataErrors=True}" />
                     </mah:MetroHeader>
                     <mah:MetroHeader Grid.Column="3"
-                        Margin="{StaticResource SmallLeftMargin}" 
-                        Header="Номер строки" 
-                        VerticalAlignment="Center">
+                                     Margin="{StaticResource SmallLeftMargin}"
+                                     Header="{x:Static properties:Resources.DocumentRowNumber}"
+                                     VerticalAlignment="Center">
                         <mah:MetroHeader.HeaderTemplate>
                             <DataTemplate>
-                                <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                    <iconPacks:PackIconMaterial VerticalAlignment="Center" Kind="RenameBox" />
+                                <StackPanel VerticalAlignment="Center"
+                                            Orientation="Horizontal">
+                                    <iconPacks:PackIconMaterial VerticalAlignment="Center"
+                                                                Kind="RenameBox" />
                                     <TextBlock Margin="{StaticResource SmallLeftMargin}"
                                                VerticalAlignment="Center"
                                                Text="{Binding}" />
                                 </StackPanel>
                             </DataTemplate>
                         </mah:MetroHeader.HeaderTemplate>
-                        <TextBox SpellCheck.IsEnabled="True" Text="{Binding RowNumber, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToNullableIntConverter}, ValidatesOnDataErrors=True}" />
+                        <TextBox SpellCheck.IsEnabled="True"
+                                 Text="{Binding RowNumber, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToNullableIntConverter}, ValidatesOnDataErrors=True}" />
                     </mah:MetroHeader>
                     <Button Grid.Column="4"
-                        Width="28"
-                        Height="28"
-                        Style="{StaticResource AccentCircleButtonStyle}"
-                        ToolTip="Удалить"
-                        Margin="24 16 12 16"
-                        VerticalAlignment="Center"
-                        Command="{Binding RelativeSource={RelativeSource AncestorType=ListView}, Path=DataContext.DeleteDocumentContentItemCommand}" CommandParameter="{Binding}">
-                        <iconPacks:MaterialDesign  Width="18" Height="18" Kind="RemoveCircle" />
+                            Width="28"
+                            Height="28"
+                            Style="{StaticResource AccentCircleButtonStyle}"
+                            ToolTip="{x:Static properties:Resources.ShellDelete}"
+                            Margin="24 16 12 16"
+                            VerticalAlignment="Center"
+                            Command="{Binding RelativeSource={RelativeSource AncestorType=ListView}, Path=DataContext.DeleteDocumentContentItemCommand}"
+                            CommandParameter="{Binding}">
+                        <iconPacks:MaterialDesign  Width="18"
+                                                   Height="18"
+                                                   Kind="RemoveCircle" />
                     </Button>
                 </Grid>
             </DataTemplate>
@@ -107,232 +124,250 @@
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock
-            Style="{StaticResource PageTitleStyle}"
-            Margin="{StaticResource MediumLeftMargin}"
-            Text="{Binding PageTitle}" />
+        <TextBlock Style="{StaticResource PageTitleStyle}"
+                   Margin="{StaticResource MediumLeftMargin}"
+                   Text="{Binding PageTitle}" />
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
 
-            <Expander  
-                    Grid.Column="0"
-                    Margin="{StaticResource SmallLeftTopRightBottomMargin}"
-                    ExpandDirection="Right" 
-                    IsExpanded="True">
-                    <StackPanel
-                    Margin="{StaticResource SmallLeftTopRightBottomMargin}" 
-                    MaxWidth="350" MinWidth="350">
-                        <mah:MetroHeader Margin="{StaticResource SmallLeftTopRightBottomMargin}" Header="Имя шаблона">
-                            <mah:MetroHeader.HeaderTemplate>
-                                <DataTemplate>
-                                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                        <iconPacks:PackIconMaterial VerticalAlignment="Center" Kind="RenameBox" />
-                                        <TextBlock Margin="{StaticResource SmallLeftMargin}"
+            <Expander Grid.Column="0"
+                      Margin="{StaticResource SmallLeftTopRightBottomMargin}"
+                      ExpandDirection="Right"
+                      IsExpanded="True">
+                <StackPanel Margin="{StaticResource SmallLeftTopRightBottomMargin}"
+                            MaxWidth="350"
+                            MinWidth="350">
+                    <mah:MetroHeader Margin="{StaticResource SmallLeftTopRightBottomMargin}"
+                                     Header="{x:Static properties:Resources.DocumentName}">
+                        <mah:MetroHeader.HeaderTemplate>
+                            <DataTemplate>
+                                <StackPanel VerticalAlignment="Center"
+                                            Orientation="Horizontal">
+                                    <iconPacks:PackIconMaterial VerticalAlignment="Center"
+                                                                Kind="RenameBox" />
+                                    <TextBlock Margin="{StaticResource SmallLeftMargin}"
                                                VerticalAlignment="Center"
                                                Text="{Binding}" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </mah:MetroHeader.HeaderTemplate>
-                            <TextBox 
-                        SpellCheck.IsEnabled="True" 
-                        TextWrapping="Wrap"
-                        Text="{Binding DocumentViewModel.DocmapperName, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
-                        </mah:MetroHeader>
-                        <mah:MetroHeader Margin="{StaticResource SmallLeftTopRightBottomMargin}" Header="Папка по умолчанию">
-                            <mah:MetroHeader.HeaderTemplate>
-                                <DataTemplate>
-                                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                        <iconPacks:PackIconMaterial VerticalAlignment="Center" Kind="RenameBox" />
-                                        <TextBlock Margin="{StaticResource SmallLeftMargin}"
+                                </StackPanel>
+                            </DataTemplate>
+                        </mah:MetroHeader.HeaderTemplate>
+                        <TextBox SpellCheck.IsEnabled="True"
+                                 TextWrapping="Wrap"
+                                 Text="{Binding DocumentViewModel.DocmapperName, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
+                    </mah:MetroHeader>
+                    <mah:MetroHeader Margin="{StaticResource SmallLeftTopRightBottomMargin}"
+                                     Header="{x:Static properties:Resources.DefaultFolder}">
+                        <mah:MetroHeader.HeaderTemplate>
+                            <DataTemplate>
+                                <StackPanel VerticalAlignment="Center"
+                                            Orientation="Horizontal">
+                                    <iconPacks:PackIconMaterial VerticalAlignment="Center"
+                                                                Kind="RenameBox" />
+                                    <TextBlock Margin="{StaticResource SmallLeftMargin}"
                                                VerticalAlignment="Center"
                                                Text="{Binding}" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </mah:MetroHeader.HeaderTemplate>
-                            <TextBox 
-                         TextWrapping="Wrap"
-                         SpellCheck.IsEnabled="True" 
-                         Text="{Binding DocumentViewModel.DefaultFolder, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
-                        </mah:MetroHeader>
-                        <mah:MetroHeader Margin="{StaticResource SmallLeftTopRightBottomMargin}" Header="Название листа">
-                            <mah:MetroHeader.HeaderTemplate>
-                                <DataTemplate>
-                                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                        <iconPacks:PackIconMaterial VerticalAlignment="Center" Kind="RenameBox" />
-                                        <TextBlock Margin="{StaticResource SmallLeftMargin}"
+                                </StackPanel>
+                            </DataTemplate>
+                        </mah:MetroHeader.HeaderTemplate>
+                        <TextBox TextWrapping="Wrap"
+                                 SpellCheck.IsEnabled="True"
+                                 Text="{Binding DocumentViewModel.DefaultFolder, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
+                    </mah:MetroHeader>
+                    <mah:MetroHeader Margin="{StaticResource SmallLeftTopRightBottomMargin}"
+                                     Header="{x:Static properties:Resources.SheetName}">
+                        <mah:MetroHeader.HeaderTemplate>
+                            <DataTemplate>
+                                <StackPanel VerticalAlignment="Center"
+                                            Orientation="Horizontal">
+                                    <iconPacks:PackIconMaterial VerticalAlignment="Center"
+                                                                Kind="RenameBox" />
+                                    <TextBlock Margin="{StaticResource SmallLeftMargin}"
                                                VerticalAlignment="Center"
                                                Text="{Binding}" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </mah:MetroHeader.HeaderTemplate>
-                            <TextBox
-                         TextWrapping="Wrap"
-                         SpellCheck.IsEnabled="True" 
-                         Text="{Binding DocumentViewModel.SheetName, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
-                        </mah:MetroHeader>
-                        <mah:MetroHeader Margin="{StaticResource SmallLeftTopRightBottomMargin}" Header="Номер строки с которой начинаются данные">
-                            <mah:MetroHeader.HeaderTemplate>
-                                <DataTemplate>
-                                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
-                                        <iconPacks:PackIconMaterial VerticalAlignment="Center" Kind="RenameBox" />
-                                        <TextBlock Margin="{StaticResource SmallLeftMargin}"
+                                </StackPanel>
+                            </DataTemplate>
+                        </mah:MetroHeader.HeaderTemplate>
+                        <TextBox TextWrapping="Wrap"
+                                 SpellCheck.IsEnabled="True"
+                                 Text="{Binding DocumentViewModel.SheetName, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
+                    </mah:MetroHeader>
+                    <mah:MetroHeader Margin="{StaticResource SmallLeftTopRightBottomMargin}"
+                                     Header="{x:Static properties:Resources.FirstDataRow}">
+                        <mah:MetroHeader.HeaderTemplate>
+                            <DataTemplate>
+                                <StackPanel VerticalAlignment="Center"
+                                            Orientation="Horizontal">
+                                    <iconPacks:PackIconMaterial VerticalAlignment="Center"
+                                                                Kind="RenameBox" />
+                                    <TextBlock Margin="{StaticResource SmallLeftMargin}"
                                                VerticalAlignment="Center"
                                                Text="{Binding}" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </mah:MetroHeader.HeaderTemplate>
-                        <TextBox Text="{Binding DocumentViewModel.FirstDataRow, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToIntConverter}, ValidatesOnDataErrors=True}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </mah:MetroHeader.HeaderTemplate>
+                        <TextBox Text="{Binding DocumentViewModel.FirstDataRow, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToIntConverter}, ValidatesOnDataErrors=True}" />
                     </mah:MetroHeader>
                     <mah:ToggleSwitch Margin="{StaticResource SmallLeftTopRightBottomMargin}"
-                                  Command="{Binding IsActiveCommand}"
-                                  CommandParameter="{Binding}"
-                                  IsOn="{Binding DocumentViewModel.IsActive, UpdateSourceTrigger=PropertyChanged}"
-                                  OffContent="Не активен"
-                                  OnContent="Активен" />
-                    </StackPanel>
-                </Expander>
+                                      Command="{Binding IsActiveCommand}"
+                                      CommandParameter="{Binding}"
+                                      IsOn="{Binding DocumentViewModel.IsActive, UpdateSourceTrigger=PropertyChanged}"
+                                      OffContent="{x:Static properties:Resources.ShellNoActive}"
+                                      OnContent="{x:Static properties:Resources.ShellActive}" />
+                </StackPanel>
+            </Expander>
 
-            <Expander   
-                    Grid.Column="1"
-                    Margin="{StaticResource SmallLeftTopRightBottomMargin}"
-                    ExpandDirection="Right" 
-                    IsExpanded="True">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="auto"/>
-                        </Grid.RowDefinitions>
-                        <ListView Grid.Row="0" ItemsSource="{Binding DocumentColumns}">
-                            <ListView.View>
-                                <GridView ColumnHeaderContainerStyle="{StaticResource MahApps.Styles.Button.Chromeless}">
-                                    <GridViewColumn DisplayMemberBinding="{Binding ElementName}"/>
-                                    <GridViewColumn>
-                                        <GridViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal" Height="40">
-                                                    <Button  Width="20" Height="20"
-                                                ToolTip="Использовать"
-                                                Command="{Binding DataContext.AddNewDocumentContentItemCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
-                                                CommandParameter="{Binding}">
-                                                        <iconPacks:MaterialDesign Kind="NavigateNext"/>
-                                                        <Button.Style>
-                                                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource AccentCircleButtonStyle}">
-                                                                <Setter Property="Visibility" Value="Hidden" />
-                                                                <Style.Triggers>
-                                                                    <DataTrigger  
-                                                                Binding="{Binding IsMouseOver, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}}"
-                                                                Value="True">
-                                                                        <Setter Property="Visibility" Value="Visible" />
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </Button.Style>
-                                                    </Button>
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </GridViewColumn.CellTemplate>
-                                    </GridViewColumn>
-                                </GridView>
-                            </ListView.View>
-                        </ListView>
-                        <mah:FlyoutsControl Grid.Row="0" Grid.RowSpan="3" Visibility="{Binding AddNewFlyoutIsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
-                        <mah:Flyout 
-                                Margin="{StaticResource SmallBottomMargin}"
-                                Width="350"
-                                mah:ControlsHelper.ContentCharacterCasing="Upper"
-                                AreAnimationsEnabled="True"
-                                FocusedElement="{Binding ElementName=firstTB}"
-                                Position="Right"
-                                IsOpen="{Binding AddNewFlyoutIsOpen}"
-                                CloseCommand="{Binding CloseAddNewFlyoutCommand}"
-                                Header="Новый элемент контента">
+            <Expander Grid.Column="1"
+                      Margin="{StaticResource SmallLeftTopRightBottomMargin}"
+                      ExpandDirection="Right"
+                      IsExpanded="True">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <ListView Grid.Row="0"
+                              ItemsSource="{Binding DocumentColumns}">
+                        <ListView.View>
+                            <GridView ColumnHeaderContainerStyle="{StaticResource MahApps.Styles.Button.Chromeless}">
+                                <GridViewColumn>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding ElementName}"
+                                                       ToolTip="{Binding SystemColumnName}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal"
+                                                        Height="40">
+                                                <Button Width="20"
+                                                        Height="20"
+                                                        ToolTip="{x:Static properties:Resources.ShellUse}"
+                                                        Command="{Binding DataContext.AddNewDocumentContentItemCommand, RelativeSource={RelativeSource AncestorType=ListView}}"
+                                                        CommandParameter="{Binding}">
+                                                    <iconPacks:MaterialDesign Kind="NavigateNext" />
+                                                    <Button.Style>
+                                                        <Style TargetType="{x:Type Button}"
+                                                               BasedOn="{StaticResource AccentCircleButtonStyle}">
+                                                            <Setter Property="Visibility"
+                                                                    Value="Hidden" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger
+                                                                        Binding="{Binding IsMouseOver, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListViewItem}}}"
+                                                                             Value="True">
+                                                                    <Setter Property="Visibility"
+                                                                            Value="Visible" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Button.Style>
+                                                </Button>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                    <mah:FlyoutsControl Grid.Row="0"
+                                        Grid.RowSpan="3"
+                                        Visibility="{Binding AddNewFlyoutIsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <mah:Flyout Margin="{StaticResource SmallBottomMargin}"
+                                    Width="350"
+                                    mah:ControlsHelper.ContentCharacterCasing="Upper"
+                                    AreAnimationsEnabled="True"
+                                    FocusedElement="{Binding ElementName=firstTB}"
+                                    Position="Right"
+                                    IsOpen="{Binding AddNewFlyoutIsOpen}"
+                                    CloseCommand="{Binding CloseAddNewFlyoutCommand}"
+                                    Header="{x:Static properties:Resources.DocumentNewContent}">
                             <Grid Margin="10">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*" />
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
-                                <TextBlock 
-                                    Margin="{StaticResource SmallTopBottomMargin}"
-                                    Text="Тут вы можете добавить новый элемент контента."
-                                    TextWrapping="Wrap" />
-                                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                <TextBlock Margin="{StaticResource SmallTopBottomMargin}"
+                                           Text="{x:Static properties:Resources.DocumentNewContentTitle}"
+                                           TextWrapping="Wrap" />
+                                <ScrollViewer Grid.Row="1"
+                                              VerticalScrollBarVisibility="Auto">
                                     <StackPanel Orientation="Vertical">
-                                        <TextBox 
-                                            x:Name="firstTB" 
-                                            mah:TextBoxHelper.Watermark="Название элемента..." 
-                                            TextWrapping="Wrap"
-                                            Text="{Binding DocumentColumnViewModel.ElementName, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"/>
-                                        <TextBox 
-                                            Margin="{StaticResource SmallTopMargin}" 
-                                            mah:TextBoxHelper.Watermark="Системное название..." 
-                                            TextWrapping="Wrap"
-                                            Text="{Binding DocumentColumnViewModel.SystemColumnName, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <TextBox x:Name="firstTB"
+                                                 mah:TextBoxHelper.Watermark="{x:Static properties:Resources.DocumentColumnElementName}"
+                                                 TextWrapping="Wrap"
+                                                 Text="{Binding DocumentColumnViewModel.ElementName, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
+                                        <TextBox Margin="{StaticResource SmallTopMargin}"
+                                                 mah:TextBoxHelper.Watermark="{x:Static properties:Resources.DocumentColumnSystemColumnName}"
+                                                 TextWrapping="Wrap"
+                                                 Text="{Binding DocumentColumnViewModel.SystemColumnName, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
                                     </StackPanel>
                                 </ScrollViewer>
-                                <UniformGrid Grid.Row="2" Columns="2" Margin="{StaticResource SmallLeftTopRightBottomMargin}">
-                                    <Button 
-                                        IsEnabled="{Binding DocumentColumnViewModel.HasErrors, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
-                                        Command="{Binding AddNewColumnCommand}" 
-                                        Margin="{StaticResource SmallLeftTopRightBottomMargin}" 
-                                        Content="{x:Static properties:Resources.ShellSaveButton}" 
-                                        Style="{DynamicResource MahApps.Styles.Button.Dialogs.AccentHighlight}" />
-                                    <Button 
-                                        Command="{Binding CloseAddNewFlyoutCommand}" 
-                                        Margin="{StaticResource SmallLeftTopRightBottomMargin}" 
-                                        Content="{x:Static properties:Resources.ShellCancelButton}" 
-                                        Style="{DynamicResource MahApps.Styles.Button.Dialogs}" />
+                                <UniformGrid Grid.Row="2"
+                                             Columns="2"
+                                             Margin="{StaticResource SmallLeftTopRightBottomMargin}">
+                                    <Button
+                                            IsEnabled="{Binding DocumentColumnViewModel.HasErrors, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
+                                            Command="{Binding AddNewColumnCommand}"
+                                            Margin="{StaticResource SmallLeftTopRightBottomMargin}"
+                                            Content="{x:Static properties:Resources.ShellSaveButton}"
+                                            Style="{DynamicResource MahApps.Styles.Button.Dialogs.AccentHighlight}" />
+                                    <Button Command="{Binding CloseAddNewFlyoutCommand}"
+                                            Margin="{StaticResource SmallLeftTopRightBottomMargin}"
+                                            Content="{x:Static properties:Resources.ShellCancelButton}"
+                                            Style="{DynamicResource MahApps.Styles.Button.Dialogs}" />
                                 </UniformGrid>
                             </Grid>
                         </mah:Flyout>
                     </mah:FlyoutsControl>
-                    <Button 
-                        Grid.Row="1" 
-                        Style="{StaticResource AccentCircleButtonStyle}" 
-                        Margin="{StaticResource SmallLeftTopRightBottomMargin}" 
-                        HorizontalAlignment="Right"
-                        Width="25"
-                        Height="25"
-                        ToolTip="Добавить новый элемент"
-                        Command="{Binding OpenAddNewFlyoutCommand}">
-                        <iconPacks:PackIconMaterial VerticalAlignment="Center" Kind="Plus" />
+                    <Button Grid.Row="1"
+                            Style="{StaticResource AccentCircleButtonStyle}"
+                            Margin="{StaticResource SmallLeftTopRightBottomMargin}"
+                            HorizontalAlignment="Right"
+                            Width="25"
+                            Height="25"
+                            ToolTip="{x:Static properties:Resources.ShellAdd}"
+                            Command="{Binding OpenAddNewFlyoutCommand}">
+                        <iconPacks:PackIconMaterial VerticalAlignment="Center"
+                                                    Kind="Plus" />
                     </Button>
-                    </Grid>
-                </Expander>
+                </Grid>
+            </Expander>
 
-            <ListView 
-                Grid.Column="2"
-                VerticalAlignment="Top"
-                Margin="{StaticResource SmallLeftTopRightBottomMargin}"
-                HorizontalAlignment="Stretch"
-                ItemsSource="{Binding DocumentContent}"
-                ItemTemplate="{StaticResource ItemTemplate}">
-                <!--<i:Interaction.Behaviors>
-                    <behaviors:WrapPanelExpanderBehavior TargetIndex="0" TargetWrapPanel="{Binding ElementName=expandedContentDocumentWrapPanel}"/>
-                </i:Interaction.Behaviors>-->
+            <ListView Grid.Column="2"
+                      VerticalAlignment="Top"
+                      Margin="{StaticResource SmallLeftTopRightBottomMargin}"
+                      HorizontalAlignment="Stretch"
+                      ItemsSource="{Binding DocumentContent}"
+                      ItemTemplate="{StaticResource ItemTemplate}">
             </ListView>
 
-            <Separator Grid.Row="1" Grid.ColumnSpan="3" Margin="{StaticResource SmallLeftTopRightBottomMargin}"/>
+            <Separator Grid.Row="1"
+                       Grid.ColumnSpan="3"
+                       Margin="{StaticResource SmallLeftTopRightBottomMargin}" />
 
-            <WrapPanel HorizontalAlignment="Right" Grid.Row="2" Grid.ColumnSpan="3">
-                <Button 
-                HorizontalAlignment="Right"
-                Content="{x:Static properties:Resources.ShellSaveButton}" 
-                Command="{Binding SaveDocumentCommand}"
-                IsEnabled="{Binding HasErrors, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
-                Margin="{StaticResource SmallLeftTopRightBottomMargin}"
-                Style="{StaticResource MahApps.Styles.Button.Dialogs.Accent}"/>
+            <WrapPanel HorizontalAlignment="Right"
+                       Grid.Row="2"
+                       Grid.ColumnSpan="3">
+                <Button HorizontalAlignment="Right"
+                        Content="{x:Static properties:Resources.ShellSaveButton}"
+                        Command="{Binding SaveDocumentCommand}"
+                        IsEnabled="{Binding HasErrors, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
+                        Margin="{StaticResource SmallLeftTopRightBottomMargin}"
+                        Style="{StaticResource MahApps.Styles.Button.Dialogs.Accent}" />
             </WrapPanel>
         </Grid>
 

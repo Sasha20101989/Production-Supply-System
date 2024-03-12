@@ -13,7 +13,7 @@ namespace DAL.Enums
         /// <summary>
         /// Получение пользователя по учетной записи.
         /// </summary>
-        [Description("Get_User_By_Account")]
-        GetUserByAccount,
+        [Description("Get_All_Users")]
+        GetAllUsers,
     }
 }

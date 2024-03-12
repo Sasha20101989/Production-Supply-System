@@ -69,7 +69,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
         public ICommand SetThemeCommand { get; }
 
-        public ICommand LogOutCommand { get; } 
+        public ICommand LogOutCommand { get; }
 
         public void OnNavigatedTo(object parameter)
         {

@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using BLL.Services;
-using DAL.Models.Docmapper;
+
+using DAL.Models.Document;
+
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
@@ -61,13 +63,13 @@ namespace production_supply_system.TEST.BLL.Services
 
             object[,] excelData = new object[,] { { "Header1", "Header2" }, { "Value1", "Value2" } };
 
-            int? firstRow = 1;
+            int firstRow = 1;
 
-            List<DocumentContent> content = new()
+            List<DocmapperContent> content = new()
             {
-                new DocumentContent { DocumentColumn = new DocumentColumn { ElementName = "Header1" }, ColumnNumber = 1 },
+                new DocmapperContent { DocmapperColumn = new DocmapperColumn { ElementName = "Header1" }, ColumnNr = 1 },
 
-                new DocumentContent { DocumentColumn = new DocumentColumn { ElementName = "Header2" }, ColumnNumber = 2 }
+                new DocmapperContent { DocmapperColumn = new DocmapperColumn { ElementName = "Header2" }, ColumnNr = 2 }
             };
 
             // Act
@@ -88,13 +90,13 @@ namespace production_supply_system.TEST.BLL.Services
 
             object[,] excelData = new object[,] { { "InvalidHeader1", "Header2" }, { "Value1", "Value2" } };
 
-            int? firstRow = 1;
+            int firstRow = 1;
 
-            List<DocumentContent> content = new()
+            List<DocmapperContent> content = new()
             {
-                new DocumentContent { DocumentColumn = new DocumentColumn { ElementName = "Header1" }, ColumnNumber = 1 },
+                new DocmapperContent { DocmapperColumn = new DocmapperColumn { ElementName = "Header1" }, ColumnNr = 1 },
 
-                new DocumentContent { DocumentColumn = new DocumentColumn { ElementName = "Header2" }, ColumnNumber = 2 }
+                new DocmapperContent { DocmapperColumn = new DocmapperColumn { ElementName = "Header2" }, ColumnNr = 2 }
             };
 
             // Act

@@ -4,6 +4,37 @@ CHANGELOG
 
 ### Added 
 
+ - f47b8d5 - Added static names - ALEKSANDR FELYUGIN
+ - 7747ee1 - Added logging - ALEKSANDR FELYUGIN
+ - c729f27 - Added static parameters - ALEKSANDR FELYUGIN
+ - bec011b - Added lot list - ALEKSANDR FELYUGIN
+ - fb8749e - Added lot list page - ALEKSANDR FELYUGIN
+ - 03678ff - Added filters - ALEKSANDR FELYUGIN
+ - c3b0125 - Added filters for parts - ALEKSANDR FELYUGIN
+ - 5420878 - Added parts - ALEKSANDR FELYUGIN
+ - b7c06cf - Added edit page - ALEKSANDR FELYUGIN
+ - cd70713 - Added edit view - ALEKSANDR FELYUGIN
+ - ae3cbe8 - Added excel color - ALEKSANDR FELYUGIN
+ - 521dea0 - Added tracing - ALEKSANDR FELYUGIN
+ - 9f4cd97 - Added tracing - ALEKSANDR FELYUGIN
+ - 322c3aa - Added invoice - ALEKSANDR FELYUGIN
+ - 72b2250 - added mode functionality - ALEKSANDR FELYUGIN
+ - 5e386cf - added case - ALEKSANDR FELYUGIN
+ - 0d826c5 - Added case - ALEKSANDR FELYUGIN
+ - 07f4349 - Added containers in db - ALEKSANDR FELYUGIN
+ - 8d919a1 - Added container type parser - ALEKSANDR FELYUGIN
+ - 650f233 - Added create lot - ALEKSANDR FELYUGIN
+ - 12a2fa6 - Added exceptions - ALEKSANDR FELYUGIN
+ - 11ffc27 - Added exceptions - ALEKSANDR FELYUGIN
+ - f58151b - Added Exceptions - ALEKSANDR FELYUGIN
+ - 932320d - Added eXCEPTIONS - ALEKSANDR FELYUGIN
+ - b54d9a2 - Added logs - ALEKSANDR FELYUGIN
+ - aeaa73f - Added messages - ALEKSANDR FELYUGIN
+ - dc8ade8 - Added more functionality - ALEKSANDR FELYUGIN
+ - dbfdb36 - Added props dates - ALEKSANDR FELYUGIN
+ - 2cbe4e4 - Added props - ALEKSANDR FELYUGIN
+ - 8c6f965 - Added abstraction - ALEKSANDR FELYUGIN
+ - 2bd4e19 - Added static service - ALEKSANDR FELYUGIN
  - 9ec4d5b - Added mapping - ru13779
  - 497ca75 - Added file validation page - ru13779
  - de152a1 - Added parser - ru13779
@@ -33,6 +64,20 @@ CHANGELOG
 
 ### Changed 
 
+ - 74ae0f1 - Changed viewmodel - ALEKSANDR FELYUGIN
+ - 1f924db - Changed wrap panel position - ALEKSANDR FELYUGIN
+ - 934b68d - Changed style Flyouts - ALEKSANDR FELYUGIN
+ - c375626 - Changed types of part - ALEKSANDR FELYUGIN
+ - 44c2851 - Changed validation - ALEKSANDR FELYUGIN
+ - 30eb88c - changed vin containers part 1 - ALEKSANDR FELYUGIN
+ - 4846088 - Changed part in invoice - ALEKSANDR FELYUGIN
+ - e135b95 - Changed tracing - ALEKSANDR FELYUGIN
+ - c22521d - Changed: start validate rows - ALEKSANDR FELYUGIN
+ - f45b07d - Changed mode functionality - ALEKSANDR FELYUGIN
+ - bae6183 - Changed validation - ALEKSANDR FELYUGIN
+ - 4b84352 - Changed methods access data - ALEKSANDR FELYUGIN
+ - 21e01b7 - Changed schema models - ALEKSANDR FELYUGIN
+ - 3dbb4fd - Changed models - ru13779
  - be8ef20 - Changed fill ng table - ru13779
  - 3b59d09 - Changed validation - ru13779
  - 1989718 - Changed Master - ru13779

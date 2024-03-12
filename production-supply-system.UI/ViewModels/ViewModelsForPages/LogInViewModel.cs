@@ -43,6 +43,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
             {
                 LoginResultType.Unauthorized => Resources.StatusUnauthorized,
                 LoginResultType.UnknownError => Resources.StatusUnknownError,
+                LoginResultType.NotConnectionToDb => Resources.StatusNotConnectionToDb,
                 LoginResultType.Success or LoginResultType.CancelledByUser => string.Empty,
                 _ => string.Empty,
             };

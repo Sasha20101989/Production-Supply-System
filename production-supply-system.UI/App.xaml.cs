@@ -4,15 +4,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Windows.Threading;
-using UI_Interface.Views;
 using NLog.Extensions.Logging;
 using System.IO;
-using PageManager.WPF;
 using UI_Interface.Services;
 using Cache.Manager.WPF;
-using UI_Interface.ViewModels.ViewModelsForPages;
-using UI_Interface.ViewModels;
 using UI_Interface.HostBuilders;
+using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
 
 namespace UI_Interface
 {
@@ -65,9 +63,9 @@ namespace UI_Interface
                 _ = builder.AddNLog();
             });
 
-            _ = services.AddRepositories();
-
             _ = services.AddSqlServerData();
+
+            _ = services.ConfigureSqlServerData();
 
             _ = services.AddBusinessLogic();
 
@@ -75,19 +73,6 @@ namespace UI_Interface
             
             _ = services.AddUiServices();
         }
-
-        //public static void ConfigurePages(IHost host)
-        //{
-        //    IPageManager pageService = host.Services.GetService<IPageManager>();
-
-        //    pageService.Configure<MainViewModel, MainPage>();
-        //    pageService.Configure<SettingsViewModel, SettingsPage>();
-        //    pageService.Configure<DocumentMapperViewModel, DocumentMapperPage>();
-        //    pageService.Configure<DocumentMapperDetailViewModel, DocumentMapperDetailPage>();
-        //    pageService.Configure<DeliveryPageViewModel, DeliveryPage>();
-        //    pageService.Configure<MasterViewModel, MasterPage>();
-        //    pageService.Configure<FileValidationViewModel, FileValidationPage>();
-        //}
 
         public async void OnExit(object sender, ExitEventArgs e)
         {
@@ -100,7 +85,10 @@ namespace UI_Interface
         {
             ILogger<App> logger = _host.Services.GetRequiredService<ILogger<App>>();
 
-            logger.LogError(e.Exception, "Unhandled exception occured");
+            logger.LogError($"Unhandled exception occured: {e.Exception}");
+
+            //TODO: Убрать в продакшене
+            e.Handled = true;
         }
     }
 }

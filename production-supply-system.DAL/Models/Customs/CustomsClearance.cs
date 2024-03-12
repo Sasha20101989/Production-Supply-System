@@ -2,6 +2,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+using DAL.Enums;
+using DAL.Models.Contracts;
+
 namespace DAL.Models
 {
     /// <summary>
@@ -9,58 +12,80 @@ namespace DAL.Models
     /// </summary>
     /// 
     [Table("tbd_Customs_Clearance", Schema = "Customs")]
-    public class CustomsClearance
+    public class CustomsClearance : IEntity
     {
+        private TypesOfPart _partType;
+
+        private ContainersInLot _container;
+
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("Customs_Clearance_Id")]
-        public int CustomsClearanceId { get; set; }
+        public int Id { get; set; }
 
-        [Required(ErrorMessage = "Поле 'Container_In_Lot_Id' обязательно для заполнения.")]
+        [Required(ErrorMessage = "Container In Lot Id is required.")]
         [Column("Container_In_Lot_Id")]
         public int ContainerInLotId { get; set; }
 
+        [MaxLength(50, ErrorMessage = "Invoice Number must not exceed 50 characters.")]
         [Column("Invoce_Number")]
-        [MaxLength(50, ErrorMessage = "Максимальная длина 'Invoce_Number' - 50 символов.")]
-        public string InvoiceNumber { get; set; }
+        public string? InvoceNumber { get; set; }
 
-        [DataType(DataType.Date)]
+        [Display(Name = "Docs To Customs Date")]
         [Column("Docs_To_Customs_Date")]
         public DateTime? DocsToCustomsDate { get; set; }
 
+        [MaxLength(20, ErrorMessage = "AEO Obligation Number must not exceed 20 characters.")]
         [Column("AEO_Obbligation_Number")]
-        [MaxLength(20, ErrorMessage = "Максимальная длина 'AEO_Obbligation_Number' - 20 символов.")]
-        public string? AEOObbligationNumber { get; set; }
+        public string? AeoObbligationNumber { get; set; }
 
-        [DataType(DataType.Date)]
+        [Display(Name = "AEO Obligation Release Date")]
         [Column("AEO_Obbligation_Release_Date")]
-        public DateTime? AEOObbligationReleaseDate { get; set; }
+        public DateTime? AeoObbligationReleaseDate { get; set; }
 
+        [MaxLength(20, ErrorMessage = "CCD Number must not exceed 20 characters.")]
         [Column("CCD_Number")]
-        [MaxLength(20, ErrorMessage = "Максимальная длина 'CCD_Number' - 20 символов.")]
-        public string? CCDNumber { get; set; }
+        public string? CcdNumber { get; set; }
 
-        [DataType(DataType.Date)]
+        [Display(Name = "CCD Release Date")]
         [Column("CCD_Release_Date")]
-        public DateTime? CCDReleaseDate { get; set; }
+        public DateTime? CcdReleaseDate { get; set; }
 
+        [Display(Name = "Customs Inspection Need")]
         [Column("Customs_Inpection_Need")]
         public bool? CustomsInpectionNeed { get; set; }
 
-        [DataType(DataType.Date)]
+        [Display(Name = "EDocuments To Be Provided Date")]
         [Column("EDocuments_To_Be_Provided_Date")]
-        public DateTime? EDocumentsToBeProvidedDate { get; set; }
+        public DateTime? EdocumentsToBeProvidedDate { get; set; }
 
-        [DataType(DataType.Date)]
+        [Display(Name = "EDocuments To Be Received Date")]
         [Column("EDocuments_To_Be_Received_Date")]
-        public DateTime? EDocumentsToBeReceivedDate { get; set; }
+        public DateTime? EdocumentsToBeReceivedDate { get; set; }
 
-        [Column("Part_Type_Id")]
+        [Display(Name = "Part Type")]
+        [ForeignKey("PartTypeId")]
         public int? PartTypeId { get; set; }
 
-        [ForeignKey("Container_In_Lot_Id")]
-        public virtual ContainerInLot ContainerInLot { get; set; }
+        [ForeignKey("ContainerInLotId")]
+        public virtual ContainersInLot ContainersInLot
+        {
+            get => _container;
+            set
+            {
+                _container = value;
+                ContainerInLotId = value?.Id ?? 0;
+            }
+        }
 
-        [ForeignKey("Part_Type_Id")]
-        public virtual TypeOfPart PartType { get; set; }
+        [ForeignKey("PartTypeId")]
+        public virtual TypesOfPart PartType
+        {
+            get => _partType;
+            set
+            {
+                _partType = value;
+                PartTypeId = value?.Id ?? null;
+            }
+        }
     }
 }

@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using DAL.Models;
-
 namespace DAL.DbAccess.Contracts
 {
     /// <summary>
@@ -19,7 +17,7 @@ namespace DAL.DbAccess.Contracts
         /// <param name="parameters">Необязательные параметры хранимой процедуры.</param>
         /// <param name="connectionId">Идентификатор соединения из appsettings.json.</param>
         /// <returns>Задача, представляющая асинхронную операцию, возвращающую загруженные данные.</returns>
-        Task<IEnumerable<T>> LoadDataWithReturn<T>(Enum storedProcedure, object parameters = null, string connectionId = "Default");
+        Task<IEnumerable<T>> LoadDataWithReturnAsync<T>(Enum storedProcedure, object parameters = null, string connectionId = "Default");
 
         /// <summary>
         /// Загружает данные из базы данных.
@@ -29,7 +27,7 @@ namespace DAL.DbAccess.Contracts
         /// <param name="parameters">Необязательные параметры хранимой процедуры.</param>
         /// <param name="connectionId">Идентификатор соединения из appsettings.json.</param>
         /// <returns>Задача, представляющая асинхронную операцию, возвращающую загруженные данные.</returns>
-        Task<IEnumerable<T>> LoadData<T>(Enum storedProcedure, object parameters = null, string connectionId = "Default");
+        Task<IEnumerable<T>> LoadDataAsync<T>(Enum storedProcedure, object parameters = null, string connectionId = "Default");
 
         /// <summary>
         /// Сохраняет данные в базу данных.
@@ -38,6 +36,13 @@ namespace DAL.DbAccess.Contracts
         /// <param name="parameters">Необязательные параметры хранимой процедуры.</param>
         /// <param name="connectionId">Идентификатор соединения из appsettings.json.</param>
         /// <returns>Задача, представляющая асинхронную операцию.</returns>
-        Task SaveData(Enum storedProcedure, object parameters = null, string connectionId = "Default");
+        Task SaveDataAsync(Enum storedProcedure, object parameters = null, string connectionId = "Default");
+
+        /// <summary>
+        /// Тестирует соединение с базой данных.
+        /// </summary>
+        /// <param name="connectionId">Идентификатор соединения из appsettings.json.</param>
+        /// <returns></returns>
+        Task<bool> TestConnectionAsync(string connectionId = "Default");
     }
 }

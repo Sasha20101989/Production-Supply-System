@@ -12,32 +12,22 @@
       xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
       d:DataContext="{d:DesignInstance Type=viewmodels:DocumentMapperViewModel}"
       mah:DialogParticipation.Register="{Binding}"
-      mc:Ignorable="d" 
-      d:DesignHeight="700" d:DesignWidth="1200">
+      mc:Ignorable="d"
+      d:DesignHeight="700"
+      d:DesignWidth="1200">
 
     <Page.Resources>
-        <Style x:Key="AccentCircleButtonStyle"
-                           BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
-                           TargetType="{x:Type ButtonBase}">
-            <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.Accent}" />
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.Accent}" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
         <DataTemplate x:Key="contentGridItemTemplate">
-            <Grid
-                Width="160"
-                Height="160"
-                Background="{DynamicResource MahApps.Brushes.Gray10}">
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{StaticResource MediumLeftTopRightBottomMargin}">
-                    <TextBlock
-                        Margin="{StaticResource XXSmallTopMargin}"
-                        HorizontalAlignment="Center"
-                        Style="{StaticResource BodyTextStyle}"
-                        Text="{Binding DocmapperName}" />
+            <Grid Width="160"
+                  Height="160"
+                  Background="{DynamicResource MahApps.Brushes.Gray10}">
+                <StackPanel HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Margin="{StaticResource MediumLeftTopRightBottomMargin}">
+                    <TextBlock Margin="{StaticResource XXSmallTopMargin}"
+                               HorizontalAlignment="Center"
+                               Style="{StaticResource BodyTextStyle}"
+                               Text="{Binding DocmapperName}" />
                 </StackPanel>
             </Grid>
         </DataTemplate>
@@ -50,46 +40,42 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <TextBlock
-            HorizontalAlignment="Left"
-            Style="{StaticResource PageTitleStyle}"
-            Margin="{StaticResource MediumLeftMargin}"
-            Text="{x:Static properties:Resources.ShellDocumentMapperPage}" />
+        <TextBlock HorizontalAlignment="Left"
+                   Style="{StaticResource PageTitleStyle}"
+                   Margin="{StaticResource MediumLeftMargin}"
+                   Text="{x:Static properties:Resources.ShellDocumentMapperPage}" />
 
-        <TextBox 
-            MinWidth="300"
-            HorizontalAlignment="Right" 
-            Margin="{StaticResource SmallLeftTopRightBottomMargin}" 
-            mah:TextBoxHelper.Watermark="Поиск шаблона..."                                             
-            Style="{StaticResource MahApps.Styles.TextBox.Search}"
-            TextWrapping="Wrap"
-            Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBox MinWidth="300"
+                 HorizontalAlignment="Right"
+                 Margin="{StaticResource SmallLeftTopRightBottomMargin}"
+                 mah:TextBoxHelper.Watermark="{x:Static properties:Resources.ShellSearch}"
+                 Style="{StaticResource MahApps.Styles.TextBox.Search}"
+                 TextWrapping="Wrap"
+                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
 
-        <Grid Grid.Row="1" >
-            <ListView
-                Margin="{StaticResource SmallLeftMargin}"
-                SelectionMode="Single"
-                ItemsSource="{Binding Source}"
-                Style="{StaticResource ContentGridListViewStyle}"
-                ItemTemplate="{StaticResource contentGridItemTemplate}">
+        <Grid Grid.Row="1">
+            <ListView Margin="{StaticResource SmallLeftMargin}"
+                      SelectionMode="Single"
+                      ItemsSource="{Binding Source}"
+                      Style="{StaticResource ContentGridListViewStyle}"
+                      ItemTemplate="{StaticResource contentGridItemTemplate}">
                 <ListView.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal"/>
+                        <WrapPanel Orientation="Horizontal" />
                     </ItemsPanelTemplate>
                 </ListView.ItemsPanel>
                 <i:Interaction.Behaviors>
                     <behaviors:ListViewItemSelectionBehavior Command="{Binding NavigateToDetailCommand}" />
                 </i:Interaction.Behaviors>
             </ListView>
-            <Button 
-                Width="160" 
-                Height="160" 
-                VerticalAlignment="Top" 
-                HorizontalAlignment="Left" 
-                Margin="{StaticResource SmallLeftMargin}" 
-                ToolTip="Добавить новый шаблон"
-                Command="{Binding NavigateToDetailCommand}"
-                BorderThickness="0">
+            <Button Width="160"
+                    Height="160"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Left"
+                    Margin="{StaticResource SmallLeftMargin}"
+                    ToolTip="{x:Static properties:Resources.DocumentTooltip}"
+                    Command="{Binding NavigateToDetailCommand}"
+                    BorderThickness="0">
                 <iconPacks:PackIconModern Kind="Add" />
             </Button>
         </Grid>

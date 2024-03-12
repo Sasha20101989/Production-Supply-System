@@ -1,28 +1,713 @@
 ﻿<Page x:Class="UI_Interface.Views.DeliveryPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:properties="clr-namespace:UI_Interface.Properties"
+      xmlns:converters="clr-namespace:UI_Interface.Converters"
+      xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+      mah:DialogParticipation.Register="{Binding}"
+      xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+      xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
       xmlns:viewmodelsforpages="clr-namespace:UI_Interface.ViewModels.ViewModelsForPages"
-      d:DataContext="{d:DesignInstance Type=viewmodelsforpages:DeliveryPageViewModel}"
-      mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DataContext="{d:DesignInstance Type=viewmodelsforpages:DeliveryViewModel}"
+      mc:Ignorable="d"
+      d:DesignHeight="800"
+      d:DesignWidth="1360"
       Style="{DynamicResource MahApps.Styles.Page}">
+
+    <Page.Resources>
+        <Style x:Key="AccentCircleButtonStyle"
+               BasedOn="{StaticResource MahApps.Styles.Button.Circle}"
+               TargetType="{x:Type ButtonBase}">
+            <Setter Property="Foreground"
+                    Value="{DynamicResource MahApps.Brushes.Accent}" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver"
+                         Value="True">
+                    <Setter Property="BorderBrush"
+                            Value="{DynamicResource MahApps.Brushes.Accent}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="IconStyle"
+               TargetType="{x:Type Button}"
+               BasedOn="{StaticResource ResourceKey=MahApps.Styles.Button.Chromeless}">
+            <Setter Property="FontSize"
+                    Value="24" />
+            <Setter Property="FontWeight"
+                    Value="Normal" />
+            <Setter Property="FontFamily"
+                    Value="Segoe UI Light" />
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <iconPacks:PackIconBootstrapIcons Kind="FileEarmarkExcel"
+                                                              Width="24"
+                                                              Height="24"
+                                                              VerticalAlignment="Center" />
+
+                            <TextBlock Margin="10 0 0 0"
+                                       VerticalAlignment="Center"
+                                       Text="{Binding}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver"
+                         Value="True">
+                    <Setter Property="Foreground"
+                            Value="Green" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <CollectionViewSource x:Key="GroupedTransports"
+                              Source="{Binding DeliveryDetailViewModel.Transports}">
+            <CollectionViewSource.GroupDescriptions>
+                <PropertyGroupDescription PropertyName="TransportNameGroup" />
+            </CollectionViewSource.GroupDescriptions>
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="TransportName"
+                                     Direction="Ascending" />
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter" />
+        <converters:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" />
+        <converters:BadgeStyleConverter x:Key="BadgeStyleConverter" />
+    </Page.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="48" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
-        <TextBlock
-            Style="{StaticResource PageTitleStyle}"
-            Margin="{StaticResource MediumLeftMargin}"
-            Text="{x:Static properties:Resources.DeliveryPageTitle}" />
+        <TextBlock Style="{StaticResource PageTitleStyle}"
+                   Margin="{StaticResource MediumLeftMargin}"
+                   Text="{x:Static properties:Resources.DeliveryPageTitle}" />
 
-        <Button Margin="{StaticResource SmallLeftTopRightBottomMargin}" Grid.Row="2" Command="{Binding UploadFileCommand}" HorizontalAlignment="Center" Content="Загрузить файл" Style="{StaticResource MahApps.Styles.Button.MetroSquare}"/>
+        <WrapPanel Orientation="Horizontal"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Right">
+            <Button Width="40"
+                    Height="40"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Left"
+                    Margin="{StaticResource SmallLeftMargin}"
+                    ToolTip="{x:Static properties:Resources.ShellAdd}"
+                    Command="{Binding OpenDetailsCommand}"
+                    BorderThickness="1"
+                    Style="{StaticResource AccentCircleButtonStyle}">
+                <iconPacks:PackIconModern Kind="Add" />
+            </Button>
+            <Button Width="40"
+                    Height="40"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Left"
+                    Margin="{StaticResource SmallLeftMargin}"
+                    ToolTip="{x:Static properties:Resources.BllDownloadLots}"
+                    Command="{Binding GetLotsCommand}"
+                    BorderThickness="1"
+                    Style="{StaticResource AccentCircleButtonStyle}">
+                <iconPacks:PackIconModern Kind="CloudDownload" />
+            </Button>
+            <Button Width="40"
+                    Height="40"
+                    VerticalAlignment="Top"
+                    HorizontalAlignment="Left"
+                    Margin="{StaticResource SmallLeftXXSRightMargin}"
+                    ToolTip="{x:Static properties:Resources.BllExportAllTracing}"
+                    Command="{Binding ExportAllTracingCommand}"
+                    BorderThickness="1"
+                    Style="{StaticResource AccentCircleButtonStyle}">
+                <iconPacks:PackIconModern Kind="OfficeExcel" />
+            </Button>
+        </WrapPanel>
 
+        <TextBlock Grid.Row="1"
+                   Text="{x:Static properties:Resources.ShellEmptyLotList}"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   Visibility="{Binding IsLotListEmpty, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+        <ListView Grid.Row="1"
+                  ItemsSource="{Binding Lots, UpdateSourceTrigger=PropertyChanged}"
+                  Margin="{StaticResource SmallLeftTopRightBottomMargin}"
+                  Visibility="{Binding IsLotListEmpty, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                  PreviewMouseDoubleClick="ListView_PreviewMouseDoubleClick">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="{x:Static properties:Resources.LotNumber}"
+                                    Width="auto"
+                                    DisplayMemberBinding="{Binding Lot.LotNumber}" />
+                    <GridViewColumn Header="{x:Static properties:Resources.InvoiceNumber}"
+                                    Width="auto"
+                                    DisplayMemberBinding="{Binding Lot.LotInvoice.InvoiceNumber}" />
+                    <GridViewColumn Header="{x:Static properties:Resources.LotOrder}"
+                                    Width="auto"
+                                    DisplayMemberBinding="{Binding Lot.LotPurchaseOrder.PurchaseOrderNumber}" />
+                    <GridViewColumn Header="{x:Static properties:Resources.ShipperName}"
+                                    Width="auto"
+                                    DisplayMemberBinding="{Binding Lot.Shipper.ShipperName}" />
+                    <GridViewColumn Header="{x:Static properties:Resources.CarrierName}"
+                                    Width="auto"
+                                    DisplayMemberBinding="{Binding Lot.Carrier.CarrierName}" />
+                    <GridViewColumn Header="{x:Static properties:Resources.DeliveryTerm}"
+                                    Width="auto"
+                                    DisplayMemberBinding="{Binding Lot.DeliveryTerms.DeliveryTerm}" />
+                    <GridViewColumn Header="{x:Static properties:Resources.TransportName}"
+                                    Width="auto"
+                                    DisplayMemberBinding="{Binding Lot.LotTransport.TransportName}" />
+                    <GridViewColumn Header="{x:Static properties:Resources.TransportType}"
+                                    Width="auto"
+                                    DisplayMemberBinding="{Binding Lot.LotTransportType.TransportType}" />
+                    <GridViewColumn Header="{x:Static properties:Resources.TransportDocument}"
+                                    Width="auto"
+                                    DisplayMemberBinding="{Binding Lot.LotTransportDocument}" />
+                    <GridViewColumn Header="{x:Static properties:Resources.ETD}"
+                                    Width="auto"
+                                    DisplayMemberBinding="{Binding Lot.LotEtd, StringFormat=dd.MM.yyyy}" />
+                    <GridViewColumn Header="{x:Static properties:Resources.ATD}"
+                                    Width="auto"
+                                    DisplayMemberBinding="{Binding Lot.LotAtd, StringFormat=dd.MM.yyyy}" />
+                    <GridViewColumn Header="{x:Static properties:Resources.ETA}"
+                                    Width="auto"
+                                    DisplayMemberBinding="{Binding Lot.LotEta, StringFormat=dd.MM.yyyy}" />
+                    <GridViewColumn Header="{x:Static properties:Resources.ATA}"
+                                    Width="auto"
+                                    DisplayMemberBinding="{Binding Lot.LotAta, StringFormat=dd.MM.yyyy}" />
+                    <GridViewColumn Header="{x:Static properties:Resources.QuantityContainers}"
+                                    Width="auto"
+                                    DisplayMemberBinding="{Binding QuantityContainers}" />
+                    <GridViewColumn Header="{x:Static properties:Resources.CloseDate}"
+                                    Width="auto"
+                                    DisplayMemberBinding="{Binding Lot.CloseDate, StringFormat=dd.MM.yyyy}" />
+                    <GridViewColumn Header="{x:Static properties:Resources.DepartureLocation}"
+                                    Width="auto"
+                                    DisplayMemberBinding="{Binding Lot.LotDepartureLocation.LocationName}" />
+                    <GridViewColumn Header="{x:Static properties:Resources.CustomsLocation}"
+                                    Width="auto"
+                                    DisplayMemberBinding="{Binding Lot.LotCustomsLocation.LocationName}" />
+                    <GridViewColumn Header="{x:Static properties:Resources.ArrivalLocation}"
+                                    Width="auto"
+                                    DisplayMemberBinding="{Binding Lot.LotArrivalLocation.LocationName}" />
+                    <GridViewColumn Header="{x:Static properties:Resources.Comment}"
+                                    Width="auto"
+                                    DisplayMemberBinding="{Binding Lot.LotComment}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <mah:FlyoutsControl Grid.Row="0"
+                            Grid.RowSpan="2"
+                            Visibility="{Binding DetailsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <mah:Flyout Width="auto"
+                        Theme="Inverse"
+                        mah:ControlsHelper.ContentCharacterCasing="Upper"
+                        AreAnimationsEnabled="True"
+                        Position="Right"
+                        IsOpen="{Binding DetailsOpen}"
+                        CloseCommand="{Binding CloseDetailsCommand}"
+                        Header="{x:Static properties:Resources.ShellDetails}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Column="0"
+                                Orientation="Vertical"
+                                MaxWidth="250"
+                                Margin="{StaticResource MediumLeftSmallTopMargin}">
+                        <mah:MetroHeader Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                                         Header="{x:Static properties:Resources.LotNumber}"
+                                         VerticalAlignment="Center">
+                            <mah:MetroHeader.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel VerticalAlignment="Center"
+                                                Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial VerticalAlignment="Center"
+                                                                    Kind="RenameBox" />
+                                        <TextBlock Margin="{StaticResource SmallLeftMargin}"
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </mah:MetroHeader.HeaderTemplate>
+                            <TextBox TextWrapping="Wrap"
+                                     Text="{Binding DeliveryDetailViewModel.LotNumber, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource MahApps.Styles.TextBox}" />
+                        </mah:MetroHeader>
+
+                        <mah:MetroHeader Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                                         Header="{x:Static properties:Resources.ShipperName}"
+                                         VerticalAlignment="Center">
+                            <mah:MetroHeader.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel VerticalAlignment="Center"
+                                                Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Foreground="IndianRed"
+                                                                    VerticalAlignment="Center"
+                                                                    Kind="AlertDecagramOutline" />
+                                        <TextBlock Margin="{StaticResource SmallLeftMargin}"
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </mah:MetroHeader.HeaderTemplate>
+                            <ComboBox
+                                    SelectedItem="{Binding DeliveryDetailViewModel.Shipper, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                                      DisplayMemberPath="ShipperName"
+                                      ItemsSource="{Binding DeliveryDetailViewModel.Shippers}">
+                            </ComboBox>
+                        </mah:MetroHeader>
+
+                        <mah:MetroHeader Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                                         Header="{x:Static properties:Resources.LotOrder}"
+                                         ToolTip="{x:Static properties:Resources.LotOrderToolTip}"
+                                         VerticalAlignment="Center">
+                            <mah:MetroHeader.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel VerticalAlignment="Center"
+                                                Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Foreground="IndianRed"
+                                                                    VerticalAlignment="Center"
+                                                                    Kind="AlertDecagramOutline" />
+                                        <TextBlock Margin="{StaticResource SmallLeftMargin}"
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </mah:MetroHeader.HeaderTemplate>
+                            <ComboBox
+                                    SelectedItem="{Binding DeliveryDetailViewModel.LotPurchaseOrder, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                                      DisplayMemberPath="PurchaseOrderNumber"
+                                      ItemsSource="{Binding DeliveryDetailViewModel.PurchaseOrdersForShipper}">
+                            </ComboBox>
+                        </mah:MetroHeader>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1"
+                                Orientation="Vertical"
+                                MaxWidth="250"
+                                Margin="{StaticResource XSmallLeftSmallTopRightBottomMargin}">
+                        <mah:MetroHeader Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                                         Header="{x:Static properties:Resources.CarrierName}"
+                                         VerticalAlignment="Center">
+                            <mah:MetroHeader.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel VerticalAlignment="Center"
+                                                Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Foreground="IndianRed"
+                                                                    VerticalAlignment="Center"
+                                                                    Kind="AlertDecagramOutline" />
+                                        <TextBlock Margin="{StaticResource SmallLeftMargin}"
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </mah:MetroHeader.HeaderTemplate>
+                            <ComboBox
+                                    SelectedItem="{Binding DeliveryDetailViewModel.Carrier, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                                      DisplayMemberPath="CarrierName"
+                                      ItemsSource="{Binding DeliveryDetailViewModel.Carriers}">
+                            </ComboBox>
+                        </mah:MetroHeader>
+
+                        <mah:MetroHeader Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                                         Header="{x:Static properties:Resources.DeliveryTerm}"
+                                         VerticalAlignment="Center">
+                            <mah:MetroHeader.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel VerticalAlignment="Center"
+                                                Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Foreground="IndianRed"
+                                                                    VerticalAlignment="Center"
+                                                                    Kind="AlertDecagramOutline" />
+                                        <TextBlock Margin="{StaticResource SmallLeftMargin}"
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </mah:MetroHeader.HeaderTemplate>
+                            <ComboBox
+                                      SelectedItem="{Binding DeliveryDetailViewModel.TermsOfDelivery, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                                      DisplayMemberPath="DeliveryTerm"
+                                      ItemsSource="{Binding DeliveryDetailViewModel.TermsOfDeliveryItems}">
+                            </ComboBox>
+                        </mah:MetroHeader>
+
+                        <mah:MetroHeader Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                                         Header="{x:Static properties:Resources.TransportType}"
+                                         VerticalAlignment="Center">
+                            <mah:MetroHeader.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel VerticalAlignment="Center"
+                                                Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Foreground="IndianRed"
+                                                                    VerticalAlignment="Center"
+                                                                    Kind="AlertDecagramOutline" />
+                                        <TextBlock Margin="{StaticResource SmallLeftMargin}"
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </mah:MetroHeader.HeaderTemplate>
+                            <ComboBox
+                                    SelectedItem="{Binding DeliveryDetailViewModel.TypeOfTransport, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                                      DisplayMemberPath="TransportType"
+                                      ItemsSource="{Binding DeliveryDetailViewModel.TypesOfTransport}">
+                            </ComboBox>
+                        </mah:MetroHeader>
+
+                        <mah:MetroHeader Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                                         Header="{x:Static properties:Resources.TransportDocument}"
+                                         VerticalAlignment="Center">
+                            <mah:MetroHeader.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel VerticalAlignment="Center"
+                                                Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial VerticalAlignment="Center"
+                                                                    Kind="RenameBox" />
+                                        <TextBlock Margin="{StaticResource SmallLeftMargin}"
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </mah:MetroHeader.HeaderTemplate>
+                            <TextBox TextWrapping="Wrap"
+                                     Text="{Binding DeliveryDetailViewModel.LotTransportDocument, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource MahApps.Styles.TextBox}" />
+                        </mah:MetroHeader>
+
+                        <mah:MetroHeader Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                                         Header="{x:Static properties:Resources.TransportName}"
+                                         VerticalAlignment="Center">
+                            <mah:MetroHeader.HeaderTemplate>
+                                <DataTemplate>
+                                    <Grid VerticalAlignment="Center">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="auto" />
+                                            <ColumnDefinition Width="auto" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <iconPacks:PackIconMaterial Width="auto"
+                                                                    Foreground="IndianRed"
+                                                                    VerticalAlignment="Center"
+                                                                    HorizontalAlignment="Left"
+                                                                    Kind="AlertDecagramOutline" />
+                                        <TextBlock Grid.Column="1"
+                                                   Width="auto"
+                                                   Margin="{StaticResource SmallLeftMargin}"
+                                                   HorizontalAlignment="Left"
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding}" />
+                                        <Button Grid.Column="2"
+                                                FontSize="{StaticResource SmallFontSize}"
+                                                VerticalAlignment="Bottom"
+                                                HorizontalAlignment="Right"
+                                                Visibility="{Binding RelativeSource={RelativeSource AncestorType=StackPanel}, Path=DataContext.DeliveryDetailViewModel.IsAddTransportVisible, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                                Foreground="{StaticResource MahApps.Brushes.Accent}"
+                                                Content="Добавить"
+                                                Style="{StaticResource MahApps.Styles.Button.Chromeless}"
+                                                Command="{Binding RelativeSource={RelativeSource AncestorType=StackPanel}, Path=DataContext.DeliveryDetailViewModel.AddNewTransportCommand}" />
+                                    </Grid>
+                                </DataTemplate>
+                            </mah:MetroHeader.HeaderTemplate>
+                            <ComboBox IsEditable="True"
+                                      IsTextSearchEnabled="True"
+                                      TextSearch.TextPath="TransportName"
+                                      DisplayMemberPath="TransportName"
+                                      SelectedItem="{Binding DeliveryDetailViewModel.LotTransport, UpdateSourceTrigger=PropertyChanged}"
+                                      ItemsSource="{Binding Source={StaticResource GroupedTransports}, UpdateSourceTrigger=PropertyChanged}"
+                                      Text="{Binding DeliveryDetailViewModel.TransportName, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                      IsDropDownOpen="{Binding DeliveryDetailViewModel.IsTransportDropDownOpen, UpdateSourceTrigger=PropertyChanged}">
+                                <ComboBox.GroupStyle>
+                                    <GroupStyle>
+                                        <GroupStyle.HeaderTemplate>
+                                            <DataTemplate>
+                                                <TextBlock FontWeight="Bold"
+                                                           Text="{Binding Name}" />
+                                            </DataTemplate>
+                                        </GroupStyle.HeaderTemplate>
+                                    </GroupStyle>
+                                </ComboBox.GroupStyle>
+                            </ComboBox>
+                        </mah:MetroHeader>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2"
+                                Orientation="Vertical"
+                                MaxWidth="300"
+                                Margin="{StaticResource XSmallLeftSmallTopRightBottomMargin}">
+                        <mah:MetroHeader Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                                         Header="{x:Static properties:Resources.ETD}"
+                                         VerticalAlignment="Center">
+                            <mah:MetroHeader.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel VerticalAlignment="Center"
+                                                Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial VerticalAlignment="Center"
+                                                                    Kind="CalendarEdit" />
+                                        <TextBlock Margin="{StaticResource SmallLeftMargin}"
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </mah:MetroHeader.HeaderTemplate>
+                            <DatePicker mah:TextBoxHelper.Watermark="{x:Static properties:Resources.ShellSelectDate}"
+                                        SelectedDate="{Binding DeliveryDetailViewModel.LotEtd, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=True}">
+                            </DatePicker>
+                        </mah:MetroHeader>
+
+                        <mah:MetroHeader Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                                         Header="{x:Static properties:Resources.ATD}"
+                                         VerticalAlignment="Center">
+                            <mah:MetroHeader.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel VerticalAlignment="Center"
+                                                Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial VerticalAlignment="Center"
+                                                                    Kind="CalendarEdit" />
+                                        <TextBlock Margin="{StaticResource SmallLeftMargin}"
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </mah:MetroHeader.HeaderTemplate>
+                            <DatePicker mah:TextBoxHelper.Watermark="{x:Static properties:Resources.ShellSelectDate}"
+                                        SelectedDate="{Binding DeliveryDetailViewModel.LotAtd, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=True}">
+                            </DatePicker>
+                        </mah:MetroHeader>
+
+                        <mah:MetroHeader Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                                         Header="{x:Static properties:Resources.ETA}"
+                                         VerticalAlignment="Center">
+                            <mah:MetroHeader.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel VerticalAlignment="Center"
+                                                Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Foreground="IndianRed"
+                                                                    VerticalAlignment="Center"
+                                                                    Kind="CalendarAlert" />
+                                        <TextBlock Margin="{StaticResource SmallLeftMargin}"
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </mah:MetroHeader.HeaderTemplate>
+                            <DatePicker mah:TextBoxHelper.Watermark="{x:Static properties:Resources.ShellSelectDate}"
+                                        SelectedDate="{Binding DeliveryDetailViewModel.LotEta, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=True}">
+                            </DatePicker>
+                        </mah:MetroHeader>
+
+                        <mah:MetroHeader Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                                         Header="{x:Static properties:Resources.ATA}"
+                                         VerticalAlignment="Center">
+                            <mah:MetroHeader.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel VerticalAlignment="Center"
+                                                Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial VerticalAlignment="Center"
+                                                                    Kind="CalendarEdit" />
+                                        <TextBlock Margin="{StaticResource SmallLeftMargin}"
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </mah:MetroHeader.HeaderTemplate>
+                            <DatePicker mah:TextBoxHelper.Watermark="{x:Static properties:Resources.ShellSelectDate}"
+                                        SelectedDate="{Binding DeliveryDetailViewModel.LotAta, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged, NotifyOnValidationError=True}">
+                            </DatePicker>
+                        </mah:MetroHeader>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="3"
+                                Orientation="Vertical"
+                                MaxWidth="300"
+                                Margin="{StaticResource SmallTopMediumRightMargin}">
+                        <mah:MetroHeader Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                                         Header="{x:Static properties:Resources.DepartureLocation}"
+                                         VerticalAlignment="Center">
+                            <mah:MetroHeader.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel VerticalAlignment="Center"
+                                                Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Foreground="IndianRed"
+                                                                    VerticalAlignment="Center"
+                                                                    Kind="MapMarkerAlertOutline" />
+                                        <TextBlock Margin="{StaticResource SmallLeftMargin}"
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </mah:MetroHeader.HeaderTemplate>
+                            <ComboBox
+                                    SelectedItem="{Binding DeliveryDetailViewModel.LotDepartureLocation, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                                      DisplayMemberPath="LocationName"
+                                      ItemsSource="{Binding DeliveryDetailViewModel.DepartureLocations}">
+                            </ComboBox>
+                        </mah:MetroHeader>
+
+                        <mah:MetroHeader Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                                         Header="{x:Static properties:Resources.CustomsLocation}"
+                                         VerticalAlignment="Center">
+                            <mah:MetroHeader.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel VerticalAlignment="Center"
+                                                Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial VerticalAlignment="Center"
+                                                                    Kind="MapMarkerOutline" />
+                                        <TextBlock Margin="{StaticResource SmallLeftMargin}"
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </mah:MetroHeader.HeaderTemplate>
+                            <ComboBox
+                                    SelectedItem="{Binding DeliveryDetailViewModel.LotCustomsLocation, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                                      DisplayMemberPath="LocationName"
+                                      ItemsSource="{Binding DeliveryDetailViewModel.CustomsLocations}">
+                            </ComboBox>
+                        </mah:MetroHeader>
+
+                        <mah:MetroHeader Margin="{StaticResource XXSmallLeftTopRightBottomMargin}"
+                                         Header="{x:Static properties:Resources.ArrivalLocation}"
+                                         VerticalAlignment="Center">
+                            <mah:MetroHeader.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel VerticalAlignment="Center"
+                                                Orientation="Horizontal">
+                                        <iconPacks:PackIconMaterial Foreground="IndianRed"
+                                                                    VerticalAlignment="Center"
+                                                                    Kind="MapMarkerAlertOutline" />
+                                        <TextBlock Margin="{StaticResource SmallLeftMargin}"
+                                                   VerticalAlignment="Center"
+                                                   Text="{Binding}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </mah:MetroHeader.HeaderTemplate>
+                            <ComboBox
+                                    SelectedItem="{Binding DeliveryDetailViewModel.LotArrivalLocation, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                                      DisplayMemberPath="LocationName"
+                                      ItemsSource="{Binding DeliveryDetailViewModel.ArrivalLocations}">
+                            </ComboBox>
+                        </mah:MetroHeader>
+                    </StackPanel>
+
+                    <mah:MetroHeader Grid.Row="1"
+                                     Grid.Column="0"
+                                     Grid.ColumnSpan="4"
+                                     Margin="{StaticResource MediumLeftSmallTopRightSmallBottomMargin}"
+                                     Header="{x:Static properties:Resources.Comment}"
+                                     VerticalAlignment="Top"
+                                     HorizontalAlignment="Center">
+                        <mah:MetroHeader.HeaderTemplate>
+                            <DataTemplate>
+                                <StackPanel VerticalAlignment="Center"
+                                            Orientation="Horizontal">
+                                    <iconPacks:PackIconMaterial VerticalAlignment="Center"
+                                                                Kind="CommentEditOutline" />
+                                    <TextBlock Margin="{StaticResource SmallLeftMargin}"
+                                               VerticalAlignment="Center"
+                                               Text="{Binding}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </mah:MetroHeader.HeaderTemplate>
+                        <TextBox MinWidth="760"
+                                 MaxWidth="750"
+                                 TextWrapping="Wrap"
+                                 Text="{Binding DeliveryDetailViewModel.LotComment, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource MahApps.Styles.TextBox}" />
+                    </mah:MetroHeader>
+
+                    <GroupBox Header="{x:Static properties:Resources.MasterUploadFile}"
+                              Grid.ColumnSpan="4"
+                              Grid.Row="2"
+                              Margin="{StaticResource MediumLeftRightMargin}"
+                              Visibility="{Binding HasErrorsInDetails, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
+                        <ListView ItemsSource="{Binding MasterCollection, UpdateSourceTrigger=PropertyChanged}">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="{x:Static properties:Resources.Position}"
+                                                    Width="70"
+                                                    DisplayMemberBinding="{Binding ProcessStep.Step}" />
+                                    <GridViewColumn Header="{x:Static properties:Resources.ShellFileName}"
+                                                    Width="640"
+                                                    DisplayMemberBinding="{Binding ProcessStep.Docmapper.DocmapperName}" />
+                                    <GridViewColumn Width="40">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <mah:Badged BadgePlacementMode="TopRight"
+                                                            Style="{Binding HasError, Converter={StaticResource BadgeStyleConverter}, UpdateSourceTrigger=PropertyChanged}">
+                                                    <Button Command="{Binding SelectFileCommand}"
+                                                            CommandParameter="{Binding}"
+                                                            Style="{StaticResource IconStyle}" />
+                                                </mah:Badged>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListViewItem}">
+                                    <Setter Property="Background"
+                                            Value="Transparent" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                                <Border BorderBrush="Transparent"
+                                                        BorderThickness="0"
+                                                        Background="{TemplateBinding Background}">
+                                                    <GridViewRowPresenter HorizontalAlignment="Stretch"
+                                                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                                          Width="Auto"
+                                                                          Margin="0"
+                                                                          Content="{TemplateBinding Content}" />
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                        </ListView>
+                    </GroupBox>
+
+                    <Separator Grid.ColumnSpan="4"
+                               Margin="{StaticResource SmallLeftTopRightMargin}"
+                               Grid.Row="3"
+                               VerticalAlignment="Bottom" />
+
+                    <WrapPanel Grid.ColumnSpan="4"
+                               Grid.Row="4"
+                               VerticalAlignment="Bottom"
+                               HorizontalAlignment="Right">
+                        <Button Style="{DynamicResource MahApps.Styles.Button.Chromeless}"
+                                Content="{x:Static properties:Resources.ShellCancelButton}"
+                                Margin="{StaticResource SmallLeftTopRightBottomMargin}"
+                                Command="{Binding CloseDetailsCommand}" />
+                        <Button Command="{Binding StartProcessCommand}"
+                                Content="{x:Static properties:Resources.ShellAdd}"
+                                IsEnabled="{Binding HasErrors, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
+                                Margin="{StaticResource SmallLeftTopRightBottomMargin}"
+                                Style="{StaticResource MahApps.Styles.Button.Dialogs.Accent}" />
+                    </WrapPanel>
+                </Grid>
+            </mah:Flyout>
+        </mah:FlyoutsControl>
     </Grid>
 </Page>

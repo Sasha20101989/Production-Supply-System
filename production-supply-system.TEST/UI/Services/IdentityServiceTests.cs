@@ -4,8 +4,11 @@ using System.Threading.Tasks;
 using System.Windows.Documents;
 
 using BLL.Contracts;
+using BLL.Services;
 
 using DAL.Models;
+
+using Microsoft.Extensions.Logging;
 
 using Moq;
 
@@ -30,7 +33,7 @@ namespace production_supply_system.TEST.UI.Services
             _ = userServiceMock.Setup(service => service.GetUserInfoAsync(It.IsAny<string>()))
                            .ReturnsAsync(UserMocks.GetUserMock());
 
-            IdentityService identityService = new(userServiceMock.Object);
+            IdentityService identityService = new(userServiceMock.Object, Mock.Of<ILogger<IdentityService>>());
 
             bool eventFired = false;
 
@@ -53,11 +56,12 @@ namespace production_supply_system.TEST.UI.Services
             // Arrange
 
             Mock<IUserService> userServiceMock = new();
+            Mock<ILogger<IdentityService>> loggerMock = new();
 
             _ = userServiceMock.Setup(service => service.GetUserInfoAsync(It.IsAny<string>()))
                            .ReturnsAsync((User)null);
 
-            IdentityService identityService = new(userServiceMock.Object);
+            IdentityService identityService = new(userServiceMock.Object, Mock.Of<ILogger<IdentityService>>());
 
             bool eventFired = false;
 
@@ -79,7 +83,7 @@ namespace production_supply_system.TEST.UI.Services
         {
             // Arrange
 
-            IdentityService identityService = new(Mock.Of<IUserService>());
+            IdentityService identityService = new(Mock.Of<IUserService>(), Mock.Of<ILogger<IdentityService>>());
 
 
             bool eventFired = false;
@@ -100,7 +104,7 @@ namespace production_supply_system.TEST.UI.Services
         {
             // Arrange
 
-            IdentityService identityService = new(Mock.Of<IUserService>());
+            IdentityService identityService = new(Mock.Of<IUserService>(), Mock.Of<ILogger<IdentityService>>());
 
             // Act
 
@@ -123,7 +127,7 @@ namespace production_supply_system.TEST.UI.Services
             _ = userServiceMock.Setup(service => service.GetUserInfoAsync(It.IsAny<string>()))
                            .ReturnsAsync(UserMocks.GetUserMock());
 
-            IdentityService identityService = new(userServiceMock.Object);
+            IdentityService identityService = new(userServiceMock.Object, Mock.Of<ILogger<IdentityService>>());
 
             // Act
 
@@ -146,7 +150,7 @@ namespace production_supply_system.TEST.UI.Services
             _ = userServiceMock.Setup(service => service.GetUserInfoAsync(It.IsAny<string>()))
                            .ReturnsAsync((User)null);
 
-            IdentityService identityService = new(userServiceMock.Object);
+            IdentityService identityService = new(userServiceMock.Object, Mock.Of<ILogger<IdentityService>>());
 
             // Act
          

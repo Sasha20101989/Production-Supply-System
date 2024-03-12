@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using DAL.Models.Docmapper;
+using DAL.Models.Document;
+
+using Microsoft.Extensions.Logging;
 
 namespace UI_Interface.ViewModels
 {
@@ -11,7 +13,7 @@ namespace UI_Interface.ViewModels
     /// </summary>
     public class DocumentViewModel : ValidatedViewModel<DocumentViewModel, List<Type>>
     {
-        public DocumentViewModel(List<Type> models) : base(models)
+        public DocumentViewModel(List<Type> models, ILogger logger) : base(models, logger)
         {
 
         }
@@ -19,15 +21,15 @@ namespace UI_Interface.ViewModels
         /// <summary>
         /// Получает или задает документ.
         /// </summary>
-        public Document Document { get; set; } = new();
+        public Docmapper Document { get; set; } = new();
 
         /// <summary>
         /// Получает или задает уникальный идентификатор шаблона документа.
         /// </summary>
         public int DocmapperId
         {
-            get => Document.DocmapperId;
-            set => _ = SetProperty(Document.DocmapperId, value, Document, (model, id) => model.DocmapperId = id);
+            get => Document.Id;
+            set => _ = SetProperty(Document.Id, value, Document, (model, id) => model.Id = id);
         }
 
         /// <summary>

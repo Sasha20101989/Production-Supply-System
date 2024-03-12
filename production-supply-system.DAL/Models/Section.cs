@@ -1,5 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
+using DAL.Models.Contracts;
+using DAL.Models.Master;
 
 namespace DAL.Models
 {
@@ -7,13 +11,18 @@ namespace DAL.Models
     /// Представляет информацию о размещении на предприятии.
     /// </summary>
     [Table("tbd_Sections", Schema = "dbo")]
-    public class Section
+    public class Section : IEntity
     {
         [Key]
-        public int SectionId { get; set; }
+        public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Section Name is required.")]
         [MaxLength(300)]
-        public string SectionName { get; set; }
-}
+        [Column("Section_Name")]
+        public string SectionName { get; set; } = null!;
+
+        public virtual ICollection<ProcessStep> ProcessesSteps { get; set; }
+
+        public virtual ICollection<User> Users { get; set; }
+    }
 }

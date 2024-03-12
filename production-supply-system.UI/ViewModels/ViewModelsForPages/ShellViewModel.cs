@@ -3,9 +3,14 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using MahApps.Metro.Controls;
 using MahApps.Metro.IconPacks;
+
+using Microsoft.Extensions.Logging;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 using NavigationManager.Frame.Extension.WPF;
+
+using Newtonsoft.Json;
+
 using UI_Interface.Contracts.Services;
 using UI_Interface.Properties;
 
@@ -13,6 +18,8 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 {
     public class ShellViewModel : ObservableObject
     {
+        private readonly ILogger<ShellViewModel> _logger;
+
         private readonly INavigationManager _navigationManager;
 
         private readonly IUserDataService _userDataService;
@@ -21,8 +28,9 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
         private HamburgerMenuItem _selectedOptionsMenuItem;
 
-        public ShellViewModel(INavigationManager navigationManager, IUserDataService userDataService)
+        public ShellViewModel(INavigationManager navigationManager, IUserDataService userDataService, ILogger<ShellViewModel> logger)
         {
+            _logger = logger;
             _navigationManager = navigationManager;
             _userDataService = userDataService;
 
@@ -37,7 +45,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         {
             new HamburgerMenuIconItem() { Label = Resources.ShellMainPage, Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.HomeSolid }, TargetPageType = typeof(MainViewModel) },
             new HamburgerMenuIconItem() { Label = Resources.ShellDocumentMapperPage, Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.MapMarkerSolid }, TargetPageType = typeof(DocumentMapperViewModel) },
-            new HamburgerMenuIconItem() { Label = Resources.ShellDeliveryPage, Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.CalendarAltSolid }, TargetPageType = typeof(DeliveryPageViewModel) }
+            new HamburgerMenuIconItem() { Label = Resources.ShellDeliveryPage, Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.TruckMovingSolid }, TargetPageType = typeof(DeliveryViewModel) },
         };
 
         public HamburgerMenuItem SelectedMenuItem
@@ -71,7 +79,10 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
         private void OnUserDataUpdated(object sender, UserViewModel user)
         {
+            _logger.LogInformation($"Information for user updated: '{JsonConvert.SerializeObject(user)}'");
+
             HamburgerMenuImageItem userMenuItem = OptionMenuItems.OfType<HamburgerMenuImageItem>().FirstOrDefault();
+
             if (userMenuItem is not null && user is not null)
             {
                 userMenuItem.Label = user.Name;
@@ -105,7 +116,11 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
             _userDataService.UserDataUpdated += OnUserDataUpdated;
 
+            _logger.LogInformation($"Start getting user");
+
             UserViewModel user = _userDataService.GetUser();
+
+            _logger.LogInformation($"Getting user completed: '{JsonConvert.SerializeObject(user)}'");
 
             HamburgerMenuImageItem userMenuItem = new()
             {
