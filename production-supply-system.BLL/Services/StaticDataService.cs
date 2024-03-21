@@ -1,94 +1,126 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using BLL.Contracts;
+using BLL.Properties;
 
 using DAL.Data.Repositories.Contracts;
 using DAL.Enums;
 using DAL.Extensions;
 using DAL.Models;
+using DAL.Models.Master;
 using DAL.Models.Partscontrol;
 using DAL.Parameters.Inbound;
+
 
 using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
 
-using Serilog;
 
 namespace BLL.Services
 {
-    public class StaticDataService : IStaticDataService
+    /// <summary>
+    /// Инициализирует новый экземпляр класса <see cref="StaticDataService"/>.
+    /// </summary>
+    /// <param name="shipperRepository">Репозиторий для доступа к информации о отправителях.</param>
+    /// <param name="carrierRepository">Репозиторий для доступа к информации о перевозчиках.</param>
+    /// <param name="termsOfDeliveryRepository">Репозиторий для доступа к информации о условиях поставки.</param>
+    /// <param name="transportTypeRepository">Репозиторий для доступа к информации о типах транспорта.</param>
+    /// <param name="locationRepository">Репозиторий для доступа к информации о локациях.</param>
+    /// <param name="locationTypeRepository">Репозиторий для доступа к информации о типах локаций.</param>
+    /// <param name="transportRepository">Репозиторий для доступа к информации о транспорте.</param>
+    /// <param name="containerTypeRepository">Репозиторий для доступа к информации о типах контейнеров.</param>
+    /// <param name="logger">Регистратор для отслеживания информации и ошибок.</param>
+    public class StaticDataService(
+        IRepository<Shipper> shipperRepository,
+        IRepository<Carrier> carrierRepository,
+        IRepository<TermsOfDelivery> termsOfDeliveryRepository,
+        IRepository<TypesOfTransport> transportTypeRepository,
+        IRepository<Location> locationRepository,
+        IRepository<TypesOfLocation> locationTypeRepository,
+        IRepository<Transport> transportRepository,
+        IRepository<TypesOfContainer> containerTypeRepository,
+        IRepository<TypesOfPart> partTypeRepository,
+        IRepository<TypesOfOrder> orderTypesRepository,
+        IRepository<TypesOfPacking> packingTypesRepository,
+        IRepository<ProcessStep> processStepsRepository,
+        IRepository<Process> processRepository,
+        IRepository<Section> sectionRepository,
+        ILogger<StaticDataService> logger) : IStaticDataService
     {
-        private readonly IRepository<Shipper> _shipperRepository;
-        private readonly IRepository<Carrier> _carrierRepository;
-        private readonly IRepository<TermsOfDelivery> _termsOfDeliveryRepository;
-        private readonly IRepository<TypesOfTransport> _transportTypeRepository;
-        private readonly IRepository<TypesOfLocation> _locationTypeRepository;
-        private readonly IRepository<TypesOfOrder> _orderTypesRepository;
-        private readonly IRepository<TypesOfPacking> _packingTypesRepository;
-        private readonly IRepository<TypesOfPart> _partTypeRepository;
-        private readonly IRepository<TypesOfContainer> _containerTypeRepository;
-        private readonly IRepository<Transport> _transportRepository;
-        private readonly IRepository<Location> _locationRepository;
-        private readonly ILogger<StaticDataService> _logger;
-
-        /// <summary>
-        /// Инициализирует новый экземпляр класса <see cref="StaticDataService"/>.
-        /// </summary>
-        /// <param name="shipperRepository">Репозиторий для доступа к информации о отправителях.</param>
-        /// <param name="carrierRepository">Репозиторий для доступа к информации о перевозчиках.</param>
-        /// <param name="termsOfDeliveryRepository">Репозиторий для доступа к информации о условиях поставки.</param>
-        /// <param name="transportTypeRepository">Репозиторий для доступа к информации о типах транспорта.</param>
-        /// <param name="locationRepository">Репозиторий для доступа к информации о локациях.</param>
-        /// <param name="locationTypeRepository">Репозиторий для доступа к информации о типах локаций.</param>
-        /// <param name="transportRepository">Репозиторий для доступа к информации о транспорте.</param>
-        /// <param name="containerTypeRepository">Репозиторий для доступа к информации о типах контейнеров.</param>
-        /// <param name="logger">Регистратор для отслеживания информации и ошибок.</param>
-        public StaticDataService(
-            IRepository<Shipper> shipperRepository,
-            IRepository<Carrier> carrierRepository,
-            IRepository<TermsOfDelivery> termsOfDeliveryRepository,
-            IRepository<TypesOfTransport> transportTypeRepository,
-            IRepository<Location> locationRepository,
-            IRepository<TypesOfLocation> locationTypeRepository,
-            IRepository<Transport> transportRepository,
-            IRepository<TypesOfContainer> containerTypeRepository,
-            IRepository<TypesOfPart> partTypeRepository,
-            IRepository<TypesOfOrder> orderTypesRepository,
-            IRepository<TypesOfPacking> packingTypesRepository,
-            ILogger<StaticDataService> logger)
-        {
-            _shipperRepository = shipperRepository;
-            _carrierRepository = carrierRepository;
-            _termsOfDeliveryRepository = termsOfDeliveryRepository;
-            _transportTypeRepository = transportTypeRepository;
-            _locationRepository = locationRepository;
-            _partTypeRepository = partTypeRepository;
-            _locationTypeRepository = locationTypeRepository;
-            _transportRepository = transportRepository;
-            _containerTypeRepository = containerTypeRepository;
-            _packingTypesRepository = packingTypesRepository;
-            _orderTypesRepository = orderTypesRepository;
-            _logger = logger;
-        }
 
         #region Get by id
 
         /// <inheritdoc />
-        public async Task<TypesOfContainer> GetContainerTypeById(int containerTypeId)
+        public async Task<Process> GetProcessByIdAsync(int processId)
         {
             try
             {
-                return await _containerTypeRepository.GetByIdAsync(containerTypeId);
+                logger.LogTrace(string.Format(Resources.LogProcessGetById, processId));
+
+                Process process = await processRepository.GetByIdAsync(processId);
+
+                logger.LogTrace($"{string.Format(Resources.LogProcessGetById, processId)} {Resources.Completed}");
+
+                return process;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get container type by id {containerTypeId}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogProcessGetById, processId)}: {JsonConvert.SerializeObject(ex)}";
+                
+                logger.LogError(message);
 
-                throw new Exception($"Ошибка получения типа контейнера по уникальному идентификатору '{containerTypeId}'.");
+                throw new Exception(message);
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<Section> GetSectionByIdAsync(int sectionId)
+        {
+            try
+            {
+                logger.LogTrace(string.Format(Resources.LogSectionGetById, sectionId));
+
+                Section section = await sectionRepository.GetByIdAsync(sectionId);
+
+                logger.LogTrace($"{string.Format(Resources.LogSectionGetById, sectionId)} {Resources.Completed}");
+
+                return section;
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {string.Format(Resources.LogSectionGetById, sectionId)}: {JsonConvert.SerializeObject(ex)}";
+
+                logger.LogError(message);
+
+                throw new Exception(message);
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task<TypesOfContainer> GetContainerTypeByIdAsync(int containerTypeId)
+        {
+            try
+            {
+                logger.LogTrace(string.Format(Resources.LogTypesOfContainerGetById, containerTypeId));
+
+                TypesOfContainer containerType = await containerTypeRepository.GetByIdAsync(containerTypeId);
+
+                logger.LogTrace($"{string.Format(Resources.LogTypesOfContainerGetById, containerTypeId)} {Resources.Completed}");
+
+                return containerType;
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {string.Format(Resources.LogTypesOfContainerGetById, containerTypeId)}: {JsonConvert.SerializeObject(ex)}";
+
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -97,13 +129,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _partTypeRepository.GetByIdAsync(partTypeId);
+                logger.LogTrace(string.Format(Resources.LogTypesOfPartGetById, partTypeId));
+
+                TypesOfPart partType = await partTypeRepository.GetByIdAsync(partTypeId);
+
+                logger.LogTrace($"{string.Format(Resources.LogTypesOfPartGetById, partTypeId)} {Resources.Completed}");
+
+                return partType;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get part type by id {partTypeId}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogTypesOfPartGetById, partTypeId)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения типа детали по уникальному идентификатору '{partTypeId}'.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -112,13 +152,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _packingTypesRepository.GetByIdAsync(packingTypeId);
+                logger.LogTrace(string.Format(Resources.LogTypesOfPackingGetById, packingTypeId));
+
+                TypesOfPacking packingType = await packingTypesRepository.GetByIdAsync(packingTypeId);
+
+                logger.LogTrace($"{string.Format(Resources.LogTypesOfPackingGetById, packingTypeId)} {Resources.Completed}");
+
+                return packingType;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get packing type by id {packingTypeId}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogTypesOfPackingGetById, packingTypeId)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения типа упаковки по уникальному идентификатору '{packingTypeId}'.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -127,13 +175,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _locationTypeRepository.GetByIdAsync(locationTypeId);
+                logger.LogTrace(string.Format(Resources.LogTypesOfLocationGetById, locationTypeId));
+
+                TypesOfLocation locationType = await locationTypeRepository.GetByIdAsync(locationTypeId);
+
+                logger.LogTrace($"{string.Format(Resources.LogTypesOfLocationGetById, locationTypeId)} {Resources.Completed}");
+
+                return locationType;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get location by location type id {locationTypeId}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogTypesOfLocationGetById, locationTypeId)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения типа локации по уникальному идентификатору '{locationTypeId}'");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -142,13 +198,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _carrierRepository.GetByIdAsync(carrierId);
+                logger.LogTrace(string.Format(Resources.LogCarrierGetById, carrierId));
+
+                Carrier carrier = await carrierRepository.GetByIdAsync(carrierId);
+
+                logger.LogTrace($"{string.Format(Resources.LogCarrierGetById, carrierId)} {Resources.Completed}");
+
+                return carrier;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get carrier by id {carrierId}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogCarrierGetById, carrierId)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения перевозчика по уникальному идентификатору '{carrierId}'");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -157,13 +221,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _termsOfDeliveryRepository.GetByIdAsync(deliveryTermId);
+                logger.LogTrace(string.Format(Resources.LogTermsOfDeliveryGetById, deliveryTermId));
+
+                TermsOfDelivery termsOfDelivery = await termsOfDeliveryRepository.GetByIdAsync(deliveryTermId);
+
+                logger.LogTrace($"{string.Format(Resources.LogTermsOfDeliveryGetById, deliveryTermId)} {Resources.Completed}");
+
+                return termsOfDelivery;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get delivery term by id {deliveryTermId}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogTermsOfDeliveryGetById, deliveryTermId)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения условия поставки по уникальному идентификатору '{deliveryTermId}'");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -172,7 +244,11 @@ namespace BLL.Services
         {
             try
             {
-                Location location = await _locationRepository.GetByIdAsync(locationId);
+                logger.LogTrace(string.Format(Resources.LogLocationGetById, locationId));
+
+                Location location = await locationRepository.GetByIdAsync(locationId);
+
+                logger.LogTrace($"{string.Format(Resources.LogLocationGetById, locationId)} {Resources.Completed}");
 
                 if (location is not null)
                 {
@@ -183,9 +259,11 @@ namespace BLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get location by id {locationId}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogLocationGetById, locationId)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения локации по уникальному идентификатору '{locationId}'");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -194,13 +272,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _transportRepository.GetByIdAsync(transportId);
+                logger.LogTrace(string.Format(Resources.LogTransportGetById, transportId));
+
+                Transport transport = await transportRepository.GetByIdAsync(transportId);
+
+                logger.LogTrace($"{string.Format(Resources.LogTransportGetById, transportId)} {Resources.Completed}");
+
+                return transport;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get transport by id {transportId}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogTransportGetById, transportId)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения транспорта по уникальному идентификатору '{transportId}'");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -209,13 +295,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _transportTypeRepository.GetByIdAsync(transportTypeId);
+                logger.LogTrace(string.Format(Resources.LogTypesOfTransportGetById, transportTypeId));
+
+                TypesOfTransport transportType = await transportTypeRepository.GetByIdAsync(transportTypeId);
+
+                logger.LogTrace($"{string.Format(Resources.LogTypesOfTransportGetById, transportTypeId)} {Resources.Completed}");
+
+                return transportType;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get transport type by id {transportTypeId}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogTypesOfTransportGetById, transportTypeId)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения типа транспорта по уникальному идентификатору '{transportTypeId}'");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -224,7 +318,11 @@ namespace BLL.Services
         {
             try
             {
-                Shipper shipper = await _shipperRepository.GetByIdAsync(shipperId);
+                logger.LogTrace(string.Format(Resources.LogShipperGetById, shipperId));
+
+                Shipper shipper = await shipperRepository.GetByIdAsync(shipperId);
+
+                logger.LogTrace($"{string.Format(Resources.LogShipperGetById, shipperId)} {Resources.Completed}");
 
                 if (shipper is not null)
                 {
@@ -238,9 +336,11 @@ namespace BLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get shipper by id {shipperId}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogShipperGetById, shipperId)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения отправителя по уникальному идентификатору '{shipperId}'.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -249,13 +349,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _orderTypesRepository.GetByIdAsync(orderTypeId);
+                logger.LogTrace(string.Format(Resources.LogTypesOfOrderGetById, orderTypeId));
+
+                TypesOfOrder orderType = await orderTypesRepository.GetByIdAsync(orderTypeId);
+
+                logger.LogTrace($"{string.Format(Resources.LogTypesOfOrderGetById, orderTypeId)} {Resources.Completed}");
+
+                return orderType;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get order type by id {orderTypeId}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogTypesOfOrderGetById, orderTypeId)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения типа заказа по уникальному идентификатору '{orderTypeId}'");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -267,13 +375,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _partTypeRepository.GetAllAsync();
+                logger.LogTrace(Resources.LogTypesOfPartGet);
+
+                IEnumerable<TypesOfPart> partTypes = await partTypeRepository.GetAllAsync();
+
+                logger.LogTrace($"{Resources.LogTypesOfPartGet} {Resources.Completed}");
+
+                return partTypes;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get all part types list: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogTypesOfPartGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения списка типов деталей.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -282,13 +398,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _packingTypesRepository.GetAllAsync();
+                logger.LogTrace(Resources.LogTypesOfPackingGet);
+
+                IEnumerable<TypesOfPacking> packingTypes = await packingTypesRepository.GetAllAsync();
+
+                logger.LogTrace($"{Resources.LogTypesOfPackingGet} {Resources.Completed}");
+
+                return packingTypes;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get all packing types list: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogTypesOfPackingGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения списка типов упаковок.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -297,13 +421,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _shipperRepository.GetAllAsync();
+                logger.LogTrace(Resources.LogShipperGet);
+
+                IEnumerable<Shipper> shippers = await shipperRepository.GetAllAsync();
+
+                logger.LogTrace($"{Resources.LogShipperGet} {Resources.Completed}");
+
+                return shippers;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get list shippers: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogShipperGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception("Ошибка получения грузоотправителей.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -312,13 +444,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _carrierRepository.GetAllAsync();
+                logger.LogTrace(Resources.LogCarrierGet);
+
+                IEnumerable<Carrier> carriers = await carrierRepository.GetAllAsync();
+
+                logger.LogTrace($"{Resources.LogCarrierGet} {Resources.Completed}");
+
+                return carriers;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get list carriers: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogCarrierGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения списка перевозчиков.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -327,13 +467,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _termsOfDeliveryRepository.GetAllAsync();
+                logger.LogTrace(Resources.LogTermsOfDeliveryGet);
+
+                IEnumerable<TermsOfDelivery> termsOfDelivery = await termsOfDeliveryRepository.GetAllAsync();
+
+                logger.LogTrace($"{Resources.LogTermsOfDeliveryGet} {Resources.Completed}");
+
+                return termsOfDelivery;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get list terms of delivery: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogTermsOfDeliveryGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения списка условий поставки.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -342,13 +490,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _transportTypeRepository.GetAllAsync();
+                logger.LogTrace(Resources.LogTypesOfTransportGet);
+
+                IEnumerable<TypesOfTransport> typesOfTransports = await transportTypeRepository.GetAllAsync();
+
+                logger.LogTrace($"{Resources.LogTypesOfTransportGet} {Resources.Completed}");
+
+                return typesOfTransports;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get list transport types: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogTypesOfTransportGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения списка типов транспорта.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -357,7 +513,11 @@ namespace BLL.Services
         {
             try
             {
-                IEnumerable<Location> locations = await _locationRepository.GetAllAsync();
+                logger.LogTrace(Resources.LogLocationGet);
+
+                IEnumerable<Location> locations = await locationRepository.GetAllAsync();
+
+                logger.LogTrace($"{Resources.LogLocationGet} {Resources.Completed}");
 
                 foreach (Location location in locations)
                 {
@@ -370,9 +530,11 @@ namespace BLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get list locations: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogLocationGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения локаций.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -381,13 +543,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _transportRepository.GetAllAsync();
+                logger.LogTrace(Resources.LogTransportGet);
+
+                IEnumerable<Transport> transports = await transportRepository.GetAllAsync();
+
+                logger.LogTrace($"{Resources.LogTransportGet} {Resources.Completed}");
+
+                return transports;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get list transports: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogTransportGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения списка транспорта.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -396,13 +566,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _containerTypeRepository.GetAllAsync();
+                logger.LogTrace(Resources.LogTypesOfContainerGet);
+
+                IEnumerable<TypesOfContainer> typesOfContainers = await containerTypeRepository.GetAllAsync();
+
+                logger.LogTrace($"{Resources.LogTypesOfContainerGet} {Resources.Completed}");
+
+                return typesOfContainers;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get list container types: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogTypesOfContainerGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения типов контейнера.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -411,11 +589,11 @@ namespace BLL.Services
         /// <inheritdoc />
         public async Task<TypesOfPacking> GetExistingPackingTypeByTypeAsync(string packingType)
         {
-            _logger.LogInformation($"The beginning of receiving a package type by type name '{packingType}'");
+            logger.LogInformation(string.Format(Resources.LogTypesOfPackingGetByTypeName, packingType));
 
             TypesOfPacking result = (await GetAllPackingTypesAsync()).FirstOrDefault(c => c.SupplierPackingType == packingType);
 
-            _logger.LogInformation($"Receiving a package type by type name '{packingType}' completed, result: '{JsonConvert.SerializeObject(result)}'");
+            logger.LogInformation($"{string.Format(Resources.LogTypesOfPackingGetByTypeName, packingType)} {Resources.Completed}, {string.Format(Resources.LogWithResult, result)}");
 
             return result;
         }
@@ -427,25 +605,22 @@ namespace BLL.Services
 
             try
             {
-                newTransport = await _transportRepository.CreateAsync(newTransport, StoredProcedureInbound.AddNewTransport, parameters);
+                logger.LogInformation($"{Resources.LogTransportAdd}: {JsonConvert.SerializeObject(newTransport)}");
+
+                newTransport = await transportRepository.CreateAsync(newTransport, StoredProcedureInbound.AddNewTransport, parameters);
+
+                logger.LogInformation($"{Resources.LogTransportAdd} {Resources.Completed}");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error add new transport: {JsonConvert.SerializeObject(newTransport)}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogTransportAdd}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка добавления нового транспорта.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
 
-            try
-            {
-                _transportRepository.RefreshData();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error refresh list transports: {JsonConvert.SerializeObject(ex)}");
-
-                throw new Exception($"Ошибка обновления списка транспорта.");
-            }
+            RefreshTransport();
 
             return newTransport;
         }
@@ -457,20 +632,24 @@ namespace BLL.Services
 
             string locationTypeName = EnumExtensions.GetDescription(locationType);
 
-            _logger.LogInformation($"Filter locations by location type {locationTypeName}");
+            logger.LogInformation($"{string.Format(Resources.LogLocationFilterByType, locationTypeName)}");
 
-            return locations.Where(location => location.LocationType.LocationType == locationTypeName);
+            IEnumerable<Location> filteredLocations = locations.Where(location => location.LocationType.LocationType == locationTypeName);
+
+            logger.LogInformation($"{string.Format(Resources.LogLocationFilterByType, locationTypeName)} {Resources.Completed}");
+
+            return filteredLocations;
         }
 
         /// <inheritdoc />
         public async Task<TypesOfContainer> GetContainerTypeByName(string containerTypeName)
         {
-            _logger.LogInformation($"The beginning of receiving a container by the name of the container type: '{containerTypeName}'");
+            logger.LogInformation($"{string.Format(Resources.LogTypesOfContainerGetByTypeName, containerTypeName)}");
 
             TypesOfContainer result = (await GetAllContainerTypes())
                       .FirstOrDefault(ct => ct.ContainerType == containerTypeName);
 
-            _logger.LogInformation($"Receiving a container by the name of the container type: '{containerTypeName}' completed, result: '{JsonConvert.SerializeObject(result)}'");
+            logger.LogInformation($"{string.Format(Resources.LogTypesOfContainerGetByTypeName, containerTypeName)} {Resources.Completed} {string.Format(Resources.LogWithResult, result)}");
 
             return result;
         }
@@ -478,11 +657,12 @@ namespace BLL.Services
         /// <inheritdoc />
         public async Task<Location> GetFinalLocationAsync()
         {
-            _logger.LogInformation($"The beginning of receiving a final location");
+            logger.LogInformation(Resources.LogLocationFinalGet);
 
             Location result = (await GetAllLocationsAsync()).
                 FirstOrDefault(l => l.LocationType.LocationType == EnumExtensions.GetDescription(LocationType.FinalLocation));
-            _logger.LogInformation($"Receiving a final location completed, result: '{JsonConvert.SerializeObject(result)}'");
+
+            logger.LogInformation($"{Resources.LogLocationFinalGet} {Resources.Completed} {string.Format(Resources.LogWithResult, JsonConvert.SerializeObject(result))}");
 
             return result;
         }
@@ -490,13 +670,57 @@ namespace BLL.Services
         /// <inheritdoc />
         public async Task<TypesOfPart> GetPartTypeByNameAsync(PartTypes partType)
         {
-            _logger.LogInformation($"The beginning of receiving a part type by the name: '{partType}'");
+            logger.LogInformation($"{string.Format(Resources.LogTypesOfPartGetByPartTypeName, partType)}");
 
             TypesOfPart result = (await GetAllPartTypesAsync()).FirstOrDefault(pt => pt.PartType == partType);
 
-            _logger.LogInformation($"The beginning of receiving a part type by the name: '{partType}' completed, result: '{JsonConvert.SerializeObject(result)}'");
+            logger.LogInformation($"{string.Format(Resources.LogTypesOfPartGetByPartTypeName, partType)} {Resources.Completed} {string.Format(Resources.LogWithResult, result)}");
 
             return result;
+        }
+
+        /// <inheritdoc />
+        public async Task<IEnumerable<ProcessStep>> GetProcessStepsByUserAsync(User user)
+        {
+            try
+            {
+                logger.LogTrace($"{string.Format(Resources.LogProcessStepGetBySectionId, user.SectionId)}");
+
+                IEnumerable<ProcessStep>  steps = (await processStepsRepository.GetAllAsync())
+                    .Where(c => c.SectionId == user.SectionId);
+
+                logger.LogTrace($"{string.Format(Resources.LogProcessStepGetBySectionId, user.SectionId)} {Resources.Completed}");
+
+                return steps;
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {string.Format(Resources.LogProcessStepGetBySectionId, user.SectionId)}: {JsonConvert.SerializeObject(ex)}";
+
+                logger.LogError(message);
+
+                throw new Exception(message);
+            }
+        }
+
+        private void RefreshTransport()
+        {
+            try
+            {
+                logger.LogTrace(Resources.LogTransportRefresh);
+
+                transportRepository.RefreshData();
+
+                logger.LogTrace($"{Resources.LogTransportRefresh} {Resources.Completed}");
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {Resources.LogTransportRefresh}: {JsonConvert.SerializeObject(ex)}";
+
+                logger.LogError(message);
+
+                throw new Exception(message);
+            }
         }
     }
 }

@@ -14,16 +14,8 @@ namespace DAL.DbAccess
     /// <summary>
     /// Реализация доступа к данным SQL.
     /// </summary>
-    public class SqlDataAccess : ISqlDataAccess
+    public class SqlDataAccess(IConfigurationWrapper configWrapper, ISqlMapper sqlMapper) : ISqlDataAccess
     {
-        private readonly IConfigurationWrapper _configWrapper;
-        private readonly ISqlMapper _sqlMapper;
-
-        public SqlDataAccess(IConfigurationWrapper configWrapper, ISqlMapper sqlMapper)
-        {
-            _configWrapper = configWrapper;
-            _sqlMapper = sqlMapper;
-        }
 
         /// <inheritdoc />
         public async Task<IEnumerable<T>> LoadDataWithReturnAsync<T>(
@@ -31,10 +23,10 @@ namespace DAL.DbAccess
             object parameters = null,
             string connectionId = "Default")
         {
-            string connectionString = _configWrapper.GetConnectionString(connectionId);
+            string connectionString = configWrapper.GetConnectionString(connectionId);
             using SqlConnection connection = new(connectionString);
 
-            return await _sqlMapper.QueryAsync<T>(
+            return await sqlMapper.QueryAsync<T>(
                 connection,
                 StoredProceduresExtensions.Map[storedProcedure.GetType()].Invoke(storedProcedure),
                 parameters,
@@ -47,9 +39,9 @@ namespace DAL.DbAccess
             object parameters = null,
             string connectionId = "Default")
         {
-            using SqlConnection connection = new(_configWrapper.GetConnectionString(connectionId));
+            using SqlConnection connection = new(configWrapper.GetConnectionString(connectionId));
 
-            await _sqlMapper.ExecuteAsync(
+            await sqlMapper.ExecuteAsync(
                 connection,
                 StoredProceduresExtensions.Map[storedProcedure.GetType()].Invoke(storedProcedure),
                 parameters,
@@ -63,8 +55,8 @@ namespace DAL.DbAccess
             string connectionId = "Default"
         )
         {
-            using SqlConnection connection = new(_configWrapper.GetConnectionString(connectionId));
-            return await _sqlMapper.QueryAsync<T>(
+            using SqlConnection connection = new(configWrapper.GetConnectionString(connectionId));
+            return await sqlMapper.QueryAsync<T>(
                 connection,
                 StoredProceduresExtensions.Map[storedProcedure.GetType()].Invoke(storedProcedure),
                 parameters,
@@ -75,7 +67,7 @@ namespace DAL.DbAccess
         {
             try
             {
-                using SqlConnection connection = new(_configWrapper.GetConnectionString(connectionId));
+                using SqlConnection connection = new(configWrapper.GetConnectionString(connectionId));
 
                 await connection.OpenAsync();
 

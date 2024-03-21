@@ -8,10 +8,7 @@ namespace DAL.Data.SqlServer
     /// <summary>
     /// Реализация SQL Server для получения условий поставки.
     /// </summary>
-    public class TermsOfDeliverySqlServerData : SqlServerData<TermsOfDelivery>
+    public class TermsOfDeliverySqlServerData(ISqlDataAccess db) : SqlServerData<TermsOfDelivery>(db, StoredProcedureInbound.GetAllTermsOfDelivery)
     {
-        public TermsOfDeliverySqlServerData(ISqlDataAccess db, ILogger<TermsOfDeliverySqlServerData> logger)
-                    : base(db, logger, StoredProcedureInbound.GetAllTermsOfDelivery)
-        { }
     }
 }

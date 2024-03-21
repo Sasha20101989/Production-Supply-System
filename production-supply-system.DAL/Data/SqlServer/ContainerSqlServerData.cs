@@ -5,10 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DAL.Data.SqlServer
 {
-    public class ContainerSqlServerData : SqlServerData<ContainersInLot>
+    public class ContainerSqlServerData(ISqlDataAccess db) : SqlServerData<ContainersInLot>(db, StoredProcedureInbound.GetAllContainers)
     {
-        public ContainerSqlServerData(ISqlDataAccess db, ILogger<ContainerSqlServerData> logger)
-            : base(db, logger, StoredProcedureInbound.GetAllContainers)
-        { }
     }
 }

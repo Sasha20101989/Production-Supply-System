@@ -7,12 +7,14 @@ using System.Windows.Media;
 
 using BLL.Contracts;
 
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+
 using DAL.Models.Document;
 
 using MahApps.Metro.Controls;
 
 using Microsoft.Extensions.Logging;
-using Microsoft.Toolkit.Mvvm.Input;
 
 using NavigationManager.Frame.Extension.WPF;
 
@@ -24,33 +26,15 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
     /// ViewModel, представляющая информацию о списке документов для взаимодействия с пользовательским интерфейсом.
     /// Наследует от ObservableObject для уведомлений об изменении свойств.
     /// </summary>
-    public class DocumentMapperViewModel : ControlledViewModel, INavigationAware
+    public partial class DocumentMapperViewModel(
+        IDocumentService documentService,
+        INavigationManager navigationManager, 
+        ILogger<DocumentMapperViewModel> logger) : ControlledViewModel(logger), INavigationAware
     {
-        private readonly ILogger<DocumentMapperViewModel> _logger;
-
-        private readonly INavigationManager _navigationManager;
-
-        private readonly IDocumentService _documentService;
-
         private string _searchText;
 
-        public DocumentMapperViewModel(IDocumentService documentService, INavigationManager navigationManager, ILogger<DocumentMapperViewModel> logger)
-        {
-            _logger = logger;
-
-            _navigationManager = navigationManager;
-
-            _documentService = documentService;
-
-            NavigateToDetailCommand = new RelayCommand<object>(NavigateToDetail);
-
-            _metroWindow = Application.Current.Windows.OfType<MetroWindow>().FirstOrDefault(x => x.IsActive);
-        }
-
-        /// <summary>
-        /// Команда перенаправления к детальной информации документа
-        /// </summary>
-        public RelayCommand<object> NavigateToDetailCommand { get; }
+        [ObservableProperty]
+        private ObservableCollection<Docmapper> _source = [];
 
         /// <summary>
         /// Получает или задает текст фильтра
@@ -66,11 +50,6 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
             }
         }
 
-        /// <summary>
-        /// Получает или задает коллекцию документов
-        /// </summary>
-        public ObservableCollection<Docmapper> Source { get; } = new ObservableCollection<Docmapper>();
-
         public void OnNavigatedFrom()
         {
 
@@ -85,9 +64,9 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
             {
                 await CreateController(Resources.BllFilterDocuments);
 
-                _logger.LogInformation($"Start filtering documents by search text '{SearchText}'.");
+                logger.LogInformation(string.Format(Resources.LogDocmapperFilter, SearchText));
 
-                IEnumerable<Docmapper> filteredDocuments = (await _documentService.GetAllAsync())
+                IEnumerable<Docmapper> filteredDocuments = (await documentService.GetAllDocumentsAsync())
                         .ToList()
                         .Where(document =>
                               document.DocmapperName.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
@@ -102,7 +81,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
                     Source.Add(item);
                 }
 
-                _logger.LogInformation($"Filtering documents by search text '{SearchText}' completed.");
+                logger.LogInformation($"{string.Format(Resources.LogDocmapperFilter, SearchText)} {Resources.Completed}");
             }
             catch (Exception ex)
             {
@@ -122,7 +101,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
             Source.Add(new() { });
 
-            foreach (Docmapper item in await _documentService.GetAllAsync())
+            foreach (Docmapper item in await documentService.GetAllDocumentsAsync())
             {
                 Source.Add(item);
             }
@@ -131,16 +110,17 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         /// <summary>
         /// Перенаправляет к детальной информации документа
         /// </summary>
+        [RelayCommand]
         private void NavigateToDetail(object parameter)
         {
             if(parameter is null)
             {
-                _ = _navigationManager.NavigateTo(
+                _ = navigationManager.NavigateTo(
                 typeof(DocumentMapperDetailViewModel).FullName,
                 null);
             }else if (parameter is Docmapper document)
             {
-                _ = _navigationManager.NavigateTo(
+                _ = navigationManager.NavigateTo(
                 typeof(DocumentMapperDetailViewModel).FullName,
                 document.Id);
             }

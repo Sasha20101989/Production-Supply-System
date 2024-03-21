@@ -8,10 +8,7 @@ namespace DAL.Data.SqlServer
     /// <summary>
     /// Реализация SQL Server для получения перевозчиков.
     /// </summary>
-    public class CarrierSqlServerData : SqlServerData<Carrier>
+    public class CarrierSqlServerData(ISqlDataAccess db) : SqlServerData<Carrier>(db, StoredProcedureInbound.GetAllCarriers)
     {
-        public CarrierSqlServerData(ISqlDataAccess db, ILogger<CarrierSqlServerData> logger)
-             : base(db, logger, StoredProcedureInbound.GetAllCarriers)
-        { }
     }
 }

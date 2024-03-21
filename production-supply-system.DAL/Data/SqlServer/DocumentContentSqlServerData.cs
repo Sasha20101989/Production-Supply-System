@@ -5,10 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DAL.Data.SqlServer
 {
-    public class DocumentContentSqlServerData : SqlServerData<DocmapperContent>
+    public class DocumentContentSqlServerData(ISqlDataAccess db) : SqlServerData<DocmapperContent>(db, StoredProcedureDocmapper.GetAllDocmapperContentItems)
     {
-        public DocumentContentSqlServerData(ISqlDataAccess db, ILogger<DocumentContentSqlServerData> logger)
-           : base(db, logger, StoredProcedureDocmapper.GetAllDocmapperContentItems)
-        { }
     }
 }

@@ -5,11 +5,8 @@ using DAL.Models;
 
 namespace DAL.Data.SqlServer
 {
-    public class PartInInvoiceSqlServerData : SqlServerData<PartsInInvoice>
+    public class PartInInvoiceSqlServerData(ISqlDataAccess db) : SqlServerData<PartsInInvoice>(db, StoredProcedureInbound.GetAllPartsInInvoice)
     {
-        public PartInInvoiceSqlServerData(ISqlDataAccess db, ILogger<PartInInvoiceSqlServerData> logger)
-            : base(db, logger, StoredProcedureInbound.GetAllPartsInInvoice)
-        { }
     }
 }
  

@@ -8,10 +8,7 @@ namespace DAL.Data.SqlServer
     /// <summary>
     /// Реализация SQL Server для получения условий поставки.
     /// </summary>
-    public class VinContainerSqlServerData : SqlServerData<VinsInContainer>
+    public class VinContainerSqlServerData(ISqlDataAccess db) : SqlServerData<VinsInContainer>(db, StoredProcedurePlanning.GetAllVinContainers)
     {
-        public VinContainerSqlServerData(ISqlDataAccess db, ILogger<VinContainerSqlServerData> logger)
-                    : base(db, logger, StoredProcedurePlanning.GetAllVinContainers)
-        { }
     }
 }

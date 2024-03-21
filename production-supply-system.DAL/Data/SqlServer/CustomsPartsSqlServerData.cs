@@ -8,10 +8,7 @@ namespace DAL.Data.SqlServer
     /// <summary>
     /// Реализация SQL Server для получения перевозчиков.
     /// </summary>
-    public class CustomsPartsSqlServerData : SqlServerData<CustomsPart>
+    public class CustomsPartsSqlServerData(ISqlDataAccess db) : SqlServerData<CustomsPart>(db, StoredProcedureCustoms.GetAllCustomsParts)
     {
-        public CustomsPartsSqlServerData(ISqlDataAccess db, ILogger<CustomsPartsSqlServerData> logger)
-             : base(db, logger, StoredProcedureCustoms.GetAllCustomsParts)
-        { }
     }
 }

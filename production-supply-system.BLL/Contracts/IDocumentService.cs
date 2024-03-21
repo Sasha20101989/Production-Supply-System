@@ -21,7 +21,7 @@ namespace BLL.Contracts
         /// Асинхронно получает список карт документов.
         /// </summary>
         /// <returns>Задача, представляющая асинхронную операцию, возвращающую список документов.</returns>
-        Task<IEnumerable<Docmapper>> GetAllAsync();
+        Task<IEnumerable<Docmapper>> GetAllDocumentsAsync();
 
         /// <summary>
         /// Получает карту по ее уникальному идентификатору
@@ -41,7 +41,7 @@ namespace BLL.Contracts
         /// </summary>
         /// <param name="mapId">Уникальный идентификатор карты документа</param>
         /// <returns>Задача, представляющая асинхронную операцию, возвращающую список контента документа.</returns>
-        Task<IEnumerable<DocmapperContent>> GetAllDocumentContentItemsByIdAsync(int mapId);
+        Task<List<DocmapperContent>> GetAllDocumentContentItemsByIdAsync(int mapId);
 
         /// <summary>
         /// Асинхронно обновляет документ.

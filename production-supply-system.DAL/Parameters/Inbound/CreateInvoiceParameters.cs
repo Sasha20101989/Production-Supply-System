@@ -3,21 +3,13 @@ using DAL.Models;
 
 namespace DAL.Parameters.Inbound
 {
-    public class CreateInvoiceParameters
+    public class CreateInvoiceParameters(Invoice entity)
     {
-        public CreateInvoiceParameters(Invoice entity)
-        {
-            InvoiceNumber = entity.InvoiceNumber;
-            InvoiceDate = entity.InvoiceDate;
-            ShipperId = entity.ShipperId;
-            PurchaseOrderId = entity.PurchaseOrderId;
-        }
+        public string InvoiceNumber { get; set; } = entity.InvoiceNumber;
+        public DateTime InvoiceDate { get; set; } = entity.InvoiceDate;
 
-        public string InvoiceNumber { get; set; }
-        public DateTime InvoiceDate { get; set; }
+        public int ShipperId { get; set; } = entity.ShipperId;
 
-        public int ShipperId { get; set; }
-
-        public int? PurchaseOrderId { get; set; } = null!;
+        public int? PurchaseOrderId { get; set; } = entity.PurchaseOrderId;
     }
 }

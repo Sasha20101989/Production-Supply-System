@@ -5,19 +5,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using BLL.Contracts;
+
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using DAL.Enums;
 using DAL.Models;
-
-using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
-
 using Microsoft.Extensions.Logging;
-using Microsoft.Toolkit.Mvvm.Input;
-
 using Newtonsoft.Json;
-
 using UI_Interface.Properties;
-using UI_Interface.ViewModels.ViewModelsForPages;
 
 namespace UI_Interface.ViewModels
 {
@@ -26,9 +22,9 @@ namespace UI_Interface.ViewModels
     /// Наследует от ObservableObject для уведомлений об изменении свойств.
     /// Реализует IDataErrorInfo для поддержки валидации данных.
     /// </summary>
-    public class DeliveryDetailViewModel : ValidatedViewModel<DeliveryDetailViewModel, List<Type>>
+    public partial class DeliveryDetailViewModel : ValidatedViewModel<DeliveryDetailViewModel, List<Type>>
     {
-        private ProgressDialogController _progressController;
+        private readonly ProgressDialogController _progressController;
 
         private readonly ILogger _logger;
 
@@ -36,36 +32,48 @@ namespace UI_Interface.ViewModels
 
         private readonly IDeliveryService _deliveryService;
 
+        [ObservableProperty]
         private bool _isTransportDropDownOpen;
 
-        private bool _isAddTransportVisible;
+        [ObservableProperty]
+        private bool _isAddTransportVisible = false;
 
         private string _transportName;
 
         private string _newTransportName;
 
+        [ObservableProperty]
         private Lot _lot;
 
+        [ObservableProperty]
         private List<Location> _departureLocations;
 
+        [ObservableProperty]
         private List<Location> _customsLocations;
 
+        [ObservableProperty]
         private List<Location> _arrivalLocations;
 
+        [ObservableProperty]
         private List<Shipper> _shippers;
 
+        [ObservableProperty]
         private List<Carrier> _carriers;
 
+        [ObservableProperty]
         private List<TermsOfDelivery> _termsOfDeliveryItems;
 
+        [ObservableProperty]
         private List<TypesOfTransport> _typesOfTransport;
 
+        [ObservableProperty]
         private List<PurchaseOrder> _allPurchaseOrders;
 
+        [ObservableProperty]
         private List<PurchaseOrder> _purchaseOrdersForShipper;
 
+        [ObservableProperty]
         private ObservableCollection<Transport> _transports;
-
 
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="DeliveryDetailViewModel"/>.
@@ -82,49 +90,12 @@ namespace UI_Interface.ViewModels
 
             _progressController = progressController;
 
-            _lot = new();
-
-            _lot.LotTransport = new();
-
-            AddNewTransportCommand = new AsyncRelayCommand(OnAddNewTransport);
-
-            IsAddTransportVisible = false;
+            _lot = new()
+            {
+                LotTransport = new()
+            };
 
             _ = Init();
-        }
-
-        /// <summary>
-        /// Команда добавления нового транспорта
-        /// </summary>
-        public AsyncRelayCommand AddNewTransportCommand { get; }
-
-        /// <summary>
-        /// Получает или задает транспорт.
-        /// </summary>
-        public ObservableCollection<Transport> Transports
-        {
-            get => _transports;
-            set => _ = SetProperty(ref _transports, value);
-        }
-
-        /// <summary>
-        /// Получает или задает видимость кнопки,
-        /// если введённый пользователем транспорт не обнаружен 
-        /// то кнопка добавления нового транспорта становится видимой
-        /// </summary>
-        public bool IsAddTransportVisible
-        {
-            get => _isAddTransportVisible;
-            set => _ = SetProperty(ref _isAddTransportVisible, value);
-        }
-
-        /// <summary>
-        /// Получает или задает состояние комбобокса(открыт/закрыт)
-        /// </summary>
-        public bool IsTransportDropDownOpen
-        {
-            get => _isTransportDropDownOpen;
-            set => _ = SetProperty(ref _isTransportDropDownOpen, value);
         }
 
         /// <summary>
@@ -249,24 +220,6 @@ namespace UI_Interface.ViewModels
         }
 
         /// <summary>
-        /// Получает или задает заказы.
-        /// </summary>
-        public List<PurchaseOrder> AllPurchaseOrders
-        {
-            get => _allPurchaseOrders;
-            set => _ = SetProperty(ref _allPurchaseOrders, value);
-        }
-
-        /// <summary>
-        /// Получает или задает заказы для отправителя.
-        /// </summary>
-        public List<PurchaseOrder> PurchaseOrdersForShipper
-        {
-            get => _purchaseOrdersForShipper;
-            set => _ = SetProperty(ref _purchaseOrdersForShipper, value);
-        }
-
-        /// <summary>
         /// Получает или задает заказ.
         /// </summary>
         public PurchaseOrder LotPurchaseOrder
@@ -282,78 +235,6 @@ namespace UI_Interface.ViewModels
         {
             get => Lot.Carrier;
             set => _ = SetProperty(Lot.Carrier, value, Lot, (model, carrier) => model.Carrier = carrier);
-        }
-
-        /// <summary>
-        /// Получает или задает локации отправления лота.
-        /// </summary>
-        public List<Location> DepartureLocations
-        {
-            get => _departureLocations;
-            set => _ = SetProperty(ref _departureLocations, value);
-        }
-
-        /// <summary>
-        /// Получает или задает локации таможенного терминала.
-        /// </summary>
-        public List<Location> CustomsLocations
-        {
-            get => _customsLocations;
-            set => _ = SetProperty(ref _customsLocations, value);
-        }
-
-        /// <summary>
-        /// Получает или задает локации места прибытия.
-        /// </summary>
-        public List<Location> ArrivalLocations
-        {
-            get => _arrivalLocations;
-            set => _ = SetProperty(ref _arrivalLocations, value);
-        }
-
-        /// <summary>
-        /// Получает или задает типы транспорта.
-        /// </summary>
-        public List<TypesOfTransport> TypesOfTransport
-        {
-            get => _typesOfTransport;
-            set => _ = SetProperty(ref _typesOfTransport, value);
-        }
-
-        /// <summary>
-        /// Получает или задает условия поставки.
-        /// </summary>
-        public List<TermsOfDelivery> TermsOfDeliveryItems
-        {
-            get => _termsOfDeliveryItems;
-            set => _ = SetProperty(ref _termsOfDeliveryItems, value);
-        }
-
-        /// <summary>
-        /// Получает или задает перевозчиков.
-        /// </summary>
-        public List<Carrier> Carriers
-        {
-            get => _carriers;
-            set => _ = SetProperty(ref _carriers, value);
-        }
-
-        /// <summary>
-        /// Получает или задает отправителей.
-        /// </summary>
-        public List<Shipper> Shippers
-        {
-            get => _shippers;
-            set => _ = SetProperty(ref _shippers, value);
-        }
-
-        /// <summary>
-        /// Получает или задает лот.
-        /// </summary>
-        public Lot Lot
-        {
-            get => _lot;
-            set => _ = SetProperty(ref _lot, value);
         }
 
         /// <summary>
@@ -402,54 +283,10 @@ namespace UI_Interface.ViewModels
         }
 
         /// <summary>
-        /// Получает заказы для отправителя
-        /// </summary>
-        private void LoadPurchaseOrdersForShipper()
-        {
-            if (Shipper is not null)
-            {
-                _logger.LogInformation($"The beginning of receiving orders for the shipper with uniq id '{Shipper.Id}'");
-
-                PurchaseOrdersForShipper = AllPurchaseOrders.Where(shipper => shipper.Id == Shipper.Id).ToList();
-
-                _logger.LogInformation($"Receiving orders for the shipper with uniq id '{Shipper.Id}' completed");
-            }
-        }
-
-        /// <summary>
-        /// Проверяет существует ли транспорт
-        /// </summary>
-        /// <param name="parameter">Имя транспорта</param>
-        /// <returns>Возвращает true если транспорт уже существует, в противном случае false</returns>
-        private bool IsExistsTransport(object transportName)
-        {
-            if (transportName is string name)
-            {
-                if (string.IsNullOrWhiteSpace(name))
-                {
-                    return false;
-                }
-
-                _logger.LogInformation($"Start filtering the list with transport with transport name '{transportName}'");
-
-                List<Transport> filteredTransports = Transports
-                        .Where(transport =>
-                              transport.TransportName == name)
-                        .ToList();
-
-                _logger.LogInformation($"Filtering the list with transport with transport name '{transportName}' completed");
-
-                return !filteredTransports.Any();
-            }
-
-            return false;
-        }
-
-        /// <summary>
         /// Добавляет новый транспорт
         /// </summary>
-        /// <returns></returns>
-        private async Task OnAddNewTransport()
+        [RelayCommand]
+        private async Task AddNewTransport()
         {
             try
             {
@@ -463,11 +300,11 @@ namespace UI_Interface.ViewModels
                     TransportName = _newTransportName
                 };
 
-                _logger.LogInformation($"Start adding the new transport '{JsonConvert.SerializeObject(newTransport)}'");
+                _logger.LogInformation(string.Format(Resources.LogTransportAdd, JsonConvert.SerializeObject(newTransport)));
 
                 newTransport = await _staticDataService.AddTransportAsync(newTransport);
 
-                _logger.LogInformation($"Adding the new transport '{JsonConvert.SerializeObject(newTransport)}' completed");
+                _logger.LogInformation($"{string.Format(Resources.LogTransportAdd, JsonConvert.SerializeObject(newTransport))} {Resources.Completed}");
 
                 Transports.Add(newTransport);
 
@@ -488,6 +325,50 @@ namespace UI_Interface.ViewModels
         }
 
         /// <summary>
+        /// Получает заказы для отправителя
+        /// </summary>
+        private void LoadPurchaseOrdersForShipper()
+        {
+            if (Shipper is not null)
+            {
+                _logger.LogInformation(string.Format(Resources.LogOrdersGetForShipper, Shipper.Id));
+
+                PurchaseOrdersForShipper = AllPurchaseOrders.Where(shipper => shipper.Id == Shipper.Id).ToList();
+
+                _logger.LogInformation($"{string.Format(Resources.LogOrdersGetForShipper, Shipper.Id)} {Resources.Completed}");
+            }
+        }
+
+        /// <summary>
+        /// Проверяет существует ли транспорт
+        /// </summary>
+        /// <param name="parameter">Имя транспорта</param>
+        /// <returns>Возвращает true если транспорт уже существует, в противном случае false</returns>
+        private bool IsExistsTransport(object transportName)
+        {
+            if (transportName is string name)
+            {
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    return false;
+                }
+
+                _logger.LogInformation(string.Format(Resources.LogFilterTransport, JsonConvert.SerializeObject(transportName)));
+
+                List<Transport> filteredTransports = Transports
+                        .Where(transport =>
+                              transport.TransportName == name)
+                        .ToList();
+
+                _logger.LogInformation($"{string.Format(Resources.LogFilterTransport, JsonConvert.SerializeObject(transportName))} {Resources.Completed}");
+
+                return filteredTransports.Count == 0;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Инициализация данных
         /// </summary>
         /// <returns></returns>
@@ -495,7 +376,7 @@ namespace UI_Interface.ViewModels
         {
             try
             {
-                _logger.LogInformation($"Start loading static data.");
+                _logger.LogInformation(Resources.LogLoadStaticData);
 
                 Shippers = (await _staticDataService.GetAllShippersAsync()).ToList();
 
@@ -511,19 +392,11 @@ namespace UI_Interface.ViewModels
 
                 DepartureLocations = (await _staticDataService.GetLocationsByTypeAsync(LocationType.DepartureTerminal)).ToList();
 
-                _logger.LogInformation($"Loading static data completed.");
-
-                _logger.LogInformation($"Start loading orders.");
+                _logger.LogInformation($"{Resources.LogLoadStaticData} {Resources.Completed}");
 
                 AllPurchaseOrders = (await _deliveryService.GetAllPurchaseOrdersAsync()).ToList();
 
-                _logger.LogInformation($"Loading orders completed.");
-
-                _logger.LogInformation($"Start loading all transport.");
-
                 Transports = new(await _staticDataService.GetAllTransportsAsync());
-
-                _logger.LogInformation($"Loading all transport completed.");
             }
             catch (Exception ex)
             {
@@ -547,7 +420,9 @@ namespace UI_Interface.ViewModels
             {
                 _progressController.SetTitle(title);
 
-                _progressController.SetMessage($"{message} Пожалуйста нажмите '{Resources.ShellClose}' для завершения.");
+                _progressController.SetMessage($"{message}. {string.Format(Resources.PleasePress, Resources.ShellClose)}.");
+
+                _logger.LogError(message);
 
                 _progressController.SetCancelable(true);
 
@@ -566,7 +441,7 @@ namespace UI_Interface.ViewModels
         /// </summary>
         private async Task ControllerPostProcess()
         {
-            if (!(_progressController is null) && _progressController.IsOpen)
+            if (_progressController is not null && _progressController.IsOpen)
             {
                 await _progressController.CloseAsync();
             }

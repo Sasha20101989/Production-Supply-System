@@ -5,10 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DAL.Data.SqlServer
 {
-    public class InvoiceSqlServerData : SqlServerData<Invoice>
+    public class InvoiceSqlServerData(ISqlDataAccess db) : SqlServerData<Invoice>(db, StoredProcedureInbound.GetAllInvoiceItems)
     {
-        public InvoiceSqlServerData(ISqlDataAccess db, ILogger<InvoiceSqlServerData> logger)
-          : base(db, logger, StoredProcedureInbound.GetAllInvoiceItems)
-        { }
     }
 }

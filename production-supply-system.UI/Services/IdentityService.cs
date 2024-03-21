@@ -15,22 +15,14 @@ namespace UI_Interface.Services
     /// <summary>
     /// Сервис аутентификации пользователя.
     /// </summary>
-    public class IdentityService : IIdentityService
+    /// <remarks>
+    /// Инициализирует новый экземпляр службы аутентификации.
+    /// </remarks>
+    /// <param name="userService">Служба пользователей.</param>
+    /// <param name="logger">Служба логирования.</param>
+    public class IdentityService(IUserService userService, ILogger<IdentityService> logger) : IIdentityService
     {
-        private readonly IUserService _userService;
-        private readonly ILogger<IdentityService> _logger;
         private User _user;
-
-        /// <summary>
-        /// Инициализирует новый экземпляр службы аутентификации.
-        /// </summary>
-        /// <param name="userService">Служба пользователей.</param>
-        /// <param name="logger">Служба логирования.</param>
-        public IdentityService(IUserService userService, ILogger<IdentityService> logger)
-        {
-            _userService = userService;
-            _logger = logger;
-        }
 
         /// <summary>
         /// Получает имя пользователя учетной записи.
@@ -47,7 +39,7 @@ namespace UI_Interface.Services
         /// <returns>True, если пользователь существует, в противном случае - false.</returns>
         private async Task<bool> IsUserExistsAsync()
         {
-            _user = await _userService.GetUserInfoAsync(GetAccountUserName());
+            _user = await userService.GetUserInfoAsync(GetAccountUserName());
 
             return _user is not null;
         }
@@ -57,7 +49,7 @@ namespace UI_Interface.Services
         {  
             try
             {
-                bool isAccessAllowed = await _userService.IsAccessAllowedAsync();
+                bool isAccessAllowed = await userService.IsAccessAllowedAsync();
 
                 if (!isAccessAllowed)
                 {
@@ -75,7 +67,7 @@ namespace UI_Interface.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.Message);
+                logger.LogError(ex.Message);
 
                 return LoginResultType.UnknownError;
             }

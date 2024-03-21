@@ -219,7 +219,7 @@
                         <TextBox Text="{Binding DocumentViewModel.FirstDataRow, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToIntConverter}, ValidatesOnDataErrors=True}" />
                     </mah:MetroHeader>
                     <mah:ToggleSwitch Margin="{StaticResource SmallLeftTopRightBottomMargin}"
-                                      Command="{Binding IsActiveCommand}"
+                                      Command="{Binding SwitchIsActiveCommand}"
                                       CommandParameter="{Binding}"
                                       IsOn="{Binding DocumentViewModel.IsActive, UpdateSourceTrigger=PropertyChanged}"
                                       OffContent="{x:Static properties:Resources.ShellNoActive}"
@@ -233,11 +233,13 @@
                       IsExpanded="True">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
+                        <RowDefinition />
+                        <RowDefinition Height="4*" />
                         <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
                     <ListView Grid.Row="0"
-                              ItemsSource="{Binding DocumentColumns}">
+                              ItemsSource="{Binding DocumentColumns}"
+                              Grid.RowSpan="2">
                         <ListView.View>
                             <GridView ColumnHeaderContainerStyle="{StaticResource MahApps.Styles.Button.Chromeless}">
                                 <GridViewColumn>
@@ -333,10 +335,10 @@
                             </Grid>
                         </mah:Flyout>
                     </mah:FlyoutsControl>
-                    <Button Grid.Row="1"
+                    <Button Grid.Row="2"
                             Style="{StaticResource AccentCircleButtonStyle}"
-                            Margin="{StaticResource SmallLeftTopRightBottomMargin}"
-                            HorizontalAlignment="Right"
+                            Margin="0,12,0,12"
+                            HorizontalAlignment="Center"
                             Width="25"
                             Height="25"
                             ToolTip="{x:Static properties:Resources.ShellAdd}"

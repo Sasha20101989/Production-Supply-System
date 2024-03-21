@@ -5,10 +5,7 @@ using DAL.Enums;
 
 namespace DAL.Data.SqlServer
 {
-    public class BodyModelVariantSqlServerData : SqlServerData<BodyModelVariant>
+    public class BodyModelVariantSqlServerData(ISqlDataAccess db) : SqlServerData<BodyModelVariant>(db, StoredProcedureDbo.GetAllModelVariants)
     {
-        public BodyModelVariantSqlServerData(ISqlDataAccess db, ILogger<BodyModelVariantSqlServerData> logger)
-             : base(db, logger, StoredProcedureDbo.GetAllModelVariants)
-        { }
     }
 }

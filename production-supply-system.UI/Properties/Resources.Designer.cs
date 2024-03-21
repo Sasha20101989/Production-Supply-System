@@ -19,7 +19,7 @@ namespace UI_Interface.Properties {
     // с помощью такого средства, как ResGen или Visual Studio.
     // Чтобы добавить или удалить член, измените файл .ResX и снова запустите ResGen
     // с параметром /str или перестройте свой проект VS.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -70,7 +70,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Место прибытия лота.
+        ///   Ищет локализованную строку, похожую на Arrival location.
         /// </summary>
         public static string ArrivalLocation {
             get {
@@ -79,7 +79,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Фактическая дата прибытия.
+        ///   Ищет локализованную строку, похожую на ATA.
         /// </summary>
         public static string ATA {
             get {
@@ -88,7 +88,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Фактическая дата доставки.
+        ///   Ищет локализованную строку, похожую на ATD.
         /// </summary>
         public static string ATD {
             get {
@@ -97,7 +97,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сохранение документа.
+        ///   Ищет локализованную строку, похожую на Saving a docmapper.
         /// </summary>
         public static string BllAddNewDocument {
             get {
@@ -106,7 +106,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавление новой колонки.
+        ///   Ищет локализованную строку, похожую на Adding a new docmapper column.
         /// </summary>
         public static string BllAddNewDocumentColumn {
             get {
@@ -115,7 +115,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сохранение документа успешно завершено.
+        ///   Ищет локализованную строку, похожую на Saving the docmapper has been completed successfully..
         /// </summary>
         public static string BllAddNewDocumentSuccess {
             get {
@@ -124,7 +124,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Загрузка контейнеров.
+        ///   Ищет локализованную строку, похожую на Loading containers.
         /// </summary>
         public static string BllDownloadContainers {
             get {
@@ -133,7 +133,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Процесс формирования лота.
+        ///   Ищет локализованную строку, похожую на The process of lot formation.
         /// </summary>
         public static string BllDownloadLot {
             get {
@@ -142,7 +142,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Загрузка списка лотов.
+        ///   Ищет локализованную строку, похожую на Loading the list of lots.
         /// </summary>
         public static string BllDownloadLots {
             get {
@@ -151,7 +151,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выгрузка файла трейсинга.
+        ///   Ищет локализованную строку, похожую на Uploading a tracing file.
         /// </summary>
         public static string BllExportAllTracing {
             get {
@@ -160,7 +160,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Фильтрация документов.
+        ///   Ищет локализованную строку, похожую на Document filtering.
         /// </summary>
         public static string BllFilterDocuments {
             get {
@@ -169,7 +169,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Загрузка колонок доступных для документа.
+        ///   Ищет локализованную строку, похожую на Loading columns available for a docmapper.
         /// </summary>
         public static string BllGetAllDocumentColumns {
             get {
@@ -178,7 +178,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Получение документа.
+        ///   Ищет локализованную строку, похожую на Receiving a document.
         /// </summary>
         public static string BllGetDocument {
             get {
@@ -187,7 +187,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Загрузка шагов процесса.
+        ///   Ищет локализованную строку, похожую на Loading process steps.
         /// </summary>
         public static string BllGetProcessSteps {
             get {
@@ -196,7 +196,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Загрузка деталей для контейнера.
+        ///   Ищет локализованную строку, похожую на Loading parts for the container.
         /// </summary>
         public static string BllLoadPartsForContainer {
             get {
@@ -205,7 +205,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Загрузка статических данных.
+        ///   Ищет локализованную строку, похожую на Loading static data.
         /// </summary>
         public static string BllLoadStaticData {
             get {
@@ -214,7 +214,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Обновление документа.
+        ///   Ищет локализованную строку, похожую на Updating the docmapper.
         /// </summary>
         public static string BllUpdateDocument {
             get {
@@ -223,7 +223,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Обновление документа успешно завершено.
+        ///   Ищет локализованную строку, похожую на Docmapper update completed successfully.
         /// </summary>
         public static string BllUpdateDocumentSuccess {
             get {
@@ -232,7 +232,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Процесс загрузки лота.
+        ///   Ищет локализованную строку, похожую на The process of loading the lot.
         /// </summary>
         public static string BllUploadLot {
             get {
@@ -241,7 +241,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Валидация колонок документа.
+        ///   Ищет локализованную строку, похожую на Validation of document columns.
         /// </summary>
         public static string BllValidationFileColumns {
             get {
@@ -250,7 +250,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Перевозчик.
+        ///   Ищет локализованную строку, похожую на Carrier.
         /// </summary>
         public static string CarrierName {
             get {
@@ -259,7 +259,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Номер кейса.
+        ///   Ищет локализованную строку, похожую на Case number.
         /// </summary>
         public static string CaseNumber {
             get {
@@ -268,7 +268,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Дата закрытия лота.
+        ///   Ищет локализованную строку, похожую на Close date.
         /// </summary>
         public static string CloseDate {
             get {
@@ -277,7 +277,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Комментарий.
+        ///   Ищет локализованную строку, похожую на Comment.
         /// </summary>
         public static string Comment {
             get {
@@ -286,7 +286,16 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Контейнер.
+        ///   Ищет локализованную строку, похожую на completed.
+        /// </summary>
+        public static string Completed {
+            get {
+                return ResourceManager.GetString("Completed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Container.
         /// </summary>
         public static string Container {
             get {
@@ -295,7 +304,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Тип контейнера.
+        ///   Ищет локализованную строку, похожую на Container type.
         /// </summary>
         public static string ContainerType {
             get {
@@ -304,7 +313,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Таможенный терминал.
+        ///   Ищет локализованную строку, похожую на Customs location.
         /// </summary>
         public static string CustomsLocation {
             get {
@@ -322,7 +331,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Папка по умолчанию.
+        ///   Ищет локализованную строку, похожую на Default folder.
         /// </summary>
         public static string DefaultFolder {
             get {
@@ -331,7 +340,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Журнал лотов.
+        ///   Ищет локализованную строку, похожую на Lot list.
         /// </summary>
         public static string DeliveryPageTitle {
             get {
@@ -340,7 +349,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Условия поставки.
+        ///   Ищет локализованную строку, похожую на Delivery term.
         /// </summary>
         public static string DeliveryTerm {
             get {
@@ -349,7 +358,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Место отправления лота.
+        ///   Ищет локализованную строку, похожую на Departure location.
         /// </summary>
         public static string DepartureLocation {
             get {
@@ -358,7 +367,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Название колонки.
+        ///   Ищет локализованную строку, похожую на Element name.
         /// </summary>
         public static string DocumentColumnElementName {
             get {
@@ -367,7 +376,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Номер колонки.
+        ///   Ищет локализованную строку, похожую на Column number.
         /// </summary>
         public static string DocumentColumnNumber {
             get {
@@ -376,7 +385,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Системное название.
+        ///   Ищет локализованную строку, похожую на System name.
         /// </summary>
         public static string DocumentColumnSystemColumnName {
             get {
@@ -385,7 +394,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Имя шаблона.
+        ///   Ищет локализованную строку, похожую на Docmapper name.
         /// </summary>
         public static string DocumentName {
             get {
@@ -394,7 +403,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Новый элемент контента.
+        ///   Ищет локализованную строку, похожую на New content element.
         /// </summary>
         public static string DocumentNewContent {
             get {
@@ -403,7 +412,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Тут вы можете добавить новый элемент контента..
+        ///   Ищет локализованную строку, похожую на Here you can add a new content element..
         /// </summary>
         public static string DocumentNewContentTitle {
             get {
@@ -412,7 +421,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Номер строки.
+        ///   Ищет локализованную строку, похожую на Row number.
         /// </summary>
         public static string DocumentRowNumber {
             get {
@@ -421,7 +430,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить новый шаблон.
+        ///   Ищет локализованную строку, похожую на Add a new template.
         /// </summary>
         public static string DocumentTooltip {
             get {
@@ -430,7 +439,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Редактирование лота.
+        ///   Ищет локализованную строку, похожую на Editing a lot.
         /// </summary>
         public static string EditDeliveryPageTitle {
             get {
@@ -439,7 +448,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ожидаемая дата прибытия.
+        ///   Ищет локализованную строку, похожую на ETA.
         /// </summary>
         public static string ETA {
             get {
@@ -448,7 +457,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ожидаемая дата доставки.
+        ///   Ищет локализованную строку, похожую на ETD.
         /// </summary>
         public static string ETD {
             get {
@@ -457,7 +466,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Фильтр.
+        ///   Ищет локализованную строку, похожую на Filter.
         /// </summary>
         public static string Filter {
             get {
@@ -466,7 +475,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Номер строки с которой начинаются данные.
+        ///   Ищет локализованную строку, похожую на First data row.
         /// </summary>
         public static string FirstDataRow {
             get {
@@ -475,7 +484,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вес брутто.
+        ///   Ищет локализованную строку, похожую на Gross weight.
         /// </summary>
         public static string GrossWeight {
             get {
@@ -484,7 +493,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Признак опасности груза.
+        ///   Ищет локализованную строку, похожую на IMO.
         /// </summary>
         public static string IMO {
             get {
@@ -493,7 +502,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Номер счета.
+        ///   Ищет локализованную строку, похожую на Invoice number.
         /// </summary>
         public static string InvoiceNumber {
             get {
@@ -502,7 +511,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Список контейнеров.
+        ///   Ищет локализованную строку, похожую на Containers list.
         /// </summary>
         public static string ListOfContainers {
             get {
@@ -511,7 +520,133 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вход.
+        ///   Ищет локализованную строку, похожую на access denied.
+        /// </summary>
+        public static string LogAccessDenied {
+            get {
+                return ResourceManager.GetString("LogAccessDenied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на saving a new docmapper.
+        /// </summary>
+        public static string LogAddNewDocument {
+            get {
+                return ResourceManager.GetString("LogAddNewDocument", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на adding a docmapper column &apos;{0}&apos;.
+        /// </summary>
+        public static string LogDocmapperColumnAdd {
+            get {
+                return ResourceManager.GetString("LogDocmapperColumnAdd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на getting columns that can be added to the document.
+        /// </summary>
+        public static string LogDocmapperColumnGet {
+            get {
+                return ResourceManager.GetString("LogDocmapperColumnGet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на adding a new document content.
+        /// </summary>
+        public static string LogDocmapperContentAdd {
+            get {
+                return ResourceManager.GetString("LogDocmapperContentAdd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на filtering documents by search text &apos;{0}&apos;.
+        /// </summary>
+        public static string LogDocmapperFilter {
+            get {
+                return ResourceManager.GetString("LogDocmapperFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на getting the document with id &apos;{0}&apos;.
+        /// </summary>
+        public static string LogDocmapperGetById {
+            get {
+                return ResourceManager.GetString("LogDocmapperGetById", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на activity status of the document has been switched to &apos;{0}&apos;.
+        /// </summary>
+        public static string LogDocumentSwitchIsActive {
+            get {
+                return ResourceManager.GetString("LogDocumentSwitchIsActive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на receiving lots.
+        /// </summary>
+        public static string LogDownloadLots {
+            get {
+                return ResourceManager.GetString("LogDownloadLots", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на starting export a file {0}.
+        /// </summary>
+        public static string LogExportFile {
+            get {
+                return ResourceManager.GetString("LogExportFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на filtering the list with transport with transport name &apos;{0}&apos;.
+        /// </summary>
+        public static string LogFilterTransport {
+            get {
+                return ResourceManager.GetString("LogFilterTransport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на beginning of the formation of the path to the file with errors based on the path: &apos;{0}&apos;.
+        /// </summary>
+        public static string LogFormationNgFolder {
+            get {
+                return ResourceManager.GetString("LogFormationNgFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на loading containers for the lot with uniq id &apos;{0}&apos;.
+        /// </summary>
+        public static string LogGetContainersByLotId {
+            get {
+                return ResourceManager.GetString("LogGetContainersByLotId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на loading parts for the container with uniq id &apos;{0}&apos;.
+        /// </summary>
+        public static string LogGetPartsForContainer {
+            get {
+                return ResourceManager.GetString("LogGetPartsForContainer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Login.
         /// </summary>
         public static string LogInButton {
             get {
@@ -520,7 +655,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Авторизация.
+        ///   Ищет локализованную строку, похожую на Authorization.
         /// </summary>
         public static string LogInPageTitle {
             get {
@@ -529,7 +664,178 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Номер лота.
+        ///   Ищет локализованную строку, похожую на loading static data.
+        /// </summary>
+        public static string LogLoadStaticData {
+            get {
+                return ResourceManager.GetString("LogLoadStaticData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на loading lot with uniq id &apos;{0}&apos;.
+        /// </summary>
+        public static string LogLotGetById {
+            get {
+                return ResourceManager.GetString("LogLotGetById", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на getting orders for the shipper with uniq id &apos;{0}&apos;.
+        /// </summary>
+        public static string LogOrdersGetForShipper {
+            get {
+                return ResourceManager.GetString("LogOrdersGetForShipper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на receiving the steps of operations &apos;{0}&apos; for the current user by his section.
+        /// </summary>
+        public static string LogProcessStepsGet {
+            get {
+                return ResourceManager.GetString("LogProcessStepsGet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на redirecting to the lot editing page.
+        /// </summary>
+        public static string LogRedirectToEditingLot {
+            get {
+                return ResourceManager.GetString("LogRedirectToEditingLot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на adding the new transport &apos;{0}&apos;.
+        /// </summary>
+        public static string LogTransportAdd {
+            get {
+                return ResourceManager.GetString("LogTransportAdd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на updating a docmapper with id &apos;{0}&apos;.
+        /// </summary>
+        public static string LogUpdateDocument {
+            get {
+                return ResourceManager.GetString("LogUpdateDocument", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на updating filters to represent containers.
+        /// </summary>
+        public static string LogUpdatingFiltersForContainers {
+            get {
+                return ResourceManager.GetString("LogUpdatingFiltersForContainers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на updating filters to represent details.
+        /// </summary>
+        public static string LogUpdatingFiltersForDetails {
+            get {
+                return ResourceManager.GetString("LogUpdatingFiltersForDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на lot formation.
+        /// </summary>
+        public static string LogUploadLot {
+            get {
+                return ResourceManager.GetString("LogUploadLot", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на lot with a unique id &apos;{0}&apos; has been formed.
+        /// </summary>
+        public static string LogUploadLotCompleted {
+            get {
+                return ResourceManager.GetString("LogUploadLotCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на apply filters to represent containers.
+        /// </summary>
+        public static string LogUpplyFiltersForContainers {
+            get {
+                return ResourceManager.GetString("LogUpplyFiltersForContainers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на apply filters to represent details.
+        /// </summary>
+        public static string LogUpplyFiltersForDetails {
+            get {
+                return ResourceManager.GetString("LogUpplyFiltersForDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на getting user.
+        /// </summary>
+        public static string LogUserGet {
+            get {
+                return ResourceManager.GetString("LogUserGet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на nformation for user updated: &apos;{0}&apos;.
+        /// </summary>
+        public static string LogUserUpdated {
+            get {
+                return ResourceManager.GetString("LogUserUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на validating a file headers {0}.
+        /// </summary>
+        public static string LogValidatingHeaders {
+            get {
+                return ResourceManager.GetString("LogValidatingHeaders", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на value validation: &apos;{0}&apos; in column &apos;{1}&apos;.
+        /// </summary>
+        public static string LogValueValidation {
+            get {
+                return ResourceManager.GetString("LogValueValidation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на validation in column &apos;{0}&apos; completed with warning: &apos;{1}&apos;.
+        /// </summary>
+        public static string LogValueValidationWarning {
+            get {
+                return ResourceManager.GetString("LogValueValidationWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на with result &apos;{0}&apos;.
+        /// </summary>
+        public static string LogWithResult {
+            get {
+                return ResourceManager.GetString("LogWithResult", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Lot number.
         /// </summary>
         public static string LotNumber {
             get {
@@ -538,7 +844,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Заказ лота.
+        ///   Ищет локализованную строку, похожую на Lot order.
         /// </summary>
         public static string LotOrder {
             get {
@@ -547,7 +853,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Если заказов нет в списке, попробуйте сначала выбрать отправителя..
+        ///   Ищет локализованную строку, похожую на If there are no orders in the list, try to select the shipper first..
         /// </summary>
         public static string LotOrderToolTip {
             get {
@@ -556,7 +862,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Главная страница.
+        ///   Ищет локализованную строку, похожую на Home page.
         /// </summary>
         public static string MainPageTitle {
             get {
@@ -565,7 +871,16 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Мастер загрузки файлов.
+        ///   Ищет локализованную строку, похожую на File Upload Wizard.
+        /// </summary>
+        public static string MasterExportFile {
+            get {
+                return ResourceManager.GetString("MasterExportFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на File Upload Wizard.
         /// </summary>
         public static string MasterUploadFile {
             get {
@@ -574,7 +889,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вес нетто.
+        ///   Ищет локализованную строку, похожую на Net weight.
         /// </summary>
         public static string NetWeight {
             get {
@@ -583,7 +898,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавление лота.
+        ///   Ищет локализованную строку, похожую на Adding a lot.
         /// </summary>
         public static string NewDeliveryPageTitle {
             get {
@@ -592,7 +907,16 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Тип упаковки.
+        ///   Ищет локализованную строку, похожую на NG-{0}-{1}{2}.
+        /// </summary>
+        public static string NgFileName {
+            get {
+                return ResourceManager.GetString("NgFileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Packing type.
         /// </summary>
         public static string PackingType {
             get {
@@ -601,7 +925,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Английское имя детали.
+        ///   Ищет локализованную строку, похожую на Part name eng.
         /// </summary>
         public static string PartNameEng {
             get {
@@ -610,7 +934,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Номер детали.
+        ///   Ищет локализованную строку, похожую на Part number.
         /// </summary>
         public static string PartNumber {
             get {
@@ -619,7 +943,16 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Позиция.
+        ///   Ищет локализованную строку, похожую на Please press &apos;{0}&apos; to complete.
+        /// </summary>
+        public static string PleasePress {
+            get {
+                return ResourceManager.GetString("PleasePress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Position.
         /// </summary>
         public static string Position {
             get {
@@ -628,7 +961,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Колличество.
+        ///   Ищет локализованную строку, похожую на Quantity.
         /// </summary>
         public static string Quantity {
             get {
@@ -637,7 +970,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Колличество контейнеров.
+        ///   Ищет локализованную строку, похожую на Quantity containers.
         /// </summary>
         public static string QuantityContainers {
             get {
@@ -646,7 +979,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Номер пломбы.
+        ///   Ищет локализованную строку, похожую на Seal number.
         /// </summary>
         public static string SealNumber {
             get {
@@ -655,7 +988,16 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Production Supply System - это приложение....
+        ///   Ищет локализованную строку, похожую на Language settings.
+        /// </summary>
+        public static string SettingsLanguageTitle {
+            get {
+                return ResourceManager.GetString("SettingsLanguageTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Production Supply System - this is app....
         /// </summary>
         public static string SettingsPageAboutText {
             get {
@@ -664,7 +1006,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на О приложении.
+        ///   Ищет локализованную строку, похожую на About the app.
         /// </summary>
         public static string SettingsPageAboutTitle {
             get {
@@ -673,7 +1015,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Цвет оформления.
+        ///   Ищет локализованную строку, похожую на The color of the design.
         /// </summary>
         public static string SettingsPageChooseThemeText {
             get {
@@ -682,7 +1024,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выйти.
+        ///   Ищет локализованную строку, похожую на Log out.
         /// </summary>
         public static string SettingsPageLogOutButtonText {
             get {
@@ -691,7 +1033,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Настройки оформления.
+        ///   Ищет локализованную строку, похожую на Design settings.
         /// </summary>
         public static string SettingsPagePersonalizationTitle {
             get {
@@ -700,7 +1042,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Тёмная.
+        ///   Ищет локализованную строку, похожую на Dark.
         /// </summary>
         public static string SettingsPageRadioButtonDarkTheme {
             get {
@@ -709,7 +1051,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Светлая.
+        ///   Ищет локализованную строку, похожую на Light.
         /// </summary>
         public static string SettingsPageRadioButtonLightTheme {
             get {
@@ -718,7 +1060,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Стандартная из Windows.
+        ///   Ищет локализованную строку, похожую на Standard from Windows.
         /// </summary>
         public static string SettingsPageRadioButtonWindowsDefaultTheme {
             get {
@@ -727,7 +1069,34 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Настройки.
+        ///   Ищет локализованную строку, похожую на English.
+        /// </summary>
+        public static string SettingsPageRadioEnLanguage {
+            get {
+                return ResourceManager.GetString("SettingsPageRadioEnLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Russian.
+        /// </summary>
+        public static string SettingsPageRadioRuLanguage {
+            get {
+                return ResourceManager.GetString("SettingsPageRadioRuLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Theme color.
+        /// </summary>
+        public static string SettingsPageThemeColor {
+            get {
+                return ResourceManager.GetString("SettingsPageThemeColor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Settings.
         /// </summary>
         public static string SettingsPageTitle {
             get {
@@ -736,7 +1105,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на О пользователе.
+        ///   Ищет локализованную строку, похожую на About user.
         /// </summary>
         public static string SettingsPageUserTitle {
             get {
@@ -745,7 +1114,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Название листа.
+        ///   Ищет локализованную строку, похожую на Sheet name.
         /// </summary>
         public static string SheetName {
             get {
@@ -754,7 +1123,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Активен.
+        ///   Ищет локализованную строку, похожую на Active.
         /// </summary>
         public static string ShellActive {
             get {
@@ -763,7 +1132,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавить.
+        ///   Ищет локализованную строку, похожую на Add.
         /// </summary>
         public static string ShellAdd {
             get {
@@ -772,7 +1141,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Отменить.
+        ///   Ищет локализованную строку, похожую на Cancel.
         /// </summary>
         public static string ShellCancelButton {
             get {
@@ -781,7 +1150,16 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Закрыть.
+        ///   Ищет локализованную строку, похожую на Switching the language.
+        /// </summary>
+        public static string ShellChangeLanguage {
+            get {
+                return ResourceManager.GetString("ShellChangeLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Close.
         /// </summary>
         public static string ShellClose {
             get {
@@ -790,7 +1168,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Удалить.
+        ///   Ищет локализованную строку, похожую на Delete.
         /// </summary>
         public static string ShellDelete {
             get {
@@ -799,7 +1177,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Журнал лотов.
+        ///   Ищет локализованную строку, похожую на Lot list.
         /// </summary>
         public static string ShellDeliveryPage {
             get {
@@ -808,7 +1186,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Общая информация.
+        ///   Ищет локализованную строку, похожую на Details.
         /// </summary>
         public static string ShellDetails {
             get {
@@ -817,7 +1195,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Изменение шаблона.
+        ///   Ищет локализованную строку, похожую на Changing the docmapper.
         /// </summary>
         public static string ShellDocumentMapperEditPage {
             get {
@@ -826,7 +1204,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавление нового шаблона.
+        ///   Ищет локализованную строку, похожую на Adding a new docmapper.
         /// </summary>
         public static string ShellDocumentMapperNewPage {
             get {
@@ -835,7 +1213,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Управление шаблонами.
+        ///   Ищет локализованную строку, похожую на Managing docmappers.
         /// </summary>
         public static string ShellDocumentMapperPage {
             get {
@@ -844,7 +1222,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Редактировать.
+        ///   Ищет локализованную строку, похожую на Edit.
         /// </summary>
         public static string ShellEdit {
             get {
@@ -853,7 +1231,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Редактирование лота.
+        ///   Ищет локализованную строку, похожую на Editing a lot.
         /// </summary>
         public static string ShellEditDeliveryPage {
             get {
@@ -862,7 +1240,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Список лотов пуст. Нажмите на кнопку &apos;Подгрузить список лотов&apos; для обновления списка..
+        ///   Ищет локализованную строку, похожую на The list of lots is empty. Click on the &apos;Upload Lot List&apos; button to update the list..
         /// </summary>
         public static string ShellEmptyLotList {
             get {
@@ -871,7 +1249,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка.
+        ///   Ищет локализованную строку, похожую на Error.
         /// </summary>
         public static string ShellError {
             get {
@@ -880,7 +1258,25 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Имя файла.
+        ///   Ищет локализованную строку, похожую на Files export complete.
+        /// </summary>
+        public static string ShellExportFileCompleted {
+            get {
+                return ResourceManager.GetString("ShellExportFileCompleted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Exporting files.
+        /// </summary>
+        public static string ShellExportFiles {
+            get {
+                return ResourceManager.GetString("ShellExportFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на File name.
         /// </summary>
         public static string ShellFileName {
             get {
@@ -907,7 +1303,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Главная.
+        ///   Ищет локализованную строку, похожую на Home.
         /// </summary>
         public static string ShellMainPage {
             get {
@@ -916,7 +1312,16 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Добавление лота.
+        ///   Ищет локализованную строку, похожую на To display the selected language correctly, you need to restart the application.
+        /// </summary>
+        public static string ShellMessageChangeLanguage {
+            get {
+                return ResourceManager.GetString("ShellMessageChangeLanguage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Adding a lot.
         /// </summary>
         public static string ShellNewDeliveryPage {
             get {
@@ -925,7 +1330,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не активен.
+        ///   Ищет локализованную строку, похожую на Not active.
         /// </summary>
         public static string ShellNoActive {
             get {
@@ -934,7 +1339,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Вы не обладаете необходимыми правами для выполнения этого процесса.
+        ///   Ищет локализованную строку, похожую на You do not have the necessary rights to perform this process.
         /// </summary>
         public static string ShellProcessForbidden {
             get {
@@ -943,7 +1348,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Сохранить.
+        ///   Ищет локализованную строку, похожую на Save.
         /// </summary>
         public static string ShellSaveButton {
             get {
@@ -952,7 +1357,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Поиск.
+        ///   Ищет локализованную строку, похожую на Search.
         /// </summary>
         public static string ShellSearch {
             get {
@@ -961,7 +1366,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Выберите дату.
+        ///   Ищет локализованную строку, похожую на Select a date.
         /// </summary>
         public static string ShellSelectDate {
             get {
@@ -970,7 +1375,16 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Загрузить.
+        ///   Ищет локализованную строку, похожую на Total quantity.
+        /// </summary>
+        public static string ShellTotalQuantity {
+            get {
+                return ResourceManager.GetString("ShellTotalQuantity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Download.
         /// </summary>
         public static string ShellUploadButton {
             get {
@@ -979,7 +1393,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Загрузка успешно завершена. .
+        ///   Ищет локализованную строку, похожую на The download has been completed successfully..
         /// </summary>
         public static string ShellUploadSuccess {
             get {
@@ -988,7 +1402,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Использовать.
+        ///   Ищет локализованную строку, похожую на Use.
         /// </summary>
         public static string ShellUse {
             get {
@@ -997,7 +1411,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Пожалуйста подождите....
+        ///   Ищет локализованную строку, похожую на Please wait....
         /// </summary>
         public static string ShellWait {
             get {
@@ -1006,7 +1420,16 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Отправитель.
+        ///   Ищет локализованную строку, похожую на .xlsx.
+        /// </summary>
+        public static string ShellXLSX {
+            get {
+                return ResourceManager.GetString("ShellXLSX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Shipper.
         /// </summary>
         public static string ShipperName {
             get {
@@ -1015,7 +1438,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Ошибка авторизации.
+        ///   Ищет локализованную строку, похожую на Authorization error.
         /// </summary>
         public static string StatusLoginFails {
             get {
@@ -1024,7 +1447,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Нет соединения с базой данных.
+        ///   Ищет локализованную строку, похожую на There is no connection to the database.
         /// </summary>
         public static string StatusNotConnectionToDb {
             get {
@@ -1033,7 +1456,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не авторизован.
+        ///   Ищет локализованную строку, похожую на Not authorized.
         /// </summary>
         public static string StatusUnauthorized {
             get {
@@ -1042,7 +1465,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Не предвиденная ошибка.
+        ///   Ищет локализованную строку, похожую на An unexpected mistake.
         /// </summary>
         public static string StatusUnknownError {
             get {
@@ -1051,7 +1474,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Список деталей для контейнера .
+        ///   Ищет локализованную строку, похожую на List of parts for container .
         /// </summary>
         public static string TitlePartsForContainer {
             get {
@@ -1060,7 +1483,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Документ транспорта.
+        ///   Ищет локализованную строку, похожую на Transport document.
         /// </summary>
         public static string TransportDocument {
             get {
@@ -1069,7 +1492,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Название транспорта.
+        ///   Ищет локализованную строку, похожую на Transport name.
         /// </summary>
         public static string TransportName {
             get {
@@ -1078,7 +1501,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Тип перевозки.
+        ///   Ищет локализованную строку, похожую на Transport type.
         /// </summary>
         public static string TransportType {
             get {
@@ -1087,7 +1510,7 @@ namespace UI_Interface.Properties {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Валидация документа.
+        ///   Ищет локализованную строку, похожую на Document validation.
         /// </summary>
         public static string ValidationPageTitle {
             get {

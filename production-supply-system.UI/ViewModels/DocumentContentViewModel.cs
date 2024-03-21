@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+
+using CommunityToolkit.Mvvm.ComponentModel;
+
 using DAL.Models.Document;
 
 using Microsoft.Extensions.Logging;
@@ -11,24 +14,19 @@ namespace UI_Interface.ViewModels
     /// Наследует от ObservableObject для уведомлений об изменении свойств.
     /// Реализует IDataErrorInfo для поддержки валидации данных.
     /// </summary>
-    public class DocumentContentViewModel : ValidatedViewModel<DocumentContentViewModel, List<Type>>
+    /// <remarks>
+    /// Инициализирует новый экземпляр класса <see cref="DocumentContentViewModel"/>.
+    /// </remarks>
+    public partial class DocumentContentViewModel(List<Type> models, ILogger logger) : ValidatedViewModel<DocumentContentViewModel, List<Type>>(models, logger)
     {
+        [ObservableProperty]
         private Docmapper _document;
 
+        [ObservableProperty]
         private DocmapperColumn _documentColumn;
 
-        /// <summary>
-        /// Инициализирует новый экземпляр класса <see cref="DocumentContentViewModel"/>.
-        /// </summary>
-        public DocumentContentViewModel(List<Type> models, ILogger logger) : base(models, logger)
-        {
-
-        }
-
-        /// <summary>
-        /// Возвращает или задает контент документа.
-        /// </summary>
-        public DocmapperContent DocumentContent { get; set; } = new();
+        [ObservableProperty]
+        private DocmapperContent _documentContent = new();
 
         /// <summary>
         /// Возвращает или задает уникальный идентификатор контента документа.
@@ -73,24 +71,6 @@ namespace UI_Interface.ViewModels
         {
             get => DocumentContent.ColumnNr;
             set => _ = SetProperty(DocumentContent.ColumnNr, value, DocumentContent, (model, col) => model.ColumnNr = col);
-        }
-
-        /// <summary>
-        /// Возвращает или задает значение документа.
-        /// </summary>
-        public Docmapper Document
-        {
-            get => _document;
-            set => _ = SetProperty(ref _document, value);
-        }
-
-        /// <summary>
-        /// Возвращает или задает значение колонки.
-        /// </summary>
-        public DocmapperColumn DocumentColumn
-        {
-            get => _documentColumn;
-            set => _ = SetProperty(ref _documentColumn, value);
         }
     }
 }

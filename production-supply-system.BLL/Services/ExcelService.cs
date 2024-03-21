@@ -3,17 +3,21 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using BLL.Contracts;
-using ClosedXML.Excel;
 
+using BLL.Contracts;
+using BLL.Properties;
+
+using ClosedXML.Excel;
 
 using DAL.Models;
 using DAL.Models.Document;
 
-using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+
 using Microsoft.Extensions.Logging;
+
 using Newtonsoft.Json;
 
 namespace BLL.Services
@@ -21,22 +25,15 @@ namespace BLL.Services
     /// <summary>
     /// Сервис для работы с файлами Excel.
     /// </summary>
-    public class ExcelService : IExcelService
+    /// <remarks>
+    /// Инициализирует новый экземпляр класса <see cref="ExcelService"/>.
+    /// </remarks>
+    /// <param name="logger">Интерфейс для записи логов.</param>
+    public partial class ExcelService(ILogger<ExcelService> logger) : IExcelService
     {
-        private readonly ILogger<ExcelService> _logger;
-
-        /// <summary>
-        /// Инициализирует новый экземпляр класса <see cref="ExcelService"/>.
-        /// </summary>
-        /// <param name="logger">Интерфейс для записи логов.</param>
-        public ExcelService(ILogger<ExcelService> logger)
-        {
-            _logger = logger;
-        }
-
         private static int GetColumnIndexFromCellReference(string cellReference)
         {
-            string columnName = Regex.Replace(cellReference, @"\d", string.Empty);
+            string columnName = ColumnRegex().Replace(cellReference, string.Empty);
 
             int index = 0;
 
@@ -55,7 +52,7 @@ namespace BLL.Services
         /// <inheritdoc />
         public void ColorCellsInDocument(Dictionary<string, CellInfo> validationErrors, string sheetName, string ngFilePath, string destinationFilePath)
         {
-            _logger.LogInformation($"The beginning of filling in the cells in the document '{ngFilePath}' on sheet name '{sheetName}'.");
+            logger.LogInformation($"{string.Format(Resources.LogExcelFillCellsInDocument, ngFilePath, sheetName)}");
 
             using XLWorkbook workbook = new(destinationFilePath);
             XLWorkbook nGWorkbook = null;
@@ -73,7 +70,7 @@ namespace BLL.Services
 
             if (nGWorksheet is null)
             {
-                throw new Exception($"Не найден лист '{sheetName}' для  того чтобы на нём отметить NG ячейки.");
+                throw new Exception($"{string.Format(Resources.LogExcelSheetNotFound, sheetName)}");
             }
 
             foreach (KeyValuePair<string, CellInfo> validationError in validationErrors)
@@ -85,15 +82,32 @@ namespace BLL.Services
                 }
             }
 
-            _logger.LogInformation($"Filling in the cells in the document '{ngFilePath}' on sheet name '{sheetName}' completed.");
+            logger.LogInformation($"{string.Format(Resources.LogExcelFillCellsInDocument, ngFilePath, sheetName)} {Resources.Completed}");
 
             nGWorkbook.Save();
         }
 
         /// <inheritdoc />
-        public void ExportFile<T>(IEnumerable<T> data, string filePath)
+        public void ExportFile(SheetData data, string filePath, string sheetName)
         {
-            throw new NotImplementedException();
+            using SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Create(filePath, SpreadsheetDocumentType.Workbook);
+            WorkbookPart workbookPart = spreadsheetDocument.AddWorkbookPart();
+            workbookPart.Workbook = new Workbook();
+            WorksheetPart worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
+            worksheetPart.Worksheet = new();
+
+            worksheetPart.Worksheet.Append(data);
+
+            Sheets sheets = workbookPart.Workbook.AppendChild(new Sheets());
+
+            _ = sheets.AppendChild(new Sheet
+            {
+                Id = workbookPart.GetIdOfPart(worksheetPart),
+                SheetId = 1,
+                Name = sheetName
+            });
+
+            workbookPart.Workbook.Save();
         }
 
         /// <inheritdoc />
@@ -101,7 +115,7 @@ namespace BLL.Services
         {
             try
             {
-                _logger.LogInformation($"The beginning of parsing a file '{filePath}' from a sheet '{sheetName}'.");
+                logger.LogInformation($"{string.Format(Resources.LogExcelParsingFileFromSheet, filePath, sheetName)}");
 
                 using SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Open(filePath, false);
                 WorkbookPart workbookPart = spreadsheetDocument.WorkbookPart;
@@ -153,33 +167,35 @@ namespace BLL.Services
                         rowIdx++;
                     }
 
-                    _logger.LogInformation($"Parsing a file '{filePath}' from a sheet '{sheetName}' completed.");
+                    logger.LogInformation($"{string.Format(Resources.LogExcelParsingFileFromSheet, filePath, sheetName)} {Resources.Completed}");
 
                     return dataArray;
                 }
                 else
                 {
-                    throw new Exception($"Sheet '{sheetName}' not found in the document '{filePath}'.");
+                    throw new Exception($"{string.Format(Resources.LogExcelSheetNotFound, sheetName)}");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex.ToString());
+                logger.LogError($"{Resources.Error} {string.Format(Resources.LogExcelParsingFileFromSheet, filePath, sheetName)}: {JsonConvert.SerializeObject(ex)}");
 
                 throw;
             }
         }
 
         /// <inheritdoc />
-        public bool ValidateExcelDataHeaders(object[,] excelData, int firstRow, List<DocmapperContent> content)
+        public object[,] ValidateExcelDataHeaders(int firstRow, List<DocmapperContent> content, string folder, string sheetName)
         {
             bool hasError = false;
 
             int row = firstRow - 1;
 
-            _logger.LogInformation($"The beginning of header validation on a line №'{firstRow}'");
+            logger.LogInformation($"{string.Format(Resources.LogExcelHeaderValidation, firstRow)}");
 
-            content = content.OrderBy(item => item.ColumnNr).ToList();
+            content = [.. content.OrderBy(item => item.ColumnNr)];
+
+            object[,] excelData = ReadExcelFile(folder, sheetName);
 
             for (int i = 0; i < content.Count; i++)
             {
@@ -196,16 +212,18 @@ namespace BLL.Services
                 {
                     if (!string.Equals(cell?.ToString(), contentItem?.DocmapperColumn?.ElementName, StringComparison.OrdinalIgnoreCase))
                     {
-                        _logger.LogInformation($"Validation of headers in the file was completed with an error: in place of the expected '{contentItem?.DocmapperColumn?.ElementName}' is located '{cell?.ToString()}'");
+                        string message = $"{Resources.Error} {string.Format(Resources.LogExcelHeaderValidation, firstRow)}: {string.Format(Resources.LogExceptionExpectedPlace, contentItem?.DocmapperColumn?.ElementName, cell?.ToString())}";
+                        
+                        logger.LogError(message);
 
-                        throw new Exception($"Validation of headers in the file was completed with an error: in place of the expected '{contentItem?.DocmapperColumn?.ElementName}' is located '{cell?.ToString()}'");
+                        throw new Exception(message);
                     }
                 }
             }
 
-            _logger.LogInformation($"Header validation on a line №'{firstRow}' completed.");
+            logger.LogInformation($"{string.Format(Resources.LogExcelHeaderValidation, firstRow)} {Resources.Completed}");
 
-            return hasError;
+            return hasError ? null : excelData;
         }
 
         /// <summary>
@@ -216,20 +234,20 @@ namespace BLL.Services
         /// <returns>Объект WorksheetPart, представляющий лист.</returns>
         private WorksheetPart GetWorksheetPartByName(SpreadsheetDocument spreadsheetDocument, string sheetName)
         {
-            _logger.LogInformation($"Search for the sheet '{sheetName}' in the document.");
+            logger.LogInformation($"{string.Format(Resources.LogExcelSheetSearch, sheetName)}");
 
             IEnumerable<Sheet> sheets = spreadsheetDocument.WorkbookPart.Workbook.Descendants<Sheet>().Where(s => s.Name == sheetName);
 
             if (sheets.Any())
             {
-                _logger.LogInformation($"The sheet '{sheetName}' is detected.");
+                logger.LogInformation($"{string.Format(Resources.LogExcelSheetSearch, sheetName)} {Resources.Completed}");
 
                 string relationshipId = sheets.First().Id;
 
                 return (WorksheetPart)spreadsheetDocument.WorkbookPart.GetPartById(relationshipId);
             }
 
-            _logger.LogInformation($"The sheet '{sheetName}' is not detected.");
+            logger.LogError($"{string.Format(Resources.LogExcelSheetNotFound, sheetName)}");
 
             return null;
         }
@@ -265,11 +283,11 @@ namespace BLL.Services
         /// <param name="color">Цвет</param>
         private void HighlightCell(IXLWorksheet worksheet, int row, int column, XLColor color)
         {
-            _logger.LogInformation($"Starting to fill row '{row}' and column '{column}'");
+            logger.LogInformation($"{string.Format(Resources.LogExcelFillRowAndColumn, row, column)}");
 
             worksheet.Cell(row, column).Style.Fill.BackgroundColor = color;
 
-            _logger.LogInformation($"Filling row '{row}' and column '{column}' completed.");
+            logger.LogInformation($"{string.Format(Resources.LogExcelFillRowAndColumn, row, column)} {Resources.Completed}");
         }
 
         /// <summary>
@@ -281,14 +299,17 @@ namespace BLL.Services
         /// <param name="commentText">Комментарий</param>
         private void AddCommentToCell(IXLWorksheet worksheet, int row, int column, string commentText)
         {
-            _logger.LogInformation($"Starting to add comment '{commentText}' to row '{row}' and column '{column}'");
+            logger.LogInformation($"{string.Format(Resources.LogExcelAddCommentAndFillRowAndColumn, commentText, row, column)}");
 
             IXLComment comment = worksheet.Cell(row, column).CreateComment();
             _ = comment.AddText(commentText);
             _ = comment.SetVisible();
             comment.FontSize = 10;
 
-            _logger.LogInformation($"Adding comment '{commentText}' to row '{row}' and column '{column}' completed.");
+            logger.LogInformation($"{string.Format(Resources.LogExcelAddCommentAndFillRowAndColumn, commentText, row, column)} {Resources.Completed}");
         }
+
+        [GeneratedRegex(@"\d")]
+        private static partial Regex ColumnRegex();
     }
 }

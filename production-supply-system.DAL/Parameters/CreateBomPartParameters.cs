@@ -2,17 +2,10 @@
 
 namespace DAL.Parameters
 {
-    public class CreateBomPartParameters
+    public class CreateBomPartParameters(BomPart entity)
     {
-        public CreateBomPartParameters(BomPart entity)
-        {
-            PartNumber = entity.PartNumber;
+        public string PartNumber { get; set; } = entity.PartNumber;
 
-            PartName = entity.PartName;
-        }
-
-        public string PartNumber { get; set; }
-
-        public string? PartName { get; set; }
+        public string? PartName { get; set; } = entity.PartName;
     }
 }

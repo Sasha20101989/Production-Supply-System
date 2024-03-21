@@ -1,7 +1,5 @@
 ﻿using DAL.Models;
-using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.Controls;
-using Microsoft.Toolkit.Mvvm.Input;
 using NavigationManager.Frame.Extension.WPF;
 using System.Threading.Tasks;
 using System.Windows.Media;
@@ -13,200 +11,65 @@ using DAL.Models.Master;
 using System.Collections.Generic;
 using BLL.Models;
 using System.Collections.ObjectModel;
-using UI_Interface.Extensions;
 using System;
 using Microsoft.Extensions.Logging;
 using DAL.Enums;
-using Microsoft.Win32;
-using Microsoft.WindowsAPICodePack.Dialogs;
+using UI_Interface.Contracts;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace UI_Interface.ViewModels.ViewModelsForPages
 {
-    public class DeliveryViewModel : ControlledViewModel, INavigationAware
+    public partial class DeliveryViewModel(
+            ILogger<DeliveryViewModel> logger,
+            INavigationManager navigationManager,
+            IStaticDataService staticDataService,
+            IDeliveryService deliveryService,
+            IExportProceduresService exportProcedures,
+            IToastNotificationsService toastNotificationsService,
+            IExcelService excelService) : ControlledViewModel(logger), INavigationAware
     {
-        private readonly ILogger<DeliveryViewModel> _logger;
-
-        private readonly INavigationManager _navigationManager;
-
-        private readonly IStaticDataService _staticDataService;
-
-        private readonly IDeliveryService _deliveryService;
-
-        private readonly IDocumentService _documentService;
-
-        private readonly IExcelService _excelService;
-
-        private DeliveryDetailViewModel _deliveryDetailViewModel;
-
+        [ObservableProperty]
         private bool _hasErrors;
 
-        private List<ProcessStep> _processSteps;
-
+        [ObservableProperty]
         private bool _detailsOpen;
 
+        [ObservableProperty]
+        private bool _exportOpen;
+
+        [ObservableProperty]
         private bool _isLotListEmpty;
 
+        [ObservableProperty]
         private bool _isProcessStepsShow;
-
-        private ObservableCollection<StepViewModel> _masterCollection;
-
+    
+        [ObservableProperty]
         private bool _hasErrorsInDetails;
 
+        [ObservableProperty]
         private bool _hasErrorsInCollection;
 
+        [ObservableProperty]
+        private DeliveryDetailViewModel _deliveryDetailViewModel;
+
+        [ObservableProperty]
+        private List<ProcessStep> _processSteps;
+
+        [ObservableProperty]
+        private ObservableCollection<StepViewModel> _masterCollection;
+
+        [ObservableProperty]
         private ObservableCollection<LotViewModel> _lots;
-
-        public DeliveryViewModel(
-            ILogger<DeliveryViewModel> logger,
-            INavigationManager navigationManager, 
-            IStaticDataService staticDataService, 
-            IDeliveryService deliveryService, 
-            IDocumentService documentService, 
-            IExcelService excelService)
-        {
-            _logger = logger;
-
-            _navigationManager = navigationManager;
-
-            _staticDataService = staticDataService;
-
-            _deliveryService = deliveryService;
-
-            _documentService = documentService;
-
-            _excelService = excelService;
-
-            NavigateToDetailsCommand = new RelayCommand<Lot>(NavigateToDetails);
-            OpenDetailsCommand = new AsyncRelayCommand(OpenDetailsFlyoutAsync);
-            CloseDetailsCommand = new RelayCommand(CloseDetailsFlyout);
-            StartProcessCommand = new AsyncRelayCommand(StartProcessAsync);
-            GetLotsCommand = new AsyncRelayCommand(GetAllLotItemsAsync);
-            ExportAllTracingCommand = new AsyncRelayCommand(ExportAllTracing);
-
-            _metroWindow = Application.Current.Windows.OfType<MetroWindow>().FirstOrDefault(x => x.IsActive);
-        }
-
-        /// <summary>
-        /// Команда перенаправления на страницу с детальной информацией лота
-        /// </summary>
-        public RelayCommand<Lot> NavigateToDetailsCommand { get; }
-
-        /// <summary>
-        /// Асинхронная команда открытия панели с детальной информацией
-        /// </summary>
-        public AsyncRelayCommand OpenDetailsCommand { get; }
-
-        /// <summary>
-        /// Команда закрытия панели с детальной информацией
-        /// </summary>
-        public RelayCommand CloseDetailsCommand { get; }
-
-        /// <summary>
-        /// Асинхронная команда начала загрузки лота
-        /// </summary>
-        public AsyncRelayCommand StartProcessCommand { get; }
-
-        /// <summary>
-        /// Асинхронная команда получения списка лотов
-        /// </summary>
-        public AsyncRelayCommand GetLotsCommand { get; }
-
-        /// <summary>
-        /// Асинхронная команда выгрузки файла c трейсингом
-        /// </summary>
-        public AsyncRelayCommand ExportAllTracingCommand { get; }
-
-        /// <summary>
-        /// Получает или задаёт коллекцию лотов
-        /// </summary>
-        public ObservableCollection<LotViewModel> Lots
-        {
-            get => _lots;
-            set => _ = SetProperty(ref _lots, value);
-        }
-
-        /// <summary>
-        /// Флаг указывающий открыта ли панель с детальной информацией
-        /// </summary>
-        public bool DetailsOpen
-        {
-            get => _detailsOpen;
-            set => _ = SetProperty(ref _detailsOpen, value);
-        }
-
-        /// <summary>
-        /// Флаг указывающий, пустой ли список лотов
-        /// </summary>
-        public bool IsLotListEmpty
-        {
-            get => _isLotListEmpty;
-            set => _ = SetProperty(ref _isLotListEmpty, value);
-        }
-
-        /// <summary>
-        /// Флаг указывающий, нужно ли отображать шаги
-        /// </summary>
-        public bool IsProcessStepsShow
-        {
-            get => _isProcessStepsShow;
-            set => _ = SetProperty(ref _isProcessStepsShow, value);
-        }
-
-        /// <summary>
-        /// Получает или задаёт модель преддставления детальной информации
-        /// </summary>
-        public DeliveryDetailViewModel DeliveryDetailViewModel
-        {
-            get => _deliveryDetailViewModel;
-            set => _ = SetProperty(ref _deliveryDetailViewModel, value);
-        }
-
-        /// <summary>
-        /// Флаг, указывающий, есть ли ошибки во всех валидируемых полях.
-        /// </summary>
-        public bool HasErrors
-        {
-            get => _hasErrors;
-            set => _ = SetProperty(ref _hasErrors, value);
-        }
-
-        /// <summary>
-        /// Коллекция шагов процесса, связанная с пользовательским интерфейсом.
-        /// </summary>
-        public ObservableCollection<StepViewModel> MasterCollection
-        {
-            get => _masterCollection;
-            set => _ = SetProperty(ref _masterCollection, value);
-        }
-
-        /// <summary>
-        /// Флаг, указывающий, есть ли ошибки в коллекции шагов.
-        /// </summary>
-        public bool HasErrorsInCollection
-        {
-            get => _hasErrorsInCollection = HasErrorsInCollectionProcesses();
-            set => _ = SetProperty(ref _hasErrorsInCollection, value);
-        }
-
-        /// <summary>
-        /// Флаг, указывающий, есть ли ошибки в детальной информации.
-        /// </summary>
-        public bool HasErrorsInDetails
-        {
-            get => _hasErrorsInDetails;
-            set => _ = SetProperty(ref _hasErrorsInDetails, value);
-        }
 
         /// <summary>
         /// Преобразование view models в models
         /// </summary>
         /// <param name="stepCollection">Список view models</param>
         /// <returns></returns>
-        private List<ProcessStep> AdaptStepsToService(List<StepViewModel> stepCollection)
+        private static List<ProcessStep> AdaptStepsToService(List<StepViewModel> stepCollection)
         {
-            _logger.LogInformation("The beginning of adapting view models to models list.");
-
-            List<ProcessStep> steps = new();
+            List<ProcessStep> steps = [];
 
             foreach (StepViewModel stepViewModel in stepCollection)
             {
@@ -224,19 +87,26 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
                 });
             }
 
-            _logger.LogInformation("The adaptation of view models to models is completed.");
-            
             return steps;
+        }
+
+        /// <summary>
+        /// Проверяет, есть ли ошибки в коллекции шагов.
+        /// </summary>
+        /// <returns>True, если есть ошибки, иначе False.</returns>
+        private bool HasErrorsInCollectionProcesses()
+        {
+            return !MasterCollection.All(item => item.HasError is false);
         }
 
         public void OnNavigatedFrom()
         {
-            _processSteps = null;
+            ProcessSteps = null;
         }
 
-        public void OnNavigatedTo(object parameter)
+        public async void OnNavigatedTo(object parameter)
         {
-            Lots = new();
+            Lots = [];
 
             DetailsOpen = false;
 
@@ -245,24 +115,27 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
             HasErrors = true;
 
             HasErrorsInDetails = true;
+
+            await GetLotsAsync();
         }
 
         /// <summary>
         /// Получает список лотов
         /// </summary>
-        private async Task GetAllLotItemsAsync()
+        [RelayCommand]
+        private async Task GetLotsAsync()
         {
             try
             {
-                _logger.LogInformation("The beginning of receiving lots.");
+                logger.LogInformation(Resources.LogDownloadLots);
 
-                 await CreateController(Resources.BllDownloadLots);
+                await CreateController(Resources.BllDownloadLots);
 
                 Lots.Clear();
 
-                foreach (Lot lot in await _deliveryService.GetAllLotsAsync())
+                foreach (Lot lot in await deliveryService.GetAllLotsAsync())
                 {
-                    int quantityContainers = await _deliveryService.GetquantityContainersForLotId(lot.Id);
+                    int quantityContainers = await deliveryService.GetquantityContainersForLotId(lot.Id);
 
                     LotViewModel lotViewModel = new(lot, quantityContainers);
 
@@ -271,7 +144,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
                 IsLotListEmpty = Lots.Count == 0;
 
-                _logger.LogInformation("The receipt of lots is completed.");
+                logger.LogInformation($"{Resources.LogDownloadLots} {Resources.Completed}");
             }
             catch (Exception ex)
             {
@@ -284,19 +157,10 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         }
 
         /// <summary>
-        /// Обработчик события, вызываемого при обновлении данных в объекте StepViewModel.
-        /// </summary>
-        private void OnStepViewModelUpdated(object sender, StepViewModel stepViewModel)
-        {
-            HasErrorsInCollection = HasErrorsInCollectionProcesses();
-
-            HasErrors = HasErrorsInDetails || HasErrorsInCollection;
-        }
-
-        /// <summary>
         /// Закрытие панери с детальной информацией
         /// </summary>
-        private void CloseDetailsFlyout()
+        [RelayCommand]
+        private void CloseDetails()
         {
             DeliveryDetailViewModel = null;
 
@@ -306,22 +170,33 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         }
 
         /// <summary>
+        /// Закрытие панели с выгрузкой файлов
+        /// </summary>
+        [RelayCommand]
+        private void CloseExport()
+        {
+            ExportOpen = !ExportOpen;
+        }
+
+        /// <summary>
         /// Формирует обьект лота и перенаправляет на страницу редактирования лота
         /// </summary>
-        /// <returns>Задача представляющая асинхронную операцию</returns>
-        private async Task StartProcessAsync()
+        [RelayCommand]
+        private async Task StartUploadLotAsync()
         {
             try
             {
-                _logger.LogInformation("The beginning of lot formation.");
+                logger.LogInformation(Resources.LogUploadLot);
 
                 await CreateController(Resources.BllUploadLot);
 
-                _deliveryService.DeliveryLoadProgressUpdated += OnDeliveryLoadProgressUpdated;
+                deliveryService.DeliveryLoadProgressUpdated += OnDeliveryLoadProgressUpdated;
 
-                Lot lot = await _deliveryService.StartProcessAsync(AdaptStepsToService(MasterCollection.ToList()), DeliveryDetailViewModel.Lot);
+                Lot lot = await deliveryService.StartUploadLotAsync(AdaptStepsToService([.. MasterCollection]), DeliveryDetailViewModel.Lot);
 
                 await WaitForMessageUnlock(Resources.BllUploadLot, Resources.ShellUploadSuccess, Brushes.Green);
+
+                logger.LogInformation(string.Format(Resources.LogUploadLotCompleted, lot.Id));
 
                 NavigateToDetails(lot);
             }
@@ -333,7 +208,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
             {
                 await ControllerPostProcess();
 
-                _deliveryService.DeliveryLoadProgressUpdated -= OnDeliveryLoadProgressUpdated;
+                deliveryService.DeliveryLoadProgressUpdated -= OnDeliveryLoadProgressUpdated;
             }
         }
 
@@ -341,35 +216,48 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         /// Перенаправляет на страницу редактирования лота
         /// </summary>
         /// <param name="lot">Лот</param>
+        [RelayCommand]
         private void NavigateToDetails(Lot lot)
         {
             if (lot is not null)
             {
-                _logger.LogInformation($"A lot with a unique id '{lot.Id}' has been formed, and redirects to the lot editing page.");
+                logger.LogInformation(Resources.LogRedirectToEditingLot);
 
-                _ = _navigationManager.NavigateTo(typeof(EditDeliveryViewModel).FullName, lot.Id);
+                _ = navigationManager.NavigateTo(typeof(EditDeliveryViewModel).FullName, lot.Id);
 
-                _logger.LogInformation($"Redirecting to the lot editing page completed.");
+                logger.LogInformation($"{Resources.LogRedirectToEditingLot} {Resources.Completed}");
             }
         }
 
-        private async Task ExportAllTracing()
+        [RelayCommand]
+        private async Task OpenExportAsync()
         {
+            ExportOpen = true;
+
             try
             {
-                CommonOpenFileDialog dialog = new();
+                MasterCollection = [];
 
-                dialog.IsFolderPicker = true;
+                await CreateController(Resources.ShellExportFiles);
 
-                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+                ProcessSteps = await GetProcessStepsAsync(AppProcess.ExportFileToExcelPartner2);
+
+                if (ProcessSteps.Count == 0)
                 {
-                    await CreateController(Resources.BllExportAllTracing);
+                    await WaitForMessageUnlock(Resources.BllGetProcessSteps, Resources.ShellProcessForbidden, Brushes.IndianRed);
 
-                    _logger.LogInformation("Starting export all tracing to file.");
+                    logger.LogWarning(Resources.LogAccessDenied);
 
-                    await _deliveryService.ExportAllTracing(dialog.FileName);
+                    return;
+                }
 
-                    _logger.LogInformation("Export all tracing to file completed.");
+                foreach (ProcessStep masterItem in ProcessSteps)
+                {
+                    StepViewModel stepViewModel = new(excelService, logger, exportProcedures, toastNotificationsService, masterItem);
+
+                    stepViewModel.HasStepViewModelUpdated += OnStepViewModelUpdated;
+
+                    MasterCollection.Add(stepViewModel);
                 }
             }
             catch (Exception ex)
@@ -387,51 +275,48 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         /// <summary>
         /// Открытие панели с детальной информацией
         /// </summary>
-        private async Task OpenDetailsFlyoutAsync()
+        [RelayCommand]
+        private async Task OpenDetailsAsync()
         {
             DetailsOpen = true;
 
-            MasterCollection = new();
+            MasterCollection = [];
 
             try
             {
                 if (DeliveryDetailViewModel is null)
                 {
-                    List<Type> validatedModels = new()
-                    {
+                    List<Type> validatedModels = 
+                    [
                         typeof(Lot),
                         typeof(Shipper),
                         typeof(Transport),
                         typeof(Invoice)
-                    };
+                    ];
 
                     await CreateController(Resources.BllLoadStaticData);
 
-                    DeliveryDetailViewModel = new DeliveryDetailViewModel(validatedModels, _staticDataService, _deliveryService, _logger, _progressController);
+                    DeliveryDetailViewModel = new DeliveryDetailViewModel(validatedModels, staticDataService, deliveryService, logger, _progressController);
 
                     DeliveryDetailViewModel.HasErrorsUpdated += OnHasErrorsUpdated;
                 }
 
                 await CreateController(Resources.BllGetProcessSteps);
 
-                _logger.LogInformation($"The beginning of receiving the steps of operations '{AppProcess.UploadInvoicesPartner2}' for the current user by his section.");
+                ProcessSteps = await GetProcessStepsAsync(AppProcess.UploadInvoicesPartner2);
 
-                _processSteps = await _deliveryService.GetProcessStepsByUserSectionAsync(AppProcess.UploadInvoicesPartner2);
-
-                _logger.LogInformation($"Getting the steps of operations '{AppProcess.UploadInvoicesPartner2}' for the current user by his section is completed.");
-
-                if (_processSteps.Count == 0)
+                if (ProcessSteps.Count == 0)
                 {
                     await WaitForMessageUnlock(Resources.BllGetProcessSteps, Resources.ShellProcessForbidden, Brushes.IndianRed);
 
-                    _logger.LogWarning($"Access denied.");
+                    logger.LogWarning(Resources.LogAccessDenied);
 
                     return;
                 }
 
-                foreach (ProcessStep masterItem in _processSteps.OrderBy(s => s.Step))
+                foreach (ProcessStep masterItem in ProcessSteps)
                 {
-                    StepViewModel stepViewModel = new(_excelService, _documentService, _logger, masterItem);
+                    StepViewModel stepViewModel = new(excelService, logger, exportProcedures, toastNotificationsService, masterItem);
 
                     stepViewModel.HasStepViewModelUpdated += OnStepViewModelUpdated;
 
@@ -448,6 +333,16 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
             {
                 await ControllerPostProcess();
             }
+        }
+
+        /// <summary>
+        /// Обработчик события, вызываемого при обновлении данных в объекте StepViewModel.
+        /// </summary>
+        private void OnStepViewModelUpdated(object sender, StepViewModel stepViewModel)
+        {
+            HasErrorsInCollection = HasErrorsInCollectionProcesses();
+
+            HasErrors = HasErrorsInDetails || HasErrorsInCollection;
         }
 
         /// <summary>
@@ -517,17 +412,15 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
             return true;
         }
 
-        /// <summary>
-        /// Проверяет, есть ли ошибки в коллекции шагов.
-        /// </summary>
-        /// <returns>True, если есть ошибки, иначе False.</returns>
-        private bool HasErrorsInCollectionProcesses()
+        private async Task<List<ProcessStep>> GetProcessStepsAsync(AppProcess appProcess)
         {
-            return !MasterCollection.All(item => item.HasError is false);
-        }
+            logger.LogInformation(Resources.LogProcessStepsGet);
 
-        /// <summary>
-        /// Обработчик события, вызываемого при наличии ошибки в объекте StepViewModel.
-        /// </summary>
+            List<ProcessStep> result = await deliveryService.GetProcessStepsByUserSectionAsync(appProcess);
+
+            logger.LogInformation($"{string.Format(Resources.LogProcessStepsGet, appProcess)} {Resources.Completed}");
+
+            return result;
+        }
     }
 }

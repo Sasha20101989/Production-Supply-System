@@ -3,61 +3,40 @@ using DAL.Models;
 
 namespace DAL.Parameters.Inbound
 {
-    public class CreateLotParameters
+    public class CreateLotParameters(Lot entity)
     {
-        public CreateLotParameters(Lot entity)
-        {
-            LotNumber = entity.LotNumber;
-            ShipperId = entity.ShipperId;
-            LotInvoiceId = entity.LotInvoiceId;
-            LotPurchaseOrderId = entity.LotPurchaseOrderId;
-            CarrierId = entity.CarrierId;
-            DeliveryTermsId = entity.DeliveryTermsId;
-            LotTransportId = entity.LotTransportId;
-            LotTransportTypeId = entity.LotTransportTypeId;
-            LotTransportDocument = entity.LotTransportDocument;
-            LotEtd = entity.LotEtd;
-            LotAtd = entity.LotAtd;
-            LotEta = entity.LotEta;
-            LotAta = entity.LotAta;
-            LotDepartureLocationId = entity.LotDepartureLocationId;
-            LotCustomsLocationId = entity.LotCustomsLocationId;
-            LotArrivalLocationId = entity.LotArrivalLocationId;
-            LotComment = entity.LotComment;
-        }
+        public string LotNumber { get; set; } = entity.LotNumber;
 
-        public string LotNumber { get; set; }
+        public int ShipperId { get; set; } = entity.ShipperId;
 
-        public int ShipperId { get; set; }
+        public int LotInvoiceId { get; set; } = entity.LotInvoiceId;
 
-        public int LotInvoiceId { get; set; }
+        public int LotPurchaseOrderId { get; set; } = entity.LotPurchaseOrderId;
 
-        public int LotPurchaseOrderId { get; set; }
+        public int CarrierId { get; set; } = entity.CarrierId;
 
-        public int CarrierId { get; set; }
+        public int DeliveryTermsId { get; set; } = entity.DeliveryTermsId;
 
-        public int DeliveryTermsId { get; set; }
+        public int? LotTransportId { get; set; } = entity.LotTransportId;
 
-        public int? LotTransportId { get; set; }
+        public int LotTransportTypeId { get; set; } = entity.LotTransportTypeId;
 
-        public int LotTransportTypeId { get; set; }
+        public string? LotTransportDocument { get; set; } = entity.LotTransportDocument;
 
-        public string? LotTransportDocument { get; set; }
+        public DateTime? LotEtd { get; set; } = entity.LotEtd;
 
-        public DateTime? LotEtd { get; set; }
+        public DateTime? LotAtd { get; set; } = entity.LotAtd;
 
-        public DateTime? LotAtd { get; set; }
+        public DateTime? LotEta { get; set; } = entity.LotEta;
 
-        public DateTime? LotEta { get; set; }
+        public DateTime? LotAta { get; set; } = entity.LotAta;
 
-        public DateTime? LotAta { get; set; }
+        public int LotDepartureLocationId { get; set; } = entity.LotDepartureLocationId;
 
-        public int LotDepartureLocationId { get; set; }
+        public int? LotCustomsLocationId { get; set; } = entity.LotCustomsLocationId;
 
-        public int? LotCustomsLocationId { get; set; }
+        public int LotArrivalLocationId { get; set; } = entity.LotArrivalLocationId;
 
-        public int LotArrivalLocationId { get; set; }
-
-        public string? LotComment { get; set; }
+        public string? LotComment { get; set; } = entity.LotComment;
     }
 }

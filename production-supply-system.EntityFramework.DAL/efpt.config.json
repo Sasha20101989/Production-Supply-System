@@ -1,0 +1,186 @@
+﻿{
+   "CodeGenerationMode": 4,
+   "ContextClassName": "PSSContext",
+   "ContextNamespace": null,
+   "DefaultDacpacSchema": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": true,
+   "ModelNamespace": null,
+   "OutputContextPath": null,
+   "OutputPath": "Models",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "production_supply_system.EntityFramework.DAL",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 2,
+   "SelectedToBeGenerated": 0,
+   "T4TemplatePath": null,
+   "Tables": [
+      {
+         "Name": "[Customs].[tbd_Customs_Clearance]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Customs].[tbd_Customs_Parts]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tbd_Log]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tbd_Sections]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Docmapper].[tbd_Docmapper]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Docmapper].[tbd_Docmapper_Columns]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Docmapper].[tbd_Docmapper_Content]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Inbound].[tbd_Carriers]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Inbound].[tbd_Cases]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Inbound].[tbd_Containers_In_Lot]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Inbound].[tbd_Imo_Cargo]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Inbound].[tbd_Invoices]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Inbound].[tbd_Locations]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Inbound].[tbd_Lots]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Inbound].[tbd_Parts_In_Container]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Inbound].[tbd_Parts_In_Invoice]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Inbound].[tbd_Shippers]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Inbound].[tbd_Terms_Of_Container_Use]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Inbound].[tbd_Terms_Of_Delivery]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Inbound].[tbd_Tracing]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Inbound].[tbd_Transports]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Inbound].[tbd_Types_Of_Container]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Inbound].[tbd_Types_Of_Location]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Inbound].[tbd_Types_Of_Packing]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Inbound].[tbd_Types_Of_Part]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Inbound].[tbd_Types_Of_Transport]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Master].[tbd_Processes]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Master].[tbd_Processes_Steps]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Partscontrol].[tbd_Purchase_Orders]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Partscontrol].[tbd_Types_Of_Order]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Planning].[tbd_Bound_VINs]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Planning].[tbd_Planned_Sequence]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Planning].[tbd_Statuses_For_SFS_Upload]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Planning].[tbd_VIN_Numbers_Local]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Planning].[tbd_VINs_In_Container]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[Users].[tbd_Users]",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": "ru-nmgr-s0053.PSS.dbo",
+   "UncountableWords": null,
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": false,
+   "UseDateOnlyTimeOnly": true,
+   "UseDbContextSplitting": true,
+   "UseDecimalDataAnnotationForSprocResult": true,
+   "UseFluentApiOnly": false,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": true,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": true,
+   "UseNoDefaultConstructor": false,
+   "UseNoNavigations": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": true,
+   "UsePrefixNavigationNaming": false,
+   "UseSchemaFolders": true,
+   "UseSchemaNamespaces": true,
+   "UseSpatial": false,
+   "UseT4": false
+}

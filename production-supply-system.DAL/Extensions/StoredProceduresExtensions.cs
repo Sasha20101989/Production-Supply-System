@@ -28,7 +28,7 @@ namespace DAL.Extensions
         /// <summary>
         /// Сопоставление типов перечислений словаря с соответствующими именами хранимых процедур.
         /// </summary>
-        public static readonly Dictionary<Type, Func<Enum, string>> Map = new();
+        public static readonly Dictionary<Type, Func<Enum, string>> Map = [];
     }
 }
 

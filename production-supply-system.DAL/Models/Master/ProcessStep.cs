@@ -47,6 +47,6 @@ namespace DAL.Models.Master
         [ForeignKey("SectionId")]
         public virtual Section Section { get; set; } = null!;
 
-        public virtual Dictionary<string, CellInfo> ValidationErrors { get; set; } = new();
+        public virtual Dictionary<string, CellInfo> ValidationErrors { get; set; } = [];
     }
 }

@@ -5,10 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DAL.Data.SqlServer
 {
-    public class SectionSqlServerData : SqlServerData<Section>
+    public class SectionSqlServerData(ISqlDataAccess db) : SqlServerData<Section>(db, StoredProcedureDbo.GetAllSections)
     {
-        public SectionSqlServerData(ISqlDataAccess db, ILogger<SectionSqlServerData> logger)
-            : base(db, logger, StoredProcedureDbo.GetAllSections)
-        { }
     }
 }

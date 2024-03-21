@@ -2,22 +2,14 @@
 
 namespace DAL.Parameters.Inbound
 {
-    public class CreateContainerParameters
+    public class CreateContainerParameters(ContainersInLot entity)
     {
-        public CreateContainerParameters(ContainersInLot entity)
-        {
-            LotId = entity.LotId;
-            ContainerNumber = entity.ContainerNumber;
-            SealNumber = entity.SealNumber;
-            ContainerTypeId = entity.ContainerTypeId;
-        }
+        public int LotId { get; set; } = entity.LotId;
 
-        public int LotId { get; set; }
+        public string ContainerNumber { get; set; } = entity.ContainerNumber;
 
-        public string ContainerNumber { get; set; }
+        public string? SealNumber { get; set; } = entity.SealNumber;
 
-        public string? SealNumber { get; set; }
-
-        public int ContainerTypeId { get; set; }
+        public int ContainerTypeId { get; set; } = entity.ContainerTypeId;
     }
 }

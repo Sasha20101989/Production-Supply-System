@@ -2,25 +2,14 @@
 
 namespace DAL.Parameters.Document
 {
-    public class CreateDocmapperContentParameters
+    public class CreateDocmapperContentParameters(DocmapperContent entity)
     {
-        public CreateDocmapperContentParameters(DocmapperContent entity)
-        {
-            DocmapperId = entity.DocmapperId;
+        public int DocmapperId { get; set; } = entity.DocmapperId;
 
-            DocmapperColumnId = entity.DocmapperColumnId;
+        public int DocmapperColumnId { get; set; } = entity.DocmapperColumnId;
 
-            RowNumber = entity.RowNr;
+        public int? RowNumber { get; set; } = entity.RowNr;
 
-            ColumnNumber = entity.ColumnNr;
-        }
-
-        public int DocmapperId { get; set; }
-
-        public int DocmapperColumnId { get; set; }
-
-        public int? RowNumber { get; set; }
-
-        public int ColumnNumber { get; set; }
+        public int ColumnNumber { get; set; } = entity.ColumnNr;
     }
 }

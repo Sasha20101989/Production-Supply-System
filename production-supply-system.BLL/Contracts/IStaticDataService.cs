@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 
 using DAL.Enums;
 using DAL.Models;
+using DAL.Models.Master;
 using DAL.Models.Partscontrol;
 
 namespace BLL.Contracts
@@ -174,8 +175,8 @@ namespace BLL.Contracts
         /// Получает тип контейнера по уникальному идентификатору
         /// </summary>
         /// <param name="containerTypeId">Уникальный идентификатор типа контейнера</param>
-        /// <returns>>Задача, представляющая асинхронную операцию, возвращающая тип контейнера по уникальному идентификатору.</returns>
-        Task<TypesOfContainer> GetContainerTypeById(int containerTypeId);
+        /// <returns>Задача, представляющая асинхронную операцию, возвращающая тип контейнера по уникальному идентификатору.</returns>
+        Task<TypesOfContainer> GetContainerTypeByIdAsync(int containerTypeId);
 
         /// <summary>
         /// Получает тип детали по имени типа
@@ -183,5 +184,26 @@ namespace BLL.Contracts
         /// <param name="partType">значение перечисления типа детали</param>
         /// <returns>Задача, представляющая асинхронную операцию, возвращающая тип детали или null в случае отсутствия.</returns>
         Task<TypesOfPart> GetPartTypeByNameAsync(PartTypes partType);
+
+        /// <summary>
+        /// Получает процессы для пользователя
+        /// </summary>
+        /// <param name="user">Пользователь для которого будут подобраны процессы</param>
+        /// <returns>Задача, представляющая асинхронную операцию, возвращающая процессы для пользователя по его секции.</returns>
+        Task<IEnumerable<ProcessStep>> GetProcessStepsByUserAsync(User user);
+
+        /// <summary>
+        /// Получает секцию по уникальному идентификатору
+        /// </summary>
+        /// <param name="sectionId">Уникальный идентификатор секции</param>
+        /// <returns>Задача, представляющая асинхронную операцию, возвращающая секцию по уникальному идентификатору.</returns>
+        Task<Section> GetSectionByIdAsync(int sectionId);
+
+        /// <summary>
+        /// Получает процесс по уникальному идентификатору
+        /// </summary>
+        /// <param name="processId">Уникальный идентификатор процесса</param>
+        /// <returns>Задача, представляющая асинхронную операцию, возвращающая процесс по уникальному идентификатору.</returns>
+        Task<Process> GetProcessByIdAsync(int processId);
     }
 }

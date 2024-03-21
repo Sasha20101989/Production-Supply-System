@@ -9,21 +9,15 @@ namespace DAL.Extensions
     {
         public static void Merge(this Dictionary<string, CellInfo> destination, Dictionary<string, CellInfo> source)
         {
-            if (destination == null)
-            {
-                throw new ArgumentNullException(nameof(destination));
-            }
+            ArgumentNullException.ThrowIfNull(destination);
 
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
+            ArgumentNullException.ThrowIfNull(source);
 
             foreach (KeyValuePair<string, CellInfo> kvp in source)
             {
-                if (destination.ContainsKey(kvp.Key))
+                if (destination.TryGetValue(kvp.Key, out CellInfo value))
                 {
-                    destination[kvp.Key].Errors.AddRange(kvp.Value.Errors);
+                    value.Errors.AddRange(kvp.Value.Errors);
                 }
                 else
                 {

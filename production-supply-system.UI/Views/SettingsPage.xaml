@@ -5,7 +5,8 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:converters="clr-namespace:UI_Interface.Converters"
-      xmlns:models="clr-namespace:Theme.Manager.MahApps.WPF;assembly=theme-manager.mahapps.wpf.nuget"
+      xmlns:themeModels="clr-namespace:Theme.Manager.MahApps.WPF;assembly=theme-manager.mahapps.wpf.nuget"
+      xmlns:multilang="clr-namespace:UI_Interface.Multilang"
       xmlns:properties="clr-namespace:UI_Interface.Properties"
       xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
       xmlns:viewmodels="clr-namespace:UI_Interface.ViewModels.ViewModelsForPages"
@@ -14,13 +15,15 @@
       d:DesignHeight="600"
       d:DesignWidth="800">
     <Page.Resources>
-        <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverter"
-                                           EnumType="models:AppTheme" />
+        <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverterTheme"
+                                                EnumType="themeModels:AppTheme" />
+        <converters:EnumToBooleanConverter x:Key="EnumToBooleanConverterLanguage"
+                                                   EnumType="multilang:Languages" />
         <Ellipse x:Key="AccentMenuIcon"
                  Width="16"
                  Height="16"
                  x:Shared="False"
-                 Fill="{Binding ColorBrush, Mode=OneWay}" />
+                 Fill="{Binding ColorBrush, UpdateSourceTrigger=PropertyChanged}" />
         <Style x:Key="AccentColorMenuItemStyle"
                BasedOn="{StaticResource MahApps.Styles.MenuItem}"
                TargetType="{x:Type MenuItem}">
@@ -37,7 +40,8 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="48" />
                 <RowDefinition Height="auto" />
-                <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
@@ -83,7 +87,7 @@
                            Text="{x:Static properties:Resources.SettingsPagePersonalizationTitle}" />
                 <Menu HorizontalAlignment="Left"
                       Margin="{StaticResource SmallTopBottomMargin}">
-                    <MenuItem Header="Цвет темы"
+                    <MenuItem Header="{x:Static properties:Resources.SettingsPageThemeColor}"
                               ItemContainerStyle="{StaticResource AccentColorMenuItemStyle}"
                               ItemsSource="{Binding AccentColors, Mode=OneWay}" />
                 </Menu>
@@ -94,7 +98,7 @@
                         <RadioButton GroupName="AppTheme"
                                      Content="{x:Static properties:Resources.SettingsPageRadioButtonLightTheme}"
                                      FontSize="{StaticResource MediumFontSize}"
-                                     IsChecked="{Binding Theme, Mode=OneWay, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Light}">
+                                     IsChecked="{Binding Theme, Mode=OneWay, Converter={StaticResource EnumToBooleanConverterTheme}, ConverterParameter=Light}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Checked">
                                     <i:InvokeCommandAction Command="{Binding SetThemeCommand}"
@@ -106,7 +110,7 @@
                                      Content="{x:Static properties:Resources.SettingsPageRadioButtonDarkTheme}"
                                      Margin="{StaticResource XSmallTopMargin}"
                                      FontSize="{StaticResource MediumFontSize}"
-                                     IsChecked="{Binding Theme, Mode=OneWay, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Dark}">
+                                     IsChecked="{Binding Theme, Mode=OneWay, Converter={StaticResource EnumToBooleanConverterTheme}, ConverterParameter=Dark}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Checked">
                                     <i:InvokeCommandAction Command="{Binding SetThemeCommand}"
@@ -118,7 +122,7 @@
                                      Content="{x:Static properties:Resources.SettingsPageRadioButtonWindowsDefaultTheme}"
                                      FontSize="{StaticResource MediumFontSize}"
                                      Margin="{StaticResource XSmallTopMargin}"
-                                     IsChecked="{Binding Theme, Mode=OneWay, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Default}">
+                                     IsChecked="{Binding Theme, Mode=OneWay, Converter={StaticResource EnumToBooleanConverterTheme}, ConverterParameter=Default}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Checked">
                                     <i:InvokeCommandAction Command="{Binding SetThemeCommand}"
@@ -130,7 +134,41 @@
                 </StackPanel>
             </StackPanel>
 
-            <StackPanel Grid.Row="3"
+            <StackPanel 
+                        Grid.Row="3"
+                        Margin="{StaticResource MediumLeftTopRightBottomMargin}">
+                <TextBlock Margin="{StaticResource SmallTopMargin}"
+                           Style="{StaticResource SubtitleTextStyle}"
+                           Text="{x:Static properties:Resources.SettingsLanguageTitle}" />
+
+                <RadioButton GroupName="AppLanguage"
+                             Content="{x:Static properties:Resources.SettingsPageRadioRuLanguage}"
+                             Margin="{StaticResource XSmallTopMargin}"
+                             FontSize="{StaticResource MediumFontSize}"
+                             IsChecked="{Binding Language, Mode=OneWay, Converter={StaticResource EnumToBooleanConverterLanguage}, ConverterParameter=ru}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Checked">
+                            <i:InvokeCommandAction Command="{Binding SetLanguageCommand}"
+                                                   CommandParameter="ru" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </RadioButton>
+                <RadioButton GroupName="AppLanguage"
+                             Content="{x:Static properties:Resources.SettingsPageRadioEnLanguage}"
+                             FontSize="{StaticResource MediumFontSize}"
+                             Margin="{StaticResource XSmallTopMargin}"
+                             IsChecked="{Binding Language, Mode=OneWay, Converter={StaticResource EnumToBooleanConverterLanguage}, ConverterParameter=en}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Checked">
+                            <i:InvokeCommandAction Command="{Binding SetLanguageCommand}"
+                                                   CommandParameter="en" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </RadioButton>
+
+            </StackPanel>
+
+            <StackPanel Grid.Row="4"
                         Margin="{StaticResource MediumLeftBottomMargin}">
                 <TextBlock Margin="{StaticResource SmallTopMargin}"
                            Style="{StaticResource SubtitleTextStyle}"

@@ -2,17 +2,10 @@
 
 namespace DAL.Parameters.Document
 {
-    public class CreateDocmapperColumnParameters
+    public class CreateDocmapperColumnParameters(DocmapperColumn entity)
     {
-        public CreateDocmapperColumnParameters(DocmapperColumn entity)
-        {
-            ElementName = entity.ElementName;
+        public string ElementName { get; set; } = entity.ElementName;
 
-            SystemColumnName = entity.SystemColumnName;
-        }
-
-        public string ElementName { get; set; }
-
-        public string SystemColumnName { get; set; }    
+        public string SystemColumnName { get; set; } = entity.SystemColumnName;
     }
 }

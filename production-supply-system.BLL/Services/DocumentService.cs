@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BLL.Contracts;
+using BLL.Properties;
+
 using DAL.Data.Repositories.Contracts;
 using DAL.Enums;
 using DAL.Models.Document;
@@ -15,29 +17,17 @@ namespace BLL.Services
     /// <summary>
     /// Интерфейс сервиса для операций, связанных с картами сопоставления данных для эксель.
     /// </summary>
-    public class DocumentService : IDocumentService
+    /// <remarks>
+    /// Инициализирует новый экземпляр класса <see cref="DocumentService"/>.
+    /// </remarks>
+    /// <param name="documentMapperRepository">Репозиторий для доступа к информации о картах сопоставления данных для эксель.</param>
+    /// <param name="logger">Регистратор для отслеживания информации и ошибок.</param>
+    public class DocumentService(
+        IRepository<Docmapper> documentMapperRepository,
+        IRepository<DocmapperColumn> documentColumnRepository,
+        IRepository<DocmapperContent> documentContentRepository,
+        ILogger<DocumentService> logger) : IDocumentService
     {
-        private readonly IRepository<Docmapper> _documentMapperRepository;
-        private readonly IRepository<DocmapperColumn> _documentColumnRepository;
-        private readonly IRepository<DocmapperContent> _documentContentRepository;
-        private readonly ILogger<DocumentService> _logger;
-
-        /// <summary>
-        /// Инициализирует новый экземпляр класса <see cref="DocumentService"/>.
-        /// </summary>
-        /// <param name="documentMapperRepository">Репозиторий для доступа к информации о картах сопоставления данных для эксель.</param>
-        /// <param name="logger">Регистратор для отслеживания информации и ошибок.</param>
-        public DocumentService(
-            IRepository<Docmapper> documentMapperRepository, 
-            IRepository<DocmapperColumn> documentColumnRepository, 
-            IRepository<DocmapperContent> documentContentRepository,
-            ILogger<DocumentService> logger)
-        {
-            _documentMapperRepository = documentMapperRepository;
-            _documentColumnRepository = documentColumnRepository;
-            _documentContentRepository = documentContentRepository;
-            _logger = logger;
-        }
 
         /// <inheritdoc />
         public async Task<Docmapper> CreateDocumentAsync(Docmapper document, List<DocmapperContent> documentContent)
@@ -46,17 +36,12 @@ namespace BLL.Services
 
             try
             {
-                _logger.LogInformation($"Start saving a document: '{JsonConvert.SerializeObject(document)}'");
+                logger.LogInformation($"{Resources.LogDocmapperAdd}: '{JsonConvert.SerializeObject(document)}'");
 
-                Docmapper newDocument = await _documentMapperRepository.CreateAsync(document, StoredProcedureDocmapper.AddNewDocmapper, parameters);
+                Docmapper newDocument = await documentMapperRepository.CreateAsync(document, StoredProcedureDocmapper.AddNewDocmapper, parameters);
 
                 foreach (DocmapperContent contentItem in documentContent)
                 {
-                    if (newDocument.Id <= 0)
-                    {
-                        throw new Exception("DocmapperId should be greater than 0.");
-                    }
-
                     contentItem.DocmapperId = newDocument.Id;
 
                     contentItem.Docmapper = newDocument;
@@ -66,39 +51,42 @@ namespace BLL.Services
 
                 newDocument.DocmapperContents = documentContent;
 
-                try
-                {
-                    _documentMapperRepository.RefreshData();
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"Error refresh documents: {JsonConvert.SerializeObject(ex)}");
+                logger.LogInformation($"{Resources.LogDocmapperAdd} {Resources.Completed}");
 
-                    throw;
-                }
+                RefreshDocmappers();
 
                 return newDocument;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error add new document: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogDocmapperAdd}: {JsonConvert.SerializeObject(ex)}";
 
-                throw;
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<Docmapper>> GetAllAsync()
+        public async Task<IEnumerable<Docmapper>> GetAllDocumentsAsync()
         {
             try
             {
-                return await _documentMapperRepository.GetAllAsync();
+                logger.LogInformation($"{Resources.LogDocmapperGet}");
+
+                IEnumerable<Docmapper> docmappers = await documentMapperRepository.GetAllAsync();
+
+                logger.LogInformation($"{Resources.LogDocmapperGet} {Resources.Completed}");
+
+                return docmappers;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get documents list: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogDocmapperGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw;
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -107,13 +95,26 @@ namespace BLL.Services
         {
             try
             {
-                return await _documentMapperRepository.GetByIdAsync(mapId);
+                logger.LogInformation($"{string.Format(Resources.LogDocmapperGetById, mapId)}");
+
+                Docmapper document = await documentMapperRepository.GetByIdAsync(mapId);
+
+                logger.LogInformation($"{string.Format(Resources.LogDocmapperGetById, mapId)} {Resources.Completed}");
+
+                if (document is not null)
+                {
+                    document.DocmapperContents = await GetAllDocumentContentItemsByIdAsync(mapId);
+                }
+
+                return document;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get document by id {mapId}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogDocmapperGetById, mapId)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw;
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -122,13 +123,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _documentColumnRepository.GetAllAsync();
+                logger.LogInformation($"{Resources.LogDocmapperColumnGet}");
+
+                IEnumerable<DocmapperColumn> columns = await documentColumnRepository.GetAllAsync();
+
+                logger.LogInformation($"{Resources.LogDocmapperColumnGet} {Resources.Completed}");
+
+                return columns;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get document columns list: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogDocmapperColumnGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw;
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -139,164 +148,234 @@ namespace BLL.Services
 
             try
             {
-                await _documentMapperRepository.UpdateAsync(document, StoredProcedureDocmapper.UpdateDocmapperItem, parameters);
+                logger.LogInformation($"{Resources.LogDocmapperUpdate}");
+
+                await documentMapperRepository.UpdateAsync(StoredProcedureDocmapper.UpdateDocmapperItem, parameters);
+
+                logger.LogInformation($"{Resources.LogDocmapperUpdate} {Resources.Completed}");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error update document: {JsonConvert.SerializeObject(document)}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogDocmapperUpdate}: {JsonConvert.SerializeObject(document)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw;
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
 
             IEnumerable<DocmapperContent> cachedContentItems = await GetAllDocumentContentItemsByIdAsync(document.Id);
 
             await DeleteExistingItemsAsync(documentContent, cachedContentItems);
 
-            await UpdateDocumentContentAsync(documentContent);
+            await UpdateOrCreateDocumentContentAsync(documentContent);
 
-            try
-            {
-                _documentMapperRepository.RefreshData();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error refresh documents: {JsonConvert.SerializeObject(ex)}");
+            RefreshDocmappers();
 
-                throw;
-            }
-
-            try
-            {
-                _documentContentRepository.RefreshData();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error refresh document content: {JsonConvert.SerializeObject(ex)}");
-
-                throw;
-            }
+            RefreshDocmapperContent();
         }
 
         /// <inheritdoc />
         public async Task<DocmapperColumn> AddDocumentColumnAsync(DocmapperColumn documentColumn)
         {
-            CreateDocmapperColumnParameters parameters = new(documentColumn);
-
-            DocmapperColumn column;
-
             try
             {
-                column = await _documentColumnRepository.CreateAsync(documentColumn, StoredProcedureDocmapper.AddNewDocmapperColumn, parameters);
+                CreateDocmapperColumnParameters parameters = new(documentColumn);
+
+                logger.LogInformation($"{Resources.LogDocmapperColumnAdd}");
+
+                DocmapperColumn column = await documentColumnRepository.CreateAsync(documentColumn, StoredProcedureDocmapper.AddNewDocmapperColumn, parameters);
+
+                logger.LogInformation($"{Resources.LogDocmapperColumnAdd} {Resources.Completed}");
+
+                RefreshDocmapperColumns();
+
+                return column;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error add new document column {JsonConvert.SerializeObject(documentColumn)}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogDocmapperColumnAdd}: {JsonConvert.SerializeObject(documentColumn)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw;
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
-
-            try
-            {
-                _documentColumnRepository.RefreshData();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error refresh document columns: {JsonConvert.SerializeObject(ex)}");
-
-                throw;
-            }
-
-            return column;
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<DocmapperContent>> GetAllDocumentContentItemsByIdAsync(int mapId)
+        public async Task<List<DocmapperContent>> GetAllDocumentContentItemsByIdAsync(int mapId)
         {
-            //Docmapper document;
-
-            //try
-            //{
-            //    document = await _documentMapperRepository.GetByIdAsync(mapId);
-            //}
-            //catch (Exception ex)
-            //{
-            //    _logger.LogError($"Error get document by id {mapId}: {JsonConvert.SerializeObject(ex)}");
-
-            //    throw;
-            //}
-
-            IEnumerable<DocmapperContent> documentContent;
-
             try
             {
-                documentContent = (await _documentContentRepository.GetAllAsync())
-                                                                        .Where(con => con.DocmapperId == mapId);
+                logger.LogInformation($"{string.Format(Resources.LogDocmapperContentGetByDocmapperId, mapId)}");
+
+                IEnumerable<DocmapperContent> documentContent = (await documentContentRepository.GetAllAsync())
+                                                                        .Where(con => con.DocmapperId == mapId)
+                                                                        .OrderBy(dc => dc.ColumnNr);
+
+                logger.LogInformation($"{string.Format(Resources.LogDocmapperContentGetByDocmapperId, mapId)} {Resources.Completed}");
+
+                foreach (DocmapperContent item in documentContent)
+                {
+                    item.DocmapperColumn = await GetDocumentColumnByIdAsync(item);
+                }
+
+                return documentContent?.ToList();
+
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get list document contents for document with id {mapId}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogDocmapperContentGetByDocmapperId, mapId)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw;
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
+        }
 
-            foreach (DocmapperContent item in documentContent)
+        private void RefreshDocmappers()
+        {
+            try
             {
-                try
-                {
-                    item.DocmapperColumn = await _documentColumnRepository.GetByIdAsync(item.DocmapperColumnId);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"Error get document column by id {item.DocmapperColumnId}: {JsonConvert.SerializeObject(ex)}");
+                logger.LogInformation($"{Resources.LogDocmapperRefresh}");
 
-                    throw;
-                }
+                documentMapperRepository.RefreshData();
+
+                logger.LogInformation($"{Resources.LogDocmapperRefresh} {Resources.Completed}");
             }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {Resources.LogDocmapperRefresh}: {JsonConvert.SerializeObject(ex)}";
 
-            return documentContent;
+                logger.LogError(message);
+
+                throw new Exception(message);
+            }
+        }
+
+        private void RefreshDocmapperContent()
+        {
+            try
+            {
+                logger.LogInformation($"{Resources.LogDocmapperContentRefresh}");
+
+                documentContentRepository.RefreshData();
+
+                logger.LogInformation($"{Resources.LogDocmapperContentRefresh} {Resources.Completed}");
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {Resources.LogDocmapperContentRefresh}: {JsonConvert.SerializeObject(ex)}";
+
+                logger.LogError(message);
+
+                throw new Exception(message);
+            }
+        }
+
+        private void RefreshDocmapperColumns()
+        {
+            try
+            {
+                logger.LogInformation($"{Resources.LogDocmapperColumnRefresh}");
+
+                documentContentRepository.RefreshData();
+
+                logger.LogInformation($"{Resources.LogDocmapperColumnRefresh} {Resources.Completed}");
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {Resources.LogDocmapperColumnRefresh}: {JsonConvert.SerializeObject(ex)}";
+
+                logger.LogError(message);
+
+                throw new Exception(message);
+            }
+        }
+
+        private async Task DeleteDocumentContentItemByIdAsync(DocmapperContent item)
+        {
+            try
+            {
+                logger.LogInformation($"{string.Format(Resources.LogDocmapperContentDeleteById, item.Id)}");
+
+                await documentContentRepository.RemoveAsync(item.Id, StoredProcedureDocmapper.DeleteDocmapperContent);
+
+                logger.LogInformation($"{string.Format(Resources.LogDocmapperContentDeleteById, item.Id)} {Resources.Completed}");
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {string.Format(Resources.LogDocmapperContentDeleteById, item.Id)}: {JsonConvert.SerializeObject(ex)}";
+
+                logger.LogError(message);
+
+                throw new Exception(message);
+            }
+        }
+
+        private async Task<DocmapperColumn> GetDocumentColumnByIdAsync(DocmapperContent item)
+        {
+            try
+            {
+                logger.LogInformation($"{string.Format(Resources.LogDocmapperColumnGetById, item.DocmapperColumnId)}");
+
+                DocmapperColumn column = await documentColumnRepository.GetByIdAsync(item.DocmapperColumnId);
+
+                logger.LogInformation($"{string.Format(Resources.LogDocmapperColumnGetById, item.DocmapperColumnId)} {Resources.Completed}");
+
+                return column;
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {string.Format(Resources.LogDocmapperColumnGetById, item.DocmapperColumnId)}: {JsonConvert.SerializeObject(ex)}";
+
+                logger.LogError(message);
+
+                throw new Exception(message);
+            }
         }
 
         private async Task DeleteExistingItemsAsync(List<DocmapperContent> documentContent, IEnumerable<DocmapperContent> cachedContentItems)
         {
+            logger.LogInformation($"{Resources.LogDocmapperContentGetMissing}");
+
             IEnumerable<DocmapperContent> missingContent = cachedContentItems
                 .Where(ca => !documentContent.Any(dc => dc.Id == ca.Id));
 
+            logger.LogInformation($"{Resources.LogDocmapperContentGetMissing} {Resources.Completed}");
+
             foreach (DocmapperContent item in missingContent)
             {
-                try
-                {
-                    await _documentContentRepository.RemoveAsync(item.Id, StoredProcedureDocmapper.DeleteDocmapperContent);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError($"Error delete document content whit id {item.Id}: {JsonConvert.SerializeObject(ex)}");
-
-                    throw;
-                }
+                await DeleteDocumentContentItemByIdAsync(item);
             }
         }
 
-        private async Task UpdateDocumentContentAsync(List<DocmapperContent> documentContent)
+        private async Task UpdateOrCreateDocumentContentAsync(List<DocmapperContent> documentContent)
         {
             foreach (DocmapperContent content in documentContent)
             {
-                if (!await _documentContentRepository.ExistsAsync(content))
+                if (!await documentContentRepository.ExistsAsync(content))
                 {
                     await CreateDocumentContentAsync(content);
                 }
                 else
                 {
-                    UpdateDocmapperContentParameters parameters = new(content);
-
                     try
                     {
-                        await _documentContentRepository.UpdateAsync(content, StoredProcedureDocmapper.UpdateDocmapperContent, parameters);
+                        UpdateDocmapperContentParameters parameters = new(content);
+
+                        logger.LogInformation($"{Resources.LogDocmapperContentUpdate}");
+
+                        await documentContentRepository.UpdateAsync(StoredProcedureDocmapper.UpdateDocmapperContent, parameters);
+
+                        logger.LogInformation($"{Resources.LogDocmapperContentUpdate} {Resources.Completed}");
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError($"Error update document content {JsonConvert.SerializeObject(content)}: {JsonConvert.SerializeObject(ex)}");
+                        string message = $"{Resources.Error} {Resources.LogDocmapperContentUpdate}: {JsonConvert.SerializeObject(content)}: {JsonConvert.SerializeObject(ex)}";
 
-                        throw;
+                        logger.LogError(message);
+
+                        throw new Exception(message);
                     }
                 }
             }
@@ -304,17 +383,23 @@ namespace BLL.Services
 
         private async Task CreateDocumentContentAsync(DocmapperContent content)
         {
-            CreateDocmapperContentParameters parameters = new(content);
-
             try
             {
-                _ = await _documentContentRepository.CreateAsync(content, StoredProcedureDocmapper.AddNewDocmapperContent, parameters);
+                CreateDocmapperContentParameters parameters = new(content);
+
+                logger.LogInformation($"{Resources.LogDocmapperContentAdd}");
+
+                _ = await documentContentRepository.CreateAsync(content, StoredProcedureDocmapper.AddNewDocmapperContent, parameters);
+
+                logger.LogInformation($"{Resources.LogDocmapperContentAdd} {Resources.Completed}");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error add new document content {JsonConvert.SerializeObject(content)}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogDocmapperContentAdd} {JsonConvert.SerializeObject(content)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw;
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
     }

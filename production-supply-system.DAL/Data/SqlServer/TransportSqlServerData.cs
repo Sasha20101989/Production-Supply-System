@@ -5,10 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DAL.Data.SqlServer
 {
-    public class TransportSqlServerData : SqlServerData<Transport>
+    public class TransportSqlServerData(ISqlDataAccess db) : SqlServerData<Transport>(db, StoredProcedureInbound.GetAllTransportItems)
     {
-        public TransportSqlServerData(ISqlDataAccess db, ILogger<TransportSqlServerData> logger)
-            : base(db, logger, StoredProcedureInbound.GetAllTransportItems)
-        { }
     }
 }

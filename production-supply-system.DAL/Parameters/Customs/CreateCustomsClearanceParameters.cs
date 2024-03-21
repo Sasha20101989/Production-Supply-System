@@ -2,19 +2,12 @@
 
 namespace DAL.Parameters.Customs
 {
-    public class CreateCustomsClearanceParameters
+    public class CreateCustomsClearanceParameters(CustomsClearance entity)
     {
-        public CreateCustomsClearanceParameters(CustomsClearance entity)
-        {
-            ContainerInLotId = entity.ContainersInLot.Id;
-            InvoceNumber = entity.InvoceNumber;
-            PartTypeId = entity.PartType.Id;
-        }
+        public int ContainerInLotId { get; set; } = entity.ContainersInLot.Id;
 
-        public int ContainerInLotId { get; set; }
+        public string InvoceNumber { get; set; } = entity.InvoceNumber;
 
-        public string InvoceNumber { get; set; }
-
-        public int? PartTypeId { get; set; }
+        public int? PartTypeId { get; set; } = entity.PartType.Id;
     }
 }

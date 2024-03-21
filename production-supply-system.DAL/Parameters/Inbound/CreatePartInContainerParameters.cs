@@ -2,25 +2,16 @@
 
 namespace DAL.Parameters.Inbound
 {
-    public class CreatePartInContainerParameters
+    public class CreatePartInContainerParameters(PartsInContainer entity)
     {
-        public CreatePartInContainerParameters(PartsInContainer entity)
-        {
-            CaseId = entity.Case.Id;
-            ContainerInLotId = entity.ContainerInLot.Id;
-            PartInvoiceId = entity.PartInvoice.Id;
-            PartNumberId = entity.PartNumber.PartNumberId;
-            Quantity = entity.Quantity;
-        }
+        public int? CaseId { get; set; } = entity.Case.Id;
 
-        public int? CaseId { get; set; }
+        public int ContainerInLotId { get; set; } = entity.ContainerInLot.Id;
 
-        public int ContainerInLotId { get; set; }
+        public int PartInvoiceId { get; set; } = entity.PartInvoice.Id;
 
-        public int PartInvoiceId { get; set; }
+        public int PartNumberId { get; set; } = entity.PartNumber.PartNumberId;
 
-        public int PartNumberId { get; set; }
-
-        public decimal Quantity { get; set; }
+        public decimal Quantity { get; set; } = entity.Quantity;
     }
 }

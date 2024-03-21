@@ -2,19 +2,22 @@
 using System.Windows.Media;
 using MahApps.Metro.Controls.Dialogs;
 using MahApps.Metro.Controls;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
 using UI_Interface.Properties;
+using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Extensions.Logging;
+using System.Windows;
+using System.Linq;
 
 namespace UI_Interface.ViewModels
 {
     /// <summary>
     /// Базовая ViewModel с общими методами управления прогрессом и диалогами.
     /// </summary>
-    public class ControlledViewModel : ObservableObject
+    public class ControlledViewModel(ILogger logger) : ObservableObject
     {
         protected ProgressDialogController _progressController;
 
-        protected MetroWindow _metroWindow;
+        protected MetroWindow _metroWindow = Application.Current.Windows.OfType<MetroWindow>().FirstOrDefault(x => x.IsActive);
 
         /// <summary>
         /// Ожидает разблокировки сообщения с указанным заголовком, текстом сообщения и цветом прогресс-бара.
@@ -28,7 +31,9 @@ namespace UI_Interface.ViewModels
             {
                 _progressController.SetTitle(title);
 
-                _progressController.SetMessage($"{message} Пожалуйста нажмите '{Resources.ShellClose}' для завершения.");
+                _progressController.SetMessage($"{message}. {string.Format(Resources.PleasePress, Resources.ShellClose)}.");
+
+                logger.LogError(message);
 
                 _progressController.SetCancelable(true);
 
@@ -47,7 +52,7 @@ namespace UI_Interface.ViewModels
         /// </summary>
         protected async Task ControllerPostProcess()
         {
-            if (!(_progressController is null) && _progressController.IsOpen)
+            if (_progressController is not null && _progressController.IsOpen)
             {
                 await _progressController.CloseAsync();
             }

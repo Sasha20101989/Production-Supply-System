@@ -18,6 +18,7 @@ namespace DAL.Extensions
         /// <example>
         /// Пример использования:
         /// <code>
+        /// Lot lot = new();
         /// Dictionary&lt;string, CellInfo&gt; validationResult;
         /// if (lot.TryValidateProperty(nameof(Lot.LotNumber), out validationResult))
         /// {
@@ -40,12 +41,9 @@ namespace DAL.Extensions
         /// <returns>Возвращает true, если валидация прошла успешно, и false в противном случае.</returns>
         public static bool TryValidateProperty(this object instance, string propertyName, int row, int col, out Dictionary<string, CellInfo> outResult)
         {
-            if (instance == null)
-            {
-                throw new ArgumentNullException(nameof(instance));
-            }
+            ArgumentNullException.ThrowIfNull(instance);
 
-            outResult = new();
+            outResult = [];
 
             PropertyInfo propertyInfo = instance.GetType().GetProperty(propertyName);
 
@@ -53,7 +51,7 @@ namespace DAL.Extensions
             {
                 object value = propertyInfo.GetValue(instance);
 
-                List<ValidationResult> results = new();
+                List<ValidationResult> results = [];
 
                 ValidationContext context = new(instance) { MemberName = propertyName };
 
@@ -63,7 +61,7 @@ namespace DAL.Extensions
                     {
                         CellInfo cellInfo = new()
                         {
-                            Errors = new(),
+                            Errors = [],
                             Value = instance.GetPropertyValue(propertyName)
                         };
 
@@ -78,9 +76,9 @@ namespace DAL.Extensions
 
                             cellInfo.Errors.Add(customError);
 
-                            if (outResult.ContainsKey(propertyName))
+                            if (outResult.TryGetValue(propertyName, out CellInfo cellValue))
                             {
-                                outResult[propertyName].Errors.AddRange(cellInfo.Errors);
+                                cellValue.Errors.AddRange(cellInfo.Errors);
                             }
                             else
                             {
@@ -116,7 +114,7 @@ namespace DAL.Extensions
         /// <returns>Результаты валидации.</returns>
         public static IEnumerable<ValidationResult> Validate<T>(this T instance)
         {
-            List<ValidationResult> validationResults = new();
+            List<ValidationResult> validationResults = [];
 
             ValidationContext context = new(instance);
 
@@ -153,7 +151,7 @@ namespace DAL.Extensions
         /// <returns>Возвращает true, если валидация прошла успешно, и false в противном случае.</returns>
         public static bool TrySetAndValidateProperty(this object model, string propertyName, object propertyValue, int row, int col, out Dictionary<string, CellInfo> outResult)
         {
-            outResult = new();
+            outResult = [];
 
             model.SetProperty(propertyName, propertyValue);
 

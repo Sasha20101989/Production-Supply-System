@@ -1,34 +1,16 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿
+using CommunityToolkit.Mvvm.ComponentModel;
 
 using DAL.Models;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
 
 namespace UI_Interface.ViewModels
 {
-    public class LotViewModel: ObservableObject
+    public partial class LotViewModel(Lot lot, int quantityContainers) : ObservableObject
     {
-        private Lot _lot;
+        [ObservableProperty]
+        private Lot _lot = lot;
 
-        private int _quantityContainers;
-
-        public LotViewModel(Lot lot, int quantityContainers)
-        {
-            _lot = lot;
-
-            _quantityContainers = quantityContainers;
-        }
-
-        public Lot Lot
-        {
-            get => _lot;
-            set => _ = SetProperty(ref _lot, value);
-        }
-
-        public int QuantityContainers
-        {
-            get => _quantityContainers;
-            set => _ = SetProperty(ref _quantityContainers, value);
-        }
+        [ObservableProperty]
+        private int _quantityContainers = quantityContainers;
     }
 }

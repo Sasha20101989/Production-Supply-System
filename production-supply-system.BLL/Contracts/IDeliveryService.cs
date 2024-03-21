@@ -6,7 +6,10 @@ using BLL.Models;
 
 using DAL.Enums;
 using DAL.Models;
+using DAL.Models.Document;
 using DAL.Models.Master;
+
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace BLL.Contracts
 {
@@ -23,10 +26,19 @@ namespace BLL.Contracts
         /// <returns>Задача, представляющая асинхронную операцию, возвращающая все заказы.</returns>
         Task<IEnumerable<PurchaseOrder>> GetAllPurchaseOrdersAsync();
 
+        /// <summary>
+        /// Загружает лоты в базу данных
+        /// </summary>
+        /// <param name="steps">Шаги которые необходимы для загрузки лота</param>
+        /// <param name="lotDetails">Детали для лота</param>
+        /// <returns>Задача, представляющая асинхронную операцию, возвращающая лот после загрузки в базу данных.</returns>
+        Task<Lot> StartUploadLotAsync(List<ProcessStep> steps, Lot lotDetails);
 
-        Task<Lot> StartProcessAsync(List<ProcessStep> steps, Lot lotDetails);
-
-
+        /// <summary>
+        /// Получает шаги для процесса
+        /// </summary>
+        /// <param name="appProcess">Значение пересичления типа процесса</param>
+        /// <returns>Задача, представляющая асинхронную операцию, возвращающая шаги для процесса.</returns>
         Task<List<ProcessStep>> GetProcessStepsByUserSectionAsync(AppProcess appProcess);
 
         /// <summary>
@@ -57,16 +69,16 @@ namespace BLL.Contracts
         Task<List<Lot>> GetAllLotsAsync();
 
         /// <summary>
-        /// Получает колличество контейнеров по уникальному идентификатору лота
+        /// Получает количество контейнеров по уникальному идентификатору лота
         /// </summary>
         /// <param name="lotId">Уникальный идентификатор лота</param>
-        /// <returns>Задача, представляющая асинхронную операцию, возвращающая колличество контейнеров по уникальному идентификатору лота.</returns>
+        /// <returns>Задача, представляющая асинхронную операцию, возвращающая количество контейнеров по уникальному идентификатору лота.</returns>
         Task<int> GetquantityContainersForLotId(int lotId);
 
         /// <summary>
-        /// Выгружает все лоты в файл
+        /// Получает весь трейсинг для выгрузки
         /// </summary>
-        /// <returns>Задача, представляющая асинхронную операцию, выгружающая все лоты в файл.</returns>
-        Task ExportAllTracing(string exportFilePath);
+        /// <returns>Задача, представляющая асинхронную операцию, выгружающая весь трейсинг для партнёра 2 для дальнейшей выгрузки в файл.</returns>
+        Task<SheetData> GetAllTracingForPartner2ToExport(List<DocmapperContent> content);
     }
 }

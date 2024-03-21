@@ -12,30 +12,19 @@ namespace UI_Interface.Services
     /// <summary>
     /// Сервис управления данными пользователя.
     /// </summary>
-    public class UserDataService : IUserDataService
+    /// <remarks>
+    /// Инициализирует новый экземпляр службы управления данными пользователя.
+    /// </remarks>
+    /// <param name="fileManager">Менеджер файлов.</param>
+    /// <param name="identityService">Служба аутентификации.</param>
+    /// <param name="appConfig">Конфигурации приложения.</param>
+    public class UserDataService(IFileManager fileManager, IIdentityService identityService, IOptions<AppConfig> appConfig) : IUserDataService
     {
-        private readonly IFileManager _fileManager;
-
-        private readonly IIdentityService _identityService;
-
-        private readonly AppConfig _appConfig;
+        private readonly AppConfig _appConfig = appConfig.Value;
 
         private readonly string _localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
         private UserViewModel _userViewModel;
-
-        /// <summary>
-        /// Инициализирует новый экземпляр службы управления данными пользователя.
-        /// </summary>
-        /// <param name="fileManager">Менеджер файлов.</param>
-        /// <param name="identityService">Служба аутентификации.</param>
-        /// <param name="appConfig">Конфигурации приложения.</param>
-        public UserDataService(IFileManager fileManager, IIdentityService identityService, IOptions<AppConfig> appConfig)
-        {
-            _fileManager = fileManager;
-            _identityService = identityService;
-            _appConfig = appConfig.Value;
-        }
 
         /// <summary>
         /// Получает имя пользователя учетной записи.
@@ -102,7 +91,7 @@ namespace UI_Interface.Services
 
             string folderPath = Path.Combine(_localAppData, _appConfig.ConfigurationsFolder);
 
-            _fileManager.Save<User>(folderPath, _appConfig.UserFileName, null);
+            fileManager.Save<User>(folderPath, _appConfig.UserFileName, null);
         }
 
         /// <summary>
@@ -113,7 +102,7 @@ namespace UI_Interface.Services
         {
             string folderPath = Path.Combine(_localAppData, _appConfig.ConfigurationsFolder);
 
-            _fileManager.Save(folderPath, _appConfig.UserFileName, userData);
+            fileManager.Save(folderPath, _appConfig.UserFileName, userData);
         }
 
         /// <summary>
@@ -124,7 +113,7 @@ namespace UI_Interface.Services
         {
             string folderPath = Path.Combine(_localAppData, _appConfig.ConfigurationsFolder);
 
-            User cacheData = _fileManager.Read<User>(folderPath, _appConfig.UserFileName);
+            User cacheData = fileManager.Read<User>(folderPath, _appConfig.UserFileName);
 
             return GetUserViewModelFromData(cacheData);
         }
@@ -132,8 +121,8 @@ namespace UI_Interface.Services
         /// <inheritdoc />
         public void Initialize()
         {
-            _identityService.LoggedIn += OnLoggedIn;
-            _identityService.LoggedOut += OnLoggedOut;
+            identityService.LoggedIn += OnLoggedIn;
+            identityService.LoggedOut += OnLoggedOut;
         }
 
         /// <inheritdoc />
@@ -143,10 +132,7 @@ namespace UI_Interface.Services
             {
                 _userViewModel = GetUserViewModelFromCache();
 
-                if (_userViewModel is null)
-                {
-                    _userViewModel = GetDefaultUserData();
-                }
+                _userViewModel ??= GetDefaultUserData();
             }
 
             return _userViewModel;

@@ -8,10 +8,7 @@ namespace DAL.Data.SqlServer
     /// <summary>
     /// Реализация SQL Server для получения отправителей.
     /// </summary>
-    public class ShipperSqlServerData : SqlServerData<Shipper>
+    public class ShipperSqlServerData(ISqlDataAccess db) : SqlServerData<Shipper>(db, StoredProcedureInbound.GetAllShippers)
     {
-        public ShipperSqlServerData(ISqlDataAccess db, ILogger<ShipperSqlServerData> logger)
-                    : base(db, logger, StoredProcedureInbound.GetAllShippers)
-        { }
     }
 }

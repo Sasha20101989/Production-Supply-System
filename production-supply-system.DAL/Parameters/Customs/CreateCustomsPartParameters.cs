@@ -3,23 +3,15 @@ using DAL.Models;
 
 namespace DAL.Parameters.Customs
 {
-    public class CreateCustomsPartParameters
+    public class CreateCustomsPartParameters(CustomsPart entity)
     {
-        public CreateCustomsPartParameters(CustomsPart entity)
-        {
-            PartNumberId = entity.PartNumberId;
-            PartNumber = entity.PartNumber;
-            PartNameEng = entity.PartNameEng;
-            PartTypeId = entity.PartTypeId;
-        }
+        public int PartNumberId { get; set; } = entity.PartNumberId;
 
-        public int PartNumberId { get; set; }
+        public string PartNumber { get; set; } = entity.PartNumber;
 
-        public string PartNumber { get; set; }
+        public string PartNameEng { get; set; } = entity.PartNameEng;
 
-        public string PartNameEng { get; set; }
-
-        public int? PartTypeId { get; set; }
+        public int? PartTypeId { get; set; } = entity.PartTypeId;
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }

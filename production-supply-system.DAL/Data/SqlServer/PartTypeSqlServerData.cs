@@ -5,10 +5,7 @@ using DAL.Models;
 
 namespace DAL.Data.SqlServer
 {
-    public class PartTypeSqlServerData : SqlServerData<TypesOfPart>
+    public class PartTypeSqlServerData(ISqlDataAccess db) : SqlServerData<TypesOfPart>(db, StoredProcedureInbound.GetAllPartTypes)
     {
-        public PartTypeSqlServerData(ISqlDataAccess db, ILogger<PartTypeSqlServerData> logger)
-            : base(db, logger, StoredProcedureInbound.GetAllPartTypes)
-        { }
     }
 }

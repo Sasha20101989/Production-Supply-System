@@ -1,17 +1,22 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
+
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+
 using MahApps.Metro.Controls;
 using MahApps.Metro.IconPacks;
 
 using Microsoft.Extensions.Logging;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
 using NavigationManager.Frame.Extension.WPF;
 
 using Newtonsoft.Json;
 
 using UI_Interface.Contracts.Services;
+using UI_Interface.Multilang;
 using UI_Interface.Properties;
 
 namespace UI_Interface.ViewModels.ViewModelsForPages
@@ -24,15 +29,18 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
         private readonly IUserDataService _userDataService;
 
+        private readonly IMultilangManager _multilangManager;
+
         private HamburgerMenuItem _selectedMenuItem;
 
         private HamburgerMenuItem _selectedOptionsMenuItem;
 
-        public ShellViewModel(INavigationManager navigationManager, IUserDataService userDataService, ILogger<ShellViewModel> logger)
+        public ShellViewModel(INavigationManager navigationManager, IUserDataService userDataService, IMultilangManager multilangManager, ILogger<ShellViewModel> logger)
         {
             _logger = logger;
             _navigationManager = navigationManager;
             _userDataService = userDataService;
+            _multilangManager = multilangManager;
 
             GoBackCommand = new RelayCommand(OnGoBack, CanGoBack);
             MenuItemInvokedCommand = new RelayCommand(OnMenuItemInvoked);
@@ -41,12 +49,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
             UnloadedCommand = new RelayCommand(OnUnloaded);
         }
 
-        public ObservableCollection<HamburgerMenuItem> MenuItems { get; } = new ObservableCollection<HamburgerMenuItem>()
-        {
-            new HamburgerMenuIconItem() { Label = Resources.ShellMainPage, Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.HomeSolid }, TargetPageType = typeof(MainViewModel) },
-            new HamburgerMenuIconItem() { Label = Resources.ShellDocumentMapperPage, Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.MapMarkerSolid }, TargetPageType = typeof(DocumentMapperViewModel) },
-            new HamburgerMenuIconItem() { Label = Resources.ShellDeliveryPage, Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.TruckMovingSolid }, TargetPageType = typeof(DeliveryViewModel) },
-        };
+        public ObservableCollection<HamburgerMenuItem> MenuItems { get; } = [];
 
         public HamburgerMenuItem SelectedMenuItem
         {
@@ -60,7 +63,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
             set => _ = SetProperty(ref _selectedOptionsMenuItem, value);
         }
 
-        public ObservableCollection<HamburgerMenuItem> OptionMenuItems { get; set; } = new();
+        public ObservableCollection<HamburgerMenuItem> OptionMenuItems { get; set; } = [];
 
         public RelayCommand GoBackCommand { get; }
 
@@ -79,7 +82,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
         private void OnUserDataUpdated(object sender, UserViewModel user)
         {
-            _logger.LogInformation($"Information for user updated: '{JsonConvert.SerializeObject(user)}'");
+            _logger.LogInformation(string.Format(Resources.LogUserUpdated, JsonConvert.SerializeObject(user)));
 
             HamburgerMenuImageItem userMenuItem = OptionMenuItems.OfType<HamburgerMenuImageItem>().FirstOrDefault();
 
@@ -112,15 +115,17 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
         private void OnLoaded()
         {
+            _multilangManager.InitializeLanguage();
+
             _navigationManager.Navigated += OnNavigated;
 
             _userDataService.UserDataUpdated += OnUserDataUpdated;
 
-            _logger.LogInformation($"Start getting user");
+            _logger.LogInformation(Resources.LogUserGet);
 
             UserViewModel user = _userDataService.GetUser();
 
-            _logger.LogInformation($"Getting user completed: '{JsonConvert.SerializeObject(user)}'");
+            _logger.LogInformation($"{Resources.LogUserGet} {Resources.Completed}: '{JsonConvert.SerializeObject(user)}'");
 
             HamburgerMenuImageItem userMenuItem = new()
             {
@@ -130,6 +135,10 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
             };
 
             OptionMenuItems.Insert(0, userMenuItem);
+
+            MenuItems.Add(new HamburgerMenuIconItem() { Label = Resources.ShellMainPage, Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.HomeSolid }, TargetPageType = typeof(MainViewModel) });
+            MenuItems.Add(new HamburgerMenuIconItem() { Label = Resources.ShellDocumentMapperPage, Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.MapMarkerSolid }, TargetPageType = typeof(DocumentMapperViewModel) });
+            MenuItems.Add(new HamburgerMenuIconItem() { Label = Resources.ShellDeliveryPage, Icon = new PackIconFontAwesome() { Kind = PackIconFontAwesomeKind.TruckMovingSolid }, TargetPageType = typeof(DeliveryViewModel) });
         }
 
         private void OnUnloaded()

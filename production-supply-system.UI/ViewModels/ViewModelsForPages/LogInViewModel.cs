@@ -1,41 +1,30 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
-
+﻿using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using UI_Interface.Contracts.Services;
 using UI_Interface.Helpers;
+using UI_Interface.Multilang;
 using UI_Interface.Properties;
 
 namespace UI_Interface.ViewModels.ViewModelsForPages
 {
-    public class LogInViewModel : ObservableObject
+    public partial class LogInViewModel : ObservableObject
     {
         private readonly IIdentityService _identityService;
+
+        [ObservableProperty]
         private string _statusMessage;
+
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
         private bool _isBusy;
 
-        public LogInViewModel(IIdentityService identityService)
+        public LogInViewModel(IIdentityService identityService, IMultilangManager multilangManager)
         {
             _identityService = identityService;
-            LoginCommand = new RelayCommand(OnLogin, () => !IsBusy);
-        }
 
-        public string StatusMessage
-        {
-            get => _statusMessage;
-            set => SetProperty(ref _statusMessage, value);
+            multilangManager.InitializeLanguage();
         }
-
-        public bool IsBusy
-        {
-            get => _isBusy;
-            set
-            {
-                _ = SetProperty(ref _isBusy, value);
-                LoginCommand.NotifyCanExecuteChanged();
-            }
-        }
-
-        public RelayCommand LoginCommand { get; }
 
         private static string GetStatusMessage(LoginResultType loginResult)
         {
@@ -49,7 +38,13 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
             };
         }
 
-        private async void OnLogin()
+        private bool CanLogin()
+        {
+            return !IsBusy;
+        }
+
+        [RelayCommand(CanExecute = nameof(CanLogin))]
+        private async Task LoginAsync()
         {
             IsBusy = true;
             StatusMessage = string.Empty;

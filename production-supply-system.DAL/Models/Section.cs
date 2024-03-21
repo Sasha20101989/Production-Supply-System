@@ -20,9 +20,5 @@ namespace DAL.Models
         [MaxLength(300)]
         [Column("Section_Name")]
         public string SectionName { get; set; } = null!;
-
-        public virtual ICollection<ProcessStep> ProcessesSteps { get; set; }
-
-        public virtual ICollection<User> Users { get; set; }
     }
 }

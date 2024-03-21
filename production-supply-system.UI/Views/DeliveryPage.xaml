@@ -65,6 +65,40 @@
             </Style.Triggers>
         </Style>
 
+        <Style x:Key="ExportIconStyle"
+               TargetType="{x:Type Button}"
+               BasedOn="{StaticResource ResourceKey=MahApps.Styles.Button.Chromeless}">
+            <Setter Property="FontSize"
+                    Value="24" />
+            <Setter Property="FontWeight"
+                    Value="Normal" />
+            <Setter Property="FontFamily"
+                    Value="Segoe UI Light" />
+            <Setter Property="ContentTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <iconPacks:PackIconBootstrapIcons Kind="Download"
+                                                              Width="24"
+                                                              Height="24"
+                                                              VerticalAlignment="Center" />
+
+                            <TextBlock Margin="10 0 0 0"
+                                       VerticalAlignment="Center"
+                                       Text="{Binding}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver"
+                         Value="True">
+                    <Setter Property="Foreground"
+                            Value="Green" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
         <CollectionViewSource x:Key="GroupedTransports"
                               Source="{Binding DeliveryDetailViewModel.Transports}">
             <CollectionViewSource.GroupDescriptions>
@@ -121,7 +155,7 @@
                     HorizontalAlignment="Left"
                     Margin="{StaticResource SmallLeftXXSRightMargin}"
                     ToolTip="{x:Static properties:Resources.BllExportAllTracing}"
-                    Command="{Binding ExportAllTracingCommand}"
+                    Command="{Binding OpenExportCommand}"
                     BorderThickness="1"
                     Style="{StaticResource AccentCircleButtonStyle}">
                 <iconPacks:PackIconModern Kind="OfficeExcel" />
@@ -204,7 +238,7 @@
 
         <mah:FlyoutsControl Grid.Row="0"
                             Grid.RowSpan="2"
-                            Visibility="{Binding DetailsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            >
             <mah:Flyout Width="auto"
                         Theme="Inverse"
                         mah:ControlsHelper.ContentCharacterCasing="Upper"
@@ -212,6 +246,7 @@
                         Position="Right"
                         IsOpen="{Binding DetailsOpen}"
                         CloseCommand="{Binding CloseDetailsCommand}"
+                        Visibility="{Binding DetailsOpen, Converter={StaticResource BooleanToVisibilityConverter}}"
                         Header="{x:Static properties:Resources.ShellDetails}">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -700,12 +735,73 @@
                                 Content="{x:Static properties:Resources.ShellCancelButton}"
                                 Margin="{StaticResource SmallLeftTopRightBottomMargin}"
                                 Command="{Binding CloseDetailsCommand}" />
-                        <Button Command="{Binding StartProcessCommand}"
+                        <Button Command="{Binding StartUploadLotCommand}"
                                 Content="{x:Static properties:Resources.ShellAdd}"
                                 IsEnabled="{Binding HasErrors, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBooleanConverter}}"
                                 Margin="{StaticResource SmallLeftTopRightBottomMargin}"
                                 Style="{StaticResource MahApps.Styles.Button.Dialogs.Accent}" />
                     </WrapPanel>
+                </Grid>
+            </mah:Flyout>
+            <mah:Flyout Width="auto"
+                        Theme="Inverse"
+                        mah:ControlsHelper.ContentCharacterCasing="Upper"
+                        AreAnimationsEnabled="True"
+                        Position="Right"
+                        IsOpen="{Binding ExportOpen}"
+                        CloseCommand="{Binding CloseExportCommand}"
+                        Visibility="{Binding ExportOpen, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Header="{x:Static properties:Resources.ShellExportFiles}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+
+                    <GroupBox Header="{x:Static properties:Resources.MasterExportFile}"
+                              Margin="{StaticResource MediumLeftRightMargin}">
+                        <ListView ItemsSource="{Binding MasterCollection, UpdateSourceTrigger=PropertyChanged}">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="{x:Static properties:Resources.ShellFileName}"
+                                                    Width="640"
+                                                    DisplayMemberBinding="{Binding ProcessStep.Docmapper.DocmapperName}" />
+                                    <GridViewColumn Width="40">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <mah:Badged BadgePlacementMode="TopRight"
+                                                            Style="{Binding HasError, Converter={StaticResource BadgeStyleConverter}, UpdateSourceTrigger=PropertyChanged}">
+                                                    <Button Command="{Binding ExportFileCommand}"
+                                                            CommandParameter="{Binding}"
+                                                            Style="{StaticResource ExportIconStyle}" />
+                                                </mah:Badged>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListViewItem}">
+                                    <Setter Property="Background"
+                                            Value="Transparent" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type ListViewItem}">
+                                                <Border BorderBrush="Transparent"
+                                                        BorderThickness="0"
+                                                        Background="{TemplateBinding Background}">
+                                                    <GridViewRowPresenter HorizontalAlignment="Stretch"
+                                                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                                                          Width="Auto"
+                                                                          Margin="0"
+                                                                          Content="{TemplateBinding Content}" />
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ListView.ItemContainerStyle>
+                        </ListView>
+                    </GroupBox>
                 </Grid>
             </mah:Flyout>
         </mah:FlyoutsControl>

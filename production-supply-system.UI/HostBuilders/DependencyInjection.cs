@@ -29,6 +29,8 @@ using DAL.Models.Planning;
 using DAL.Models.BOM;
 using DAL.Models.Inbound;
 using DAL.Models.Partscontrol;
+using UI_Interface.Multilang;
+using UI_Interface.Contracts;
 
 namespace UI_Interface.HostBuilders
 {
@@ -315,6 +317,8 @@ namespace UI_Interface.HostBuilders
 
             _ = services.AddSingleton<IBOMService, BOMService>();
 
+            _ = services.AddSingleton<IExportProceduresService, ExportProceduresService>();
+
             return services;
         }
 
@@ -352,12 +356,15 @@ namespace UI_Interface.HostBuilders
             _ = services.AddSingleton<IIdentityService, IdentityService>();
             _ = services.AddSingleton<IUserDataService, UserDataService>();
 
+            _ = services.AddSingleton<IMultilangManager, MultilangManager>();
             _ = services.AddSingleton<IThemeManager, ThemeManager>();
             _ = services.AddSingleton<IСacheManager, СacheManager>();
             _ = services.AddSingleton<IFileManager, FileManager>();
             _ = services.AddSingleton<IPageManager, PageManager.WPF.PageManager>();
             _ = services.AddSingleton<INavigationManager, NavigationManager.Frame.Extension.WPF.NavigationManager>();
             _ = services.AddSingleton<IDialogCoordinator, DialogCoordinator>();
+            _ = services.AddSingleton<IToastNotificationsService, ToastNotificationsService>();
+            _ = services.AddSingleton<ISystemService, SystemService>();
 
             return services;
         }

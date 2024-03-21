@@ -20,6 +20,6 @@ namespace DAL.Models
         [Column("Transport_Name")]
         public string TransportName { get; set; } = null!;
 
-        public string TransportNameGroup => string.IsNullOrEmpty(TransportName) ? "" : TransportName.Substring(0, 1).ToUpper();
+        public string TransportNameGroup => string.IsNullOrEmpty(TransportName) ? "" : TransportName[..1].ToUpper();
     }
 }

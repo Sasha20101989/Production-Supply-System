@@ -8,17 +8,11 @@ using DAL.Models.Contracts;
 
 using Dapper;
 
-using Microsoft.Extensions.Logging;
-
-using Newtonsoft.Json;
-
 namespace DAL.Data
 {
     public abstract class SqlServerData<T> where T : IEntity
     {
         private readonly ISqlDataAccess _db;
-
-        private readonly ILogger<SqlServerData<T>> _logger;
 
         protected internal Lazy<Task<IEnumerable<T>>> _dataItems;
 
@@ -29,11 +23,9 @@ namespace DAL.Data
         /// </summary>
         /// <param name="db">Служба доступа к данным SQL.</param>
         /// <param name="initialDataStoredProcedure">Хранимая процедура инициализирующая данные.</param>
-        protected SqlServerData(ISqlDataAccess db, ILogger<SqlServerData<T>> logger, Enum initialDataStoredProcedure)
+        protected SqlServerData(ISqlDataAccess db, Enum initialDataStoredProcedure)
         {
             _db = db;
-
-            _logger = logger;
 
             _initialStoredProcedure = initialDataStoredProcedure;
 
@@ -69,23 +61,14 @@ namespace DAL.Data
 
         private async Task<IEnumerable<T>> GetAllDataItemsAsync(Enum storedProcedure)
         {
-            _logger.LogInformation($"Get all {typeof(T).Name} items");
-
             IEnumerable<T> result = await _db.LoadDataAsync<T>(storedProcedure);
-
-            _logger.LogInformation($"List of {typeof(T).Name} items received");
 
             return result;
         }
 
-        public async Task UpdateAsync(T entity, Enum storedProcedure, object parameters)
+        public async Task UpdateAsync(Enum storedProcedure, object parameters)
         {
-            _logger.LogInformation($"Update {typeof(T).Name} with id {entity.Id} " +
-                $"-> Updated information: {JsonConvert.SerializeObject(entity)}");
-
             await _db.SaveDataAsync(storedProcedure, parameters);
-
-            _logger.LogInformation($"{typeof(T).Name} with id {entity.Id} updated");
 
             Refresh();
         }
@@ -95,26 +78,19 @@ namespace DAL.Data
             DynamicParameters parameters = new();
             parameters.Add("@Id", id);
 
-            _logger.LogInformation($"Delete {typeof(T).Name} with id {id}");
-
             await _db.SaveDataAsync(storedProcedure, parameters);
-
-            _logger.LogInformation($"{typeof(T).Name} with id {id} deleted");
 
             Refresh();
         }
 
         public async Task<T> CreateAsync(T entity, Enum storedProcedure, object parameters)
         {
-            _logger.LogInformation($"Create {nameof(entity)}: {JsonConvert.SerializeObject(entity)}");
-
             IEnumerable<T> result = await _db.LoadDataAsync<T>(storedProcedure, parameters);
 
             T newColumn = result.First();
 
             entity.Id = newColumn.Id;
 
-            _logger.LogInformation($"{nameof(entity)} with id {entity.Id} created");
 
             Refresh();
 

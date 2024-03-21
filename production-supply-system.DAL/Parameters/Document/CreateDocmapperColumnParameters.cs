@@ -2,25 +2,14 @@
 
 namespace DAL.Parameters.Document
 {
-    public class CreateDocmapperParameters
+    public class CreateDocmapperParameters(Docmapper entity)
     {
-        public CreateDocmapperParameters(Docmapper entity)
-        {
-            DocmapperName = entity.DocmapperName;
+        public string DocmapperName { get; set; } = entity.DocmapperName;
 
-            DefaultFolder = entity.DefaultFolder;
+        public string? DefaultFolder { get; set; } = entity.DefaultFolder;
 
-            SheetName = entity.SheetName;
+        public string SheetName { get; set; } = entity.SheetName;
 
-            FirstDataRow = entity.FirstDataRow;
-        }
-
-        public string DocmapperName { get; set; }
-
-        public string? DefaultFolder { get; set; }
-
-        public string SheetName { get; set; } = null!;
-
-        public int FirstDataRow { get; set; }
+        public int FirstDataRow { get; set; } = entity.FirstDataRow;
     }
 }

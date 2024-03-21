@@ -1,6 +1,8 @@
 ﻿using System.Windows.Media.Imaging;
+
+using CommunityToolkit.Mvvm.ComponentModel;
+
 using DAL.Models;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
 using UI_Interface.Helpers;
 using UI_Interface.Properties;
 
@@ -10,12 +12,10 @@ namespace UI_Interface.ViewModels
     /// ViewModel, представляющая информацию о пользователе для взаимодействия с пользовательским интерфейсом.
     /// Наследует от ObservableObject для уведомлений об изменении свойств.
     /// </summary>
-    public class UserViewModel : ObservableObject
+    public partial class UserViewModel : ObservableObject
     {
-        /// <summary>
-        /// Получает или задает пользователя.
-        /// </summary>
-        public User User { get; set; } = new();
+        [ObservableProperty]
+        private User _user = new();
 
         /// <summary>
         /// Получает или задает имя пользователя.

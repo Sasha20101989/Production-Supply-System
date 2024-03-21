@@ -1,0 +1,495 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="CheckingProgress" xml:space="preserve">
+    <value>checking {0} from {1} lines</value>
+  </data>
+  <data name="Completed" xml:space="preserve">
+    <value>completed</value>
+  </data>
+  <data name="ContainerTypeMissing" xml:space="preserve">
+    <value>container '{0}' is missing container type information</value>
+  </data>
+  <data name="ContainerTypeMissingInStaticData" xml:space="preserve">
+    <value>container type '{0}' is missing in static data</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>error</value>
+  </data>
+  <data name="ErrorGettingTypeForPart" xml:space="preserve">
+    <value>error getting type for part</value>
+  </data>
+  <data name="ErrorInvoceNumberCustomsClearance" xml:space="preserve">
+    <value>error in generating the invoice number for the customs clearance</value>
+  </data>
+  <data name="ErrorsInFile" xml:space="preserve">
+    <value>there are errors that prevent further continuation, correct the errors in the file '{0}'</value>
+  </data>
+  <data name="ExportFormatDate" xml:space="preserve">
+    <value>dd/MM/yyyy</value>
+  </data>
+  <data name="FinalLocationNotFound" xml:space="preserve">
+    <value>the final location was not found when generating tracing</value>
+  </data>
+  <data name="InvoiceNumberHasBeenUploaded" xml:space="preserve">
+    <value>document with invoice number '{0}' has already been uploaded</value>
+  </data>
+  <data name="LogBodyModelVariantGet" xml:space="preserve">
+    <value>getting model variants list</value>
+  </data>
+  <data name="LogBomPartAdd" xml:space="preserve">
+    <value>adding new bom part</value>
+  </data>
+  <data name="LogBomPartGetExisting" xml:space="preserve">
+    <value>searching for an existing bom part by part number '{0}'</value>
+  </data>
+  <data name="LogBomPartsGet" xml:space="preserve">
+    <value>getting list bom parts</value>
+  </data>
+  <data name="LogCarrierGet" xml:space="preserve">
+    <value>getting list carriers</value>
+  </data>
+  <data name="LogCarrierGetById" xml:space="preserve">
+    <value>getting carrier by id '{0}'</value>
+  </data>
+  <data name="LogCaseAdd" xml:space="preserve">
+    <value>adding new case</value>
+  </data>
+  <data name="LogCaseGet" xml:space="preserve">
+    <value>getting cases list</value>
+  </data>
+  <data name="LogCaseGetById" xml:space="preserve">
+    <value>getting case by id '{0}'</value>
+  </data>
+  <data name="LogContainersInLotAdd" xml:space="preserve">
+    <value>adding new container</value>
+  </data>
+  <data name="LogContainersInLotByOpenLot" xml:space="preserve">
+    <value>getting container '{0}' in open lot</value>
+  </data>
+  <data name="LogContainersInLotGet" xml:space="preserve">
+    <value>getting containers list</value>
+  </data>
+  <data name="LogContainersInLotGetById" xml:space="preserve">
+    <value>getting container by id '{0}'</value>
+  </data>
+  <data name="LogContainersInLotGetByLotId" xml:space="preserve">
+    <value>getting containers by lot id '{0}'</value>
+  </data>
+  <data name="LogCustomsClearanceAdd" xml:space="preserve">
+    <value>adding new customs clearance</value>
+  </data>
+  <data name="LogCustomsClearanceGet" xml:space="preserve">
+    <value>getting customs clearance list</value>
+  </data>
+  <data name="LogCustomsPartAdd" xml:space="preserve">
+    <value>adding new customs part</value>
+  </data>
+  <data name="LogCustomsPartGet" xml:space="preserve">
+    <value>getting customs parts list</value>
+  </data>
+  <data name="LogCustomsPartGetById" xml:space="preserve">
+    <value>getting customs part by part number id '{0}'</value>
+  </data>
+  <data name="LogDocmapperAdd" xml:space="preserve">
+    <value>adding new docmapper</value>
+  </data>
+  <data name="LogDocmapperColumnAdd" xml:space="preserve">
+    <value>adding new docmapper column</value>
+  </data>
+  <data name="LogDocmapperColumnGet" xml:space="preserve">
+    <value>getting list docmapper columns</value>
+  </data>
+  <data name="LogDocmapperColumnGetById" xml:space="preserve">
+    <value>getting docmapper column by id '{0}'</value>
+  </data>
+  <data name="LogDocmapperColumnRefresh" xml:space="preserve">
+    <value>refreshing docmapper columns</value>
+  </data>
+  <data name="LogDocmapperContentAdd" xml:space="preserve">
+    <value>adding new document content</value>
+  </data>
+  <data name="LogDocmapperContentDeleteById" xml:space="preserve">
+    <value>deleting docmapper content by id '{0}'</value>
+  </data>
+  <data name="LogDocmapperContentGetByDocmapperId" xml:space="preserve">
+    <value>getting docmapper content by docmapper id '{0}'</value>
+  </data>
+  <data name="LogDocmapperContentGetMissing" xml:space="preserve">
+    <value>getting missing content</value>
+  </data>
+  <data name="LogDocmapperContentRefresh" xml:space="preserve">
+    <value>refreshing docmapper content</value>
+  </data>
+  <data name="LogDocmapperContentUpdate" xml:space="preserve">
+    <value>updating document content</value>
+  </data>
+  <data name="LogDocmapperGet" xml:space="preserve">
+    <value>getting list docmappers</value>
+  </data>
+  <data name="LogDocmapperGetById" xml:space="preserve">
+    <value>getting docmapper by id '{0}'</value>
+  </data>
+  <data name="LogDocmapperRefresh" xml:space="preserve">
+    <value>refreshing docmappers</value>
+  </data>
+  <data name="LogDocmapperUpdate" xml:space="preserve">
+    <value>updating docmapper</value>
+  </data>
+  <data name="LogExcelAddCommentAndFillRowAndColumn" xml:space="preserve">
+    <value>adding comment '{0}' to row '{1}' and column '{2}'</value>
+  </data>
+  <data name="LogExcelFillCellsInDocument" xml:space="preserve">
+    <value>filling cells in the document '{0}' on sheet name '{1}'</value>
+  </data>
+  <data name="LogExcelFillRowAndColumn" xml:space="preserve">
+    <value>filling row '{0}' and column '{1}'</value>
+  </data>
+  <data name="LogExcelHeaderValidation" xml:space="preserve">
+    <value>header validation on a line №'{0}'</value>
+  </data>
+  <data name="LogExcelParsingFileFromSheet" xml:space="preserve">
+    <value>parsing a file '{0}' from a sheet '{1}</value>
+  </data>
+  <data name="LogExcelSheetNotFound" xml:space="preserve">
+    <value>sheet '{0}' was not found</value>
+  </data>
+  <data name="LogExcelSheetSearch" xml:space="preserve">
+    <value>searching sheet '{0}' in the document</value>
+  </data>
+  <data name="LogExceptionExpectedPlace" xml:space="preserve">
+    <value>in place of the expected '{0}' is located '{1}</value>
+  </data>
+  <data name="LogExportFile" xml:space="preserve">
+    <value>starting export a file {0}</value>
+  </data>
+  <data name="LogInvoiceAdd" xml:space="preserve">
+    <value>adding new invoice</value>
+  </data>
+  <data name="LogInvoiceGet" xml:space="preserve">
+    <value>getting invoices list</value>
+  </data>
+  <data name="LogInvoiceGetById" xml:space="preserve">
+    <value>getting invoice by id '{0}</value>
+  </data>
+  <data name="LogLocationFilterByType" xml:space="preserve">
+    <value>filter locations by location type '{0}'</value>
+  </data>
+  <data name="LogLocationFinalGet" xml:space="preserve">
+    <value>getting final location</value>
+  </data>
+  <data name="LogLocationGet" xml:space="preserve">
+    <value>getting locations list</value>
+  </data>
+  <data name="LogLocationGetById" xml:space="preserve">
+    <value>getting location by id '{0}'</value>
+  </data>
+  <data name="LogLotAdd" xml:space="preserve">
+    <value>adding new lot</value>
+  </data>
+  <data name="LogLotGet" xml:space="preserve">
+    <value>getting lots list</value>
+  </data>
+  <data name="LogLotGetById" xml:space="preserve">
+    <value>getting lot by id '{0}'</value>
+  </data>
+  <data name="LogPartsInContainerAdd" xml:space="preserve">
+    <value>adding new part in container</value>
+  </data>
+  <data name="LogPartsInContainerGet" xml:space="preserve">
+    <value>getting parts in container list</value>
+  </data>
+  <data name="LogPartsInContainerGetByContainerId" xml:space="preserve">
+    <value>getting parts by container id '{0}'</value>
+  </data>
+  <data name="LogPartsInInvoiceAdd" xml:space="preserve">
+    <value>adding new part in invoice</value>
+  </data>
+  <data name="LogPartsInInvoiceGet" xml:space="preserve">
+    <value>getting parts in invoice list</value>
+  </data>
+  <data name="LogProcessGetById" xml:space="preserve">
+    <value>getting process by id '{0}'</value>
+  </data>
+  <data name="LogProcessStepGet" xml:space="preserve">
+    <value>getting process steps for app process {0}</value>
+  </data>
+  <data name="LogProcessStepGetBySectionId" xml:space="preserve">
+    <value>getting process steps by section id '{0}'</value>
+  </data>
+  <data name="LogPurchaseOrderGet" xml:space="preserve">
+    <value>getting purchase orders list</value>
+  </data>
+  <data name="LogPurchaseOrderGetById" xml:space="preserve">
+    <value>getting purchase order by id '{0}'</value>
+  </data>
+  <data name="LogSectionGetById" xml:space="preserve">
+    <value>getting section by id '{0}'</value>
+  </data>
+  <data name="LogShipperGet" xml:space="preserve">
+    <value>getting list shippers</value>
+  </data>
+  <data name="LogShipperGetById" xml:space="preserve">
+    <value>getting shipper by id '{0}'</value>
+  </data>
+  <data name="LogTermsOfDeliveryGet" xml:space="preserve">
+    <value>getting delivery terms list</value>
+  </data>
+  <data name="LogTermsOfDeliveryGetById" xml:space="preserve">
+    <value>getting delivery term by id '{0}'</value>
+  </data>
+  <data name="LogTracingAdd" xml:space="preserve">
+    <value>adding new tracing</value>
+  </data>
+  <data name="LogTracingGet" xml:space="preserve">
+    <value>getting tracing list</value>
+  </data>
+  <data name="LogTransportAdd" xml:space="preserve">
+    <value>adding new transport</value>
+  </data>
+  <data name="LogTransportGet" xml:space="preserve">
+    <value>getting transport list</value>
+  </data>
+  <data name="LogTransportGetById" xml:space="preserve">
+    <value>getting transport by id '{0}'</value>
+  </data>
+  <data name="LogTransportRefresh" xml:space="preserve">
+    <value>refreshing transport</value>
+  </data>
+  <data name="LogTypesOfContainerGet" xml:space="preserve">
+    <value>getting container types list</value>
+  </data>
+  <data name="LogTypesOfContainerGetById" xml:space="preserve">
+    <value>getting container type by id '{0}'</value>
+  </data>
+  <data name="LogTypesOfContainerGetByTypeName" xml:space="preserve">
+    <value>getting container type by container type name '{0}'</value>
+  </data>
+  <data name="LogTypesOfLocationGetById" xml:space="preserve">
+    <value>getting a location type by id '{0}</value>
+  </data>
+  <data name="LogTypesOfOrderGetById" xml:space="preserve">
+    <value>getting order type by id '{0}'</value>
+  </data>
+  <data name="LogTypesOfPackingGet" xml:space="preserve">
+    <value>getting list packing types</value>
+  </data>
+  <data name="LogTypesOfPackingGetById" xml:space="preserve">
+    <value>getting a package type by id '{0}</value>
+  </data>
+  <data name="LogTypesOfPackingGetByTypeName" xml:space="preserve">
+    <value>getting a package type by type name '{0}</value>
+  </data>
+  <data name="LogTypesOfPartGet" xml:space="preserve">
+    <value>getting list part types</value>
+  </data>
+  <data name="LogTypesOfPartGetById" xml:space="preserve">
+    <value>getting part type by id '{0}'</value>
+  </data>
+  <data name="LogTypesOfPartGetByPartTypeName" xml:space="preserve">
+    <value>getting part type by part type name '{0}'</value>
+  </data>
+  <data name="LogTypesOfTransportGet" xml:space="preserve">
+    <value>getting transport types list</value>
+  </data>
+  <data name="LogTypesOfTransportGetById" xml:space="preserve">
+    <value>getting transport type by id '{0}'</value>
+  </data>
+  <data name="LogUsersGet" xml:space="preserve">
+    <value>getting users list</value>
+  </data>
+  <data name="LogUsersGetByAccount" xml:space="preserve">
+    <value>getting user by account '{0}' from received list</value>
+  </data>
+  <data name="LogUsersNotFound" xml:space="preserve">
+    <value>user not found</value>
+  </data>
+  <data name="LogUsersNotFoundWithAccount" xml:space="preserve">
+    <value>user with account '{0}' not found</value>
+  </data>
+  <data name="LogVinsInContainerAdd" xml:space="preserve">
+    <value>adding new vin container</value>
+  </data>
+  <data name="LogVinsInContainerGet" xml:space="preserve">
+    <value>getting vin containers list</value>
+  </data>
+  <data name="LogWithResult" xml:space="preserve">
+    <value>with result: '{0}'</value>
+  </data>
+  <data name="LotNumberEmptySymbol" xml:space="preserve">
+    <value>-</value>
+  </data>
+  <data name="NotValidVIN" xml:space="preserve">
+    <value>not valid VIN '{0}'</value>
+  </data>
+  <data name="PackingTypeMissingInStaticData" xml:space="preserve">
+    <value>packing type '{0}' is missing in static data</value>
+  </data>
+  <data name="PartByNumberNotFound" xml:space="preserve">
+    <value>part by number '{0}' not found</value>
+  </data>
+  <data name="Partner2GetAllTracing" xml:space="preserve">
+    <value>start of get data to partner 2 to export file</value>
+  </data>
+  <data name="PartNumberDifferentPrice" xml:space="preserve">
+    <value>part number '{0}' has different prices</value>
+  </data>
+  <data name="PleaseWait" xml:space="preserve">
+    <value>Please wait</value>
+  </data>
+  <data name="PriceByPartNumberNotFound" xml:space="preserve">
+    <value>price by part number '{0}' not found</value>
+  </data>
+  <data name="QuantityByPartNumberNotFound" xml:space="preserve">
+    <value>quantity by part number '{0}' not found</value>
+  </data>
+  <data name="ReleaseNotFound" xml:space="preserve">
+    <value>Release not found for body '{0}' and part '{1}', check the correctness of the input or contact the DSS</value>
+  </data>
+  <data name="SavingProgressCase" xml:space="preserve">
+    <value>saving a case to the {0} from {1}</value>
+  </data>
+  <data name="SavingProgressContainer" xml:space="preserve">
+    <value>saving a container to the {0} from {1}</value>
+  </data>
+  <data name="SavingProgressCustomsClearance" xml:space="preserve">
+    <value>saving a customs clearance to the {0} from {1}</value>
+  </data>
+  <data name="SavingProgressCustomsPart" xml:space="preserve">
+    <value>saving a customs part to the {0} from {1}</value>
+  </data>
+  <data name="SavingProgressDetailInContainer" xml:space="preserve">
+    <value>saving a detail to the container {0} from {1}</value>
+  </data>
+  <data name="SavingProgressPartInInvoice" xml:space="preserve">
+    <value>saving a part in invoice to the {0} from {1}</value>
+  </data>
+  <data name="SavingProgressTracing" xml:space="preserve">
+    <value>saving a tracing to the {0} from {1}</value>
+  </data>
+  <data name="SavingProgressVinContainer" xml:space="preserve">
+    <value>saving a vin container to the {0} from {1}</value>
+  </data>
+  <data name="SymbolBody" xml:space="preserve">
+    <value>A</value>
+  </data>
+  <data name="SymbolParts" xml:space="preserve">
+    <value>B</value>
+  </data>
+</root>

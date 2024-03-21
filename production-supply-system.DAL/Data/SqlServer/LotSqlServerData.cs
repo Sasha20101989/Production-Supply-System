@@ -8,10 +8,7 @@ namespace DAL.Data.SqlServer
     /// <summary>
     /// Реализация SQL Server для получения перевозчиков.
     /// </summary>
-    public class LotSqlServerData : SqlServerData<Lot>
+    public class LotSqlServerData(ISqlDataAccess db) : SqlServerData<Lot>(db, StoredProcedureInbound.GetAllLotItems)
     {
-        public LotSqlServerData(ISqlDataAccess db, ILogger<LotSqlServerData> logger)
-             : base(db, logger, StoredProcedureInbound.GetAllLotItems)
-        { }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 
 namespace DAL.Extensions
@@ -20,30 +21,47 @@ namespace DAL.Extensions
         /// </exception>
         public static string GetSystemColumnName(this Type modelType, string nameOfProperty)
         {
-            if (modelType == null)
-            {
-                throw new ArgumentNullException(nameof(modelType));
-            }
+            ArgumentNullException.ThrowIfNull(modelType);
 
-             PropertyInfo propertyModelInfo = modelType.GetProperty(nameOfProperty);
+            PropertyInfo propertyModelInfo = modelType.GetProperty(nameOfProperty);
 
             if (propertyModelInfo != null && Attribute.IsDefined(propertyModelInfo, typeof(ColumnAttribute)))
             {
                 ColumnAttribute systemColumnNameAttribute = (ColumnAttribute)propertyModelInfo.GetCustomAttribute(typeof(ColumnAttribute));
 
-                if (systemColumnNameAttribute != null && systemColumnNameAttribute.Name != null)
-                {
-                    return systemColumnNameAttribute.Name;
-                }
-                else
-                {
-                    throw new InvalidOperationException($"ColumnAttribute in {nameOfProperty} or its {nameOfProperty} property is null.");
-                }
+                return systemColumnNameAttribute != null && systemColumnNameAttribute.Name != null
+                    ? systemColumnNameAttribute.Name
+                    : throw new InvalidOperationException($"ColumnAttribute in {nameOfProperty} or its {nameOfProperty} property is null.");
             }
             else
             {
                 throw new InvalidOperationException($"Property {nameOfProperty} not found, ColumnAttribute is missing, or the property type is not string.");
             }
+        }
+
+        public static object GetPropertyByColumnAttribute<T>(this T model, string attributeName)
+        {
+            Type type = typeof(T);
+
+            PropertyInfo[] properties = type.GetProperties();
+
+            PropertyInfo prop = properties.FirstOrDefault(property =>
+           {
+               if (Attribute.IsDefined(property, typeof(ColumnAttribute)))
+               {
+                   ColumnAttribute columnAttribute = property.GetCustomAttribute<ColumnAttribute>();
+
+                   return columnAttribute != null && columnAttribute.Name == attributeName;
+               }
+               else
+               {
+                   throw new InvalidOperationException($"More than one model found with the specified ColumnAttribute '{attributeName}'.");
+               }
+           });
+
+            return prop is null
+                ? throw new InvalidOperationException($"A property with the system name '{attributeName}' was not found.")
+                : prop.GetValue(model);
         }
 
         /// <summary>
@@ -68,29 +86,21 @@ namespace DAL.Extensions
                 {
                     if (Attribute.IsDefined(propertyInfo, typeof(ColumnAttribute)) && propertyInfo.PropertyType == typeof(string))
                     {
-                        ColumnAttribute columnAttribute = (ColumnAttribute)propertyInfo.GetCustomAttribute(typeof(ColumnAttribute));
+                        ColumnAttribute columnAttribute = propertyInfo.GetCustomAttribute<ColumnAttribute>();
 
                         if (columnAttribute != null && columnAttribute.Name == systemColumnNameAttribute)
                         {
-                            if (foundModel == null)
-                            {
-                                foundModel = modelType;
-                            }
-                            else
-                            {
-                                throw new InvalidOperationException($"More than one model found with the specified ColumnAttribute '{systemColumnNameAttribute}'.");
-                            }
+                            foundModel = foundModel == null
+                                ? modelType
+                                : throw new InvalidOperationException($"More than one model found with the specified ColumnAttribute '{systemColumnNameAttribute}'.");
                         }
                     }
                 }
             }
 
-            if (foundModel is null)
-            {
-                throw new InvalidOperationException($"No model found with the specified ColumnAttribute '{systemColumnNameAttribute}'.");
-            }
-
-            return foundModel;
+            return foundModel is null
+                ? throw new InvalidOperationException($"No model found with the specified ColumnAttribute '{systemColumnNameAttribute}'.")
+                : foundModel;
         }
 
         /// <summary>
@@ -142,28 +152,17 @@ namespace DAL.Extensions
                 }
             }
 
-            if (foundModel == null)
-            {
-                throw new InvalidOperationException($"No model found with the specified ColumnAttribute '{systemColumnNameAttribute}'.");
-            }
-
-            return foundPropertyName;
+            return foundModel == null
+                ? throw new InvalidOperationException($"No model found with the specified ColumnAttribute '{systemColumnNameAttribute}'.")
+                : foundPropertyName;
         }
 
         public static void SetProperty(this object model, string propertyName, object value)
         {
-            if (model == null)
-            {
-                throw new ArgumentNullException(nameof(model));
-            }
+            ArgumentNullException.ThrowIfNull(model);
 
-            PropertyInfo propertyInfo = model.GetType().GetProperty(propertyName);
-
-            if (propertyInfo == null)
-            {
-                throw new ArgumentException($"Поле '{propertyName}' не найдено в модели данных '{model.GetType().Name}'");
-            }
-
+            PropertyInfo propertyInfo = model.GetType().GetProperty(propertyName) ?? throw new ArgumentException($"Поле '{propertyName}' не найдено в модели данных '{model.GetType().Name}'");
+            
             Type propertyType = propertyInfo.PropertyType;
 
             if (propertyType == typeof(decimal) || (propertyType.IsGenericType && propertyType.GetGenericTypeDefinition() == typeof(Nullable<>) && Nullable.GetUnderlyingType(propertyType) == typeof(decimal)))
@@ -226,19 +225,13 @@ namespace DAL.Extensions
 
         public static object GetPropertyValue(this object model, string propertyName)
         {
-            if (model == null)
-            {
-                throw new ArgumentNullException(nameof(model));
-            }
+            ArgumentNullException.ThrowIfNull(model);
 
             PropertyInfo propertyInfo = model.GetType().GetProperty(propertyName);
 
-            if (propertyInfo == null)
-            {
-                throw new ArgumentException($"Property {propertyName} not found in type {model.GetType().Name}");
-            }
-
-            return propertyInfo.GetValue(model);
+            return propertyInfo == null
+                ? throw new ArgumentException($"Property {propertyName} not found in type {model.GetType().Name}")
+                : propertyInfo.GetValue(model);
         }
     }
 }

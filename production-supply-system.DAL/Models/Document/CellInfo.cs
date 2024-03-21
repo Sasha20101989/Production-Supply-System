@@ -10,6 +10,6 @@ namespace DAL.Models
 
         public bool HasError => Errors is not null && Errors.Count > 0;
 
-        public List<CustomError> Errors { get; set; } = new();
+        public List<CustomError> Errors { get; set; } = [];
     }
 }

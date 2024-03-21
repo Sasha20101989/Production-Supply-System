@@ -2,22 +2,14 @@
 
 namespace DAL.Parameters.Inbound
 {
-    public class CreatePartInInvoiceParameters
+    public class CreatePartInInvoiceParameters(PartsInInvoice entity)
     {
-        public CreatePartInInvoiceParameters(PartsInInvoice entity)
-        {
-            InvoiceId = entity.InvoiceId;
-            PartNumberId = entity.PartNumberId;
-            Quantity = entity.Quantity;
-            Price = entity.Price;
-        }
+        public int InvoiceId { get; set; } = entity.InvoiceId;
 
-        public int InvoiceId { get; set; }
+        public int PartNumberId { get; set; } = entity.PartNumberId;
 
-        public int PartNumberId { get; set; }
+        public decimal Quantity { get; set; } = entity.Quantity;
 
-        public decimal Quantity { get; set; }
-
-        public decimal Price { get; set; }
+        public decimal Price { get; set; } = entity.Price;
     }
 }

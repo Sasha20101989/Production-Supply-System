@@ -5,10 +5,7 @@ using DAL.Models;
 
 namespace DAL.Data.SqlServer
 {
-    public class PackingTypeSqlServerData : SqlServerData<TypesOfPacking>
+    public class PackingTypeSqlServerData(ISqlDataAccess db) : SqlServerData<TypesOfPacking>(db, StoredProcedureInbound.GetAllPackingTypes)
     {
-        public PackingTypeSqlServerData(ISqlDataAccess db, ILogger<PackingTypeSqlServerData> logger)
-            : base(db, logger, StoredProcedureInbound.GetAllPackingTypes)
-        { }
     }
 }

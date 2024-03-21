@@ -5,10 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DAL.Data.SqlServer
 {
-    public class LocationSqlServerData : SqlServerData<Location>
+    public class LocationSqlServerData(ISqlDataAccess db) : SqlServerData<Location>(db, StoredProcedureInbound.GetAllLocations)
     {
-        public LocationSqlServerData(ISqlDataAccess db, ILogger<LocationSqlServerData> logger)
-            : base(db, logger, StoredProcedureInbound.GetAllLocations)
-        { }
     }
 }

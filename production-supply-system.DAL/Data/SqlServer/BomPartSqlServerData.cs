@@ -5,10 +5,7 @@ using DAL.Models.BOM;
 
 namespace DAL.Data.SqlServer
 {
-    public class BomPartSqlServerData : SqlServerData<BomPart>
+    public class BomPartSqlServerData(ISqlDataAccess db) : SqlServerData<BomPart>(db, StoredProcedureDbo.GetAllBomParts)
     {
-        public BomPartSqlServerData(ISqlDataAccess db, ILogger<BomPartSqlServerData> logger)
-             : base(db, logger, StoredProcedureDbo.GetAllBomParts)
-        { }
     }
 }

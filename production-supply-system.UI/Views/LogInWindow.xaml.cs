@@ -1,6 +1,7 @@
 ﻿using MahApps.Metro.Controls;
 
 using UI_Interface.Contracts.Views;
+using UI_Interface.Multilang;
 using UI_Interface.ViewModels.ViewModelsForPages;
 
 namespace UI_Interface.Views

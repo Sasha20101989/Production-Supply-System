@@ -14,8 +14,9 @@ using System.Windows.Data;
 using System.ComponentModel;
 using UI_Interface.Contracts;
 using UI_Interface.Filters;
-using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
+using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace UI_Interface.ViewModels.ViewModelsForPages
 {
@@ -23,19 +24,40 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
     /// ViewModel, представляющая информацию о лоте для взаимодействия с пользовательским интерфейсом.
     /// Наследует от ControlledViewModel для уведомлений об изменении свойств и выдачи уведомлений.
     /// </summary>
-    public class EditDeliveryViewModel : ControlledViewModel, INavigationAware
+    public partial class EditDeliveryViewModel(
+        IStaticDataService staticDataService, 
+        IDeliveryService deliveryService, 
+        ILogger<EditDeliveryViewModel> logger) : ControlledViewModel(logger), INavigationAware
     {
-        private readonly ILogger<EditDeliveryViewModel> _logger;
-
-        private readonly IDeliveryService _deliveryService;
-
-        private readonly IStaticDataService _staticDataService;
-
+        [ObservableProperty]
         private DeliveryDetailViewModel _deliveryDetailViewModel;
 
-        private ObservableCollection<PartsInContainer> _parts;
+        [ObservableProperty]
+        private ObservableCollection<PartsInContainer> _parts = [];
 
-        private ObservableCollection<ContainersInLot> _containers;
+        [ObservableProperty]
+        private ObservableCollection<ContainersInLot> _containers = [];
+
+        [ObservableProperty]
+        private string _titleParts = Resources.TitlePartsForContainer;
+
+        [ObservableProperty]
+        private decimal _totalQuantityNetWeight;
+
+        [ObservableProperty]
+        private decimal _totalQuantityGrossWeight;
+
+        [ObservableProperty]
+        private decimal _totalQuantityParts;
+
+        [ObservableProperty]
+        private ICollectionView _partsView;
+
+        [ObservableProperty]
+        private ICollectionView _containersView;
+
+        [ObservableProperty]
+        private bool _detailsOpen = false;
 
         private ContainersInLot _selectedContainer;
 
@@ -53,118 +75,8 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         private string _filterIMO;
         private string _filterContainerComment;
 
-        private string _titleParts;
-
-        private ICollectionView _partsView;
-        private ICollectionView _containersView;
-
-        private bool _detailsOpen;
-
         private List<ICustomFilter> _partsFilters;
         private List<ICustomFilter> _containersFilters;
-
-        public EditDeliveryViewModel(IStaticDataService staticDataService, IDeliveryService deliveryService, ILogger<EditDeliveryViewModel> logger)
-        {
-            _logger = logger;
-
-            _staticDataService = staticDataService;
-
-            _deliveryService = deliveryService;
-
-            _metroWindow = Application.Current.Windows.OfType<MetroWindow>().FirstOrDefault(x => x.IsActive);
-
-            OpenDetailsCommand = new RelayCommand(OpenDetailsFlyout);
-            CloseDetailsCommand = new RelayCommand(CloseDetailsFlyout);
-            EditDetailsCommand = new AsyncRelayCommand(EditDetailsAsync);
-
-            Parts = new();
-            Containers = new();
-
-            LotLoaded += OnLotLoadedAsync;
-            ContainersLoaded += OnContainersLoaded;
-
-            DetailsOpen = false;
-
-            TitleParts = Resources.TitlePartsForContainer;
-        }
-
-        /// <summary>
-        /// Асинхронная команда открытия панели с детальной информацией
-        /// </summary>
-        public RelayCommand OpenDetailsCommand { get; }
-
-        /// <summary>
-        /// Команда закрытия панели с детальной информацией
-        /// </summary>
-        public RelayCommand CloseDetailsCommand { get; }
-
-        /// <summary>
-        /// Команда редактирования детальной информации
-        /// </summary>
-        public AsyncRelayCommand EditDetailsCommand { get; }
-
-        /// <summary>
-        /// Заголовок раздела с деталями
-        /// </summary>
-        public string TitleParts
-        {
-            get => _titleParts;
-            set => _ = SetProperty(ref _titleParts, value);
-        }
-
-        /// <summary>
-        /// Флаг указывающий, открыта ли панель с детальной информацией
-        /// </summary>
-        public bool DetailsOpen
-        {
-            get => _detailsOpen;
-            set => _ = SetProperty(ref _detailsOpen, value);
-        }
-
-        /// <summary>
-        /// Коллекция деталей
-        /// </summary>
-        public ICollectionView PartsView
-        {
-            get => _partsView;
-            set => _ = SetProperty(ref _partsView, value);
-        }
-
-        /// <summary>
-        /// Коллекция контейнеров
-        /// </summary>
-        public ICollectionView ContainersView
-        {
-            get => _containersView;
-            set => _ = SetProperty(ref _containersView, value);
-        }
-
-        /// <summary>
-        /// Устанавливает или получает модель представления с детальной информацией
-        /// </summary>
-        public DeliveryDetailViewModel DeliveryDetailViewModel
-        {
-            get => _deliveryDetailViewModel;
-            set => _ = SetProperty(ref _deliveryDetailViewModel, value);
-        }
-
-        /// <summary>
-        /// Коллекция деталей
-        /// </summary>
-        public ObservableCollection<PartsInContainer> Parts
-        {
-            get => _parts;
-            set => _ = SetProperty(ref _parts, value);
-        }
-
-        /// <summary>
-        /// Коллекция контейнеров
-        /// </summary>
-        public ObservableCollection<ContainersInLot> Containers
-        {
-            get => _containers;
-            set => _ = SetProperty(ref _containers, value);
-        }
 
         /// <summary>
         /// Выбранный контейнер в списке
@@ -384,78 +296,62 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
         public async void OnNavigatedTo(object parameter)
         {
+            LotLoaded += OnLotLoadedAsync;
+
+            ContainersLoaded += OnContainersLoaded;
+
             if (parameter is int lotId)
             {
-                _logger.LogInformation($"Start loading lot with uniq id '{lotId}'.");
-
                 Lot lot = await GetLotByIdAsync(lotId);
-
-                _logger.LogInformation($"Loading lot with uniq id '{lotId}' completed.");
 
                 LotLoaded?.Invoke(this, lot);
             }
         }
 
+
         /// <summary>
-        /// Обработчик события загрузки контейнеров
+        /// Редактирует детальную информацию
         /// </summary>
-        private void OnContainersLoaded(object sender, List<ContainersInLot> containers)
+        [RelayCommand]
+        private async Task EditDetailsAsync()
         {
-            if (Containers.Count != 0)
+            try
             {
-                Containers.Clear();
-            }
+                await CreateController(Resources.EditDeliveryPageTitle);
 
-            foreach (ContainersInLot container in containers)
+                throw new Exception("Этот функционал находится в разработке.");
+
+            }
+            catch (Exception ex)
             {
-                if (container is not null)
-                {
-                    Containers.Add(container);
-                }
+                await WaitForMessageUnlock(Resources.ShellError, ex.Message, Brushes.IndianRed);
+
+                return;
             }
+            finally
+            {
+                await ControllerPostProcess();
 
-            ContainersView = CollectionViewSource.GetDefaultView(Containers);
-
-            UpdateContainersFilters();
+                CloseDetails();
+            }
         }
 
         /// <summary>
-        /// Обработчик события загрузки лотов
+        /// Открывает панель с детальной информацией
         /// </summary>
-        private async void OnLotLoadedAsync(object sender, Lot lot)
+        [RelayCommand]
+        private void OpenDetails()
         {
-            if (lot is not null)
-            {
-                if (DeliveryDetailViewModel is null)
-                {
-                    DeliveryDetailViewModel = new DeliveryDetailViewModel(new(), _staticDataService, _deliveryService, _logger, _progressController)
-                    {
-                        Carrier = lot.Carrier,
-                        LotArrivalLocation = lot.LotArrivalLocation,
-                        LotAta = lot.LotAta,
-                        LotAtd = lot.LotAtd,
-                        LotComment = lot.LotComment,
-                        LotCustomsLocation = lot.LotCustomsLocation,
-                        LotDepartureLocation = lot.LotDepartureLocation,
-                        LotEta = lot.LotEta,
-                        LotEtd = lot.LotEtd,
-                        LotNumber = lot.LotNumber,
-                        LotPurchaseOrder = lot.LotPurchaseOrder,
-                        LotTransport = lot.LotTransport,
-                        LotTransportDocument = lot.LotTransportDocument,
-                        Shipper = lot.Shipper,
-                        TermsOfDelivery = lot.DeliveryTerms,
-                        TypeOfTransport = lot.LotTransportType,
-                        CloseDate = lot.CloseDate
-                    };
-                }
+            DetailsOpen = true;
+        }
 
-                _logger.LogInformation($"Start loading containers for the lot with uniq id '{lot.Id}'.");
-
-                ContainersLoaded?.Invoke(this, await GetContainersAsync(lot.Id));
-
-                _logger.LogInformation($"Loading containers for the lot with uniq id '{lot.Id}' completed.");
-            }
+        /// <summary>
+        /// Закрывает панель с детальной информацией
+        /// </summary>
+        [RelayCommand]
+        private void CloseDetails()
+        {
+            DetailsOpen = !DetailsOpen;
         }
 
         /// <summary>
@@ -472,9 +368,9 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
                     Parts.Clear();
                 }
 
-                _logger.LogInformation($"Start loading parts for the container with uniq id '{containerId}'.");
+                logger.LogInformation(string.Format(Resources.LogGetPartsForContainer, containerId));
 
-                foreach (PartsInContainer part in await _deliveryService.GetPartsForContainerAsync(containerId))
+                foreach (PartsInContainer part in await deliveryService.GetPartsForContainerAsync(containerId))
                 {
                     if (part is not null)
                     {
@@ -482,7 +378,13 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
                     }
                 }
 
-                _logger.LogInformation($"Loading parts for the container with uniq id '{containerId}' completed.");
+                TotalQuantityGrossWeight = Parts.Sum(p => p.Case.GrossWeight);
+
+                TotalQuantityNetWeight = Parts.Sum(p => p.Case.NetWeight);
+
+                TotalQuantityParts = Parts.Sum(p => p.Quantity);
+
+                logger.LogInformation($"{string.Format(Resources.LogGetPartsForContainer, containerId)} {Resources.Completed}");
 
                 PartsView = CollectionViewSource.GetDefaultView(Parts);
 
@@ -505,9 +407,9 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         /// </summary>
         private void UpdatePartsFilters()
         {
-            _logger.LogInformation($"Start updating filters to represent details.");
+            logger.LogInformation(Resources.LogUpdatingFiltersForDetails);
 
-            _partsFilters = new List<ICustomFilter>();
+            _partsFilters = [];
 
             if (!string.IsNullOrEmpty(FilterCaseNumber))
             {
@@ -549,7 +451,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
                 _partsFilters.Add(new GrossWeightFilter(FilterGrossWeight));
             }
 
-            _logger.LogInformation($"Updating filters to represent details completed.");
+            logger.LogInformation($"{Resources.LogUpdatingFiltersForDetails} {Resources.Completed}");
 
             ApplyPartsFilter();
         }
@@ -559,9 +461,9 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         /// </summary>
         private void UpdateContainersFilters()
         {
-            _logger.LogInformation($"Start updating filters to represent containers.");
+            logger.LogInformation(Resources.LogUpdatingFiltersForContainers);
 
-            _containersFilters = new List<ICustomFilter>();
+            _containersFilters = [];
 
             if (!string.IsNullOrEmpty(FilterContainerNumber))
             {
@@ -588,7 +490,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
                 _containersFilters.Add(new ContainerCommentFilter(FilterContainerComment));
             }
 
-            _logger.LogInformation($"Updating filters to represent containers completed.");
+            logger.LogInformation($"{Resources.LogUpdatingFiltersForContainers} {Resources.Completed}");
 
             ApplyContainersFilter();
         }
@@ -598,7 +500,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         /// </summary>
         private void ApplyPartsFilter()
         {
-            _logger.LogInformation($"Start apply filters to represent details.");
+            logger.LogInformation(Resources.LogUpplyFiltersForDetails);
 
             if (PartsView is not null)
             {
@@ -610,7 +512,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
                 PartsView.Refresh();
             }
 
-            _logger.LogInformation($"Apply filters to represent details completed.");
+            logger.LogInformation($"{Resources.LogUpplyFiltersForDetails} {Resources.Completed}");
         }
 
         /// <summary>
@@ -618,7 +520,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         /// </summary>
         private void ApplyContainersFilter()
         {
-            _logger.LogInformation($"Start apply filters to represent containers.");
+            logger.LogInformation(Resources.LogUpplyFiltersForContainers);
 
             if (ContainersView is not null)
             {
@@ -630,7 +532,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
                 ContainersView.Refresh();
             }
 
-            _logger.LogInformation($"Apply filters to represent containers completed.");
+            logger.LogInformation($"{Resources.LogUpplyFiltersForContainers} {Resources.Completed}");
         }
 
         /// <summary>
@@ -644,7 +546,13 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
             {
                 await CreateController(Resources.BllDownloadContainers);
 
-                return await _deliveryService.GetAllContainersByLotIdAsync(lotId);
+                logger.LogInformation(string.Format(Resources.LogGetContainersByLotId, lotId));
+
+                List<ContainersInLot> result = await deliveryService.GetAllContainersByLotIdAsync(lotId);
+
+                logger.LogInformation($"{string.Format(Resources.LogGetContainersByLotId, lotId)} {Resources.Completed}");
+
+                return result;
             }
             catch (Exception ex)
             {
@@ -667,9 +575,15 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         {
             try
             {
+                logger.LogInformation(string.Format(Resources.LogLotGetById, lotId));
+
                 await CreateController(Resources.BllDownloadLot);
 
-                return await _deliveryService.GetLotByIdAsync(lotId);
+                Lot result = await deliveryService.GetLotByIdAsync(lotId);
+
+                logger.LogInformation($"{string.Format(Resources.LogLotGetById, lotId)} {Resources.Completed}");
+
+                return result;
             }
             catch (Exception ex)
             {
@@ -684,45 +598,58 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         }
 
         /// <summary>
-        /// Редактирует детальную информацию
+        /// Обработчик события загрузки контейнеров
         /// </summary>
-        private async Task EditDetailsAsync()
+        private void OnContainersLoaded(object sender, List<ContainersInLot> containers)
         {
-            try
+            if (Containers.Count != 0)
             {
-                await CreateController(Resources.EditDeliveryPageTitle);
-
-                throw new Exception("Этот функционал находится в разработке.");
-
+                Containers.Clear();
             }
-            catch (Exception ex)
+
+            foreach (ContainersInLot container in containers)
             {
-                await WaitForMessageUnlock(Resources.ShellError, ex.Message, Brushes.IndianRed);
-
-                return;
+                if (container is not null)
+                {
+                    Containers.Add(container);
+                }
             }
-            finally
-            {
-                await ControllerPostProcess();
 
-                CloseDetailsFlyout();
-            }
+            ContainersView = CollectionViewSource.GetDefaultView(Containers);
+
+            UpdateContainersFilters();
         }
 
         /// <summary>
-        /// Открывает панель с детальной информацией
+        /// Обработчик события загрузки лотов
         /// </summary>
-        private void OpenDetailsFlyout()
+        private async void OnLotLoadedAsync(object sender, Lot lot)
         {
-            DetailsOpen = true;
-        }
+            if (lot is not null)
+            {
+                DeliveryDetailViewModel ??= new DeliveryDetailViewModel([], staticDataService, deliveryService, logger, _progressController)
+                    {
+                        Carrier = lot.Carrier,
+                        LotArrivalLocation = lot.LotArrivalLocation,
+                        LotAta = lot.LotAta,
+                        LotAtd = lot.LotAtd,
+                        LotComment = lot.LotComment,
+                        LotCustomsLocation = lot.LotCustomsLocation,
+                        LotDepartureLocation = lot.LotDepartureLocation,
+                        LotEta = lot.LotEta,
+                        LotEtd = lot.LotEtd,
+                        LotNumber = lot.LotNumber,
+                        LotPurchaseOrder = lot.LotPurchaseOrder,
+                        LotTransport = lot.LotTransport,
+                        LotTransportDocument = lot.LotTransportDocument,
+                        Shipper = lot.Shipper,
+                        TermsOfDelivery = lot.DeliveryTerms,
+                        TypeOfTransport = lot.LotTransportType,
+                        CloseDate = lot.CloseDate
+                    };
 
-        /// <summary>
-        /// Закрывает панель с детальной информацией
-        /// </summary>
-        private void CloseDetailsFlyout()
-        {
-            DetailsOpen = !DetailsOpen;
+                ContainersLoaded?.Invoke(this, await GetContainersAsync(lot.Id));
+            }
         }
 
         /// <summary>

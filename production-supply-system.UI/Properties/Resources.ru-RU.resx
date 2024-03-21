@@ -1,0 +1,501 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>Система производственного снабжения</value>
+  </data>
+  <data name="ArrivalLocation" xml:space="preserve">
+    <value>Место прибытия лота</value>
+  </data>
+  <data name="ATA" xml:space="preserve">
+    <value>Фактическая дата прибытия</value>
+  </data>
+  <data name="ATD" xml:space="preserve">
+    <value>Фактическая дата доставки</value>
+  </data>
+  <data name="BllAddNewDocument" xml:space="preserve">
+    <value>Сохранение документа</value>
+  </data>
+  <data name="BllAddNewDocumentColumn" xml:space="preserve">
+    <value>Добавление новой колонки</value>
+  </data>
+  <data name="BllAddNewDocumentSuccess" xml:space="preserve">
+    <value>Сохранение документа успешно завершено</value>
+  </data>
+  <data name="BllDownloadContainers" xml:space="preserve">
+    <value>Загрузка контейнеров</value>
+  </data>
+  <data name="BllDownloadLot" xml:space="preserve">
+    <value>Процесс формирования лота</value>
+  </data>
+  <data name="BllDownloadLots" xml:space="preserve">
+    <value>Загрузка списка лотов</value>
+  </data>
+  <data name="BllExportAllTracing" xml:space="preserve">
+    <value>Выгрузка файла трейсинга</value>
+  </data>
+  <data name="BllFilterDocuments" xml:space="preserve">
+    <value>Фильтрация документов</value>
+  </data>
+  <data name="BllGetAllDocumentColumns" xml:space="preserve">
+    <value>Загрузка колонок доступных для документа</value>
+  </data>
+  <data name="BllGetDocument" xml:space="preserve">
+    <value>Получение документа</value>
+  </data>
+  <data name="BllGetProcessSteps" xml:space="preserve">
+    <value>Загрузка шагов процесса</value>
+  </data>
+  <data name="BllLoadPartsForContainer" xml:space="preserve">
+    <value>Загрузка деталей для контейнера</value>
+  </data>
+  <data name="BllLoadStaticData" xml:space="preserve">
+    <value>Загрузка статических данных</value>
+  </data>
+  <data name="BllUpdateDocument" xml:space="preserve">
+    <value>Обновление документа</value>
+  </data>
+  <data name="BllUpdateDocumentSuccess" xml:space="preserve">
+    <value>Обновление документа успешно завершено</value>
+  </data>
+  <data name="BllUploadLot" xml:space="preserve">
+    <value>Процесс загрузки лота</value>
+  </data>
+  <data name="BllValidationFileColumns" xml:space="preserve">
+    <value>Валидация колонок документа</value>
+  </data>
+  <data name="CarrierName" xml:space="preserve">
+    <value>Перевозчик</value>
+  </data>
+  <data name="CaseNumber" xml:space="preserve">
+    <value>Номер кейса</value>
+  </data>
+  <data name="CloseDate" xml:space="preserve">
+    <value>Дата закрытия лота</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Комментарий</value>
+  </data>
+  <data name="Container" xml:space="preserve">
+    <value>Контейнер</value>
+  </data>
+  <data name="ContainerType" xml:space="preserve">
+    <value>Тип контейнера</value>
+  </data>
+  <data name="CustomsLocation" xml:space="preserve">
+    <value>Таможенный терминал</value>
+  </data>
+  <data name="DefaultAvatar" xml:space="preserve">
+    <value>DefaultIcon.png</value>
+  </data>
+  <data name="DefaultFolder" xml:space="preserve">
+    <value>Папка по умолчанию</value>
+  </data>
+  <data name="DeliveryPageTitle" xml:space="preserve">
+    <value>Журнал лотов</value>
+  </data>
+  <data name="DeliveryTerm" xml:space="preserve">
+    <value>Условия поставки</value>
+  </data>
+  <data name="DepartureLocation" xml:space="preserve">
+    <value>Место отправления лота</value>
+  </data>
+  <data name="DocumentColumnElementName" xml:space="preserve">
+    <value>Название колонки</value>
+  </data>
+  <data name="DocumentColumnNumber" xml:space="preserve">
+    <value>Номер колонки</value>
+  </data>
+  <data name="DocumentColumnSystemColumnName" xml:space="preserve">
+    <value>Системное название</value>
+  </data>
+  <data name="DocumentName" xml:space="preserve">
+    <value>Имя шаблона</value>
+  </data>
+  <data name="DocumentNewContent" xml:space="preserve">
+    <value>Новый элемент контента</value>
+  </data>
+  <data name="DocumentNewContentTitle" xml:space="preserve">
+    <value>Тут вы можете добавить новый элемент контента.</value>
+  </data>
+  <data name="DocumentRowNumber" xml:space="preserve">
+    <value>Номер строки</value>
+  </data>
+  <data name="DocumentTooltip" xml:space="preserve">
+    <value>Добавить новый шаблон</value>
+  </data>
+  <data name="EditDeliveryPageTitle" xml:space="preserve">
+    <value>Редактирование лота</value>
+  </data>
+  <data name="ETA" xml:space="preserve">
+    <value>Ожидаемая дата прибытия</value>
+  </data>
+  <data name="ETD" xml:space="preserve">
+    <value>Ожидаемая дата доставки</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Фильтр</value>
+  </data>
+  <data name="FirstDataRow" xml:space="preserve">
+    <value>Номер строки с которой начинаются данные</value>
+  </data>
+  <data name="GrossWeight" xml:space="preserve">
+    <value>Вес брутто</value>
+  </data>
+  <data name="IMO" xml:space="preserve">
+    <value>Признак опасности груза</value>
+  </data>
+  <data name="InvoiceNumber" xml:space="preserve">
+    <value>Номер счета</value>
+  </data>
+  <data name="ListOfContainers" xml:space="preserve">
+    <value>Список контейнеров</value>
+  </data>
+  <data name="LogInButton" xml:space="preserve">
+    <value>Вход</value>
+  </data>
+  <data name="LogInPageTitle" xml:space="preserve">
+    <value>Авторизация</value>
+  </data>
+  <data name="LotNumber" xml:space="preserve">
+    <value>Номер лота</value>
+  </data>
+  <data name="LotOrder" xml:space="preserve">
+    <value>Заказ лота</value>
+  </data>
+  <data name="LotOrderToolTip" xml:space="preserve">
+    <value>Если заказов нет в списке, попробуйте сначала выбрать отправителя.</value>
+  </data>
+  <data name="MainPageTitle" xml:space="preserve">
+    <value>Главная страница</value>
+  </data>
+  <data name="MasterExportFile" xml:space="preserve">
+    <value>Мастер выгрузки файлов</value>
+  </data>
+  <data name="MasterUploadFile" xml:space="preserve">
+    <value>Мастер загрузки файлов</value>
+  </data>
+  <data name="NetWeight" xml:space="preserve">
+    <value>Вес нетто</value>
+  </data>
+  <data name="NewDeliveryPageTitle" xml:space="preserve">
+    <value>Добавление лота</value>
+  </data>
+  <data name="PackingType" xml:space="preserve">
+    <value>Тип упаковки</value>
+  </data>
+  <data name="PartNameEng" xml:space="preserve">
+    <value>Английское имя детали</value>
+  </data>
+  <data name="PartNumber" xml:space="preserve">
+    <value>Номер детали</value>
+  </data>
+  <data name="PleasePress" xml:space="preserve">
+    <value>Пожалуйста нажмите '{0}' для завершения</value>
+  </data>
+  <data name="Position" xml:space="preserve">
+    <value>Позиция</value>
+  </data>
+  <data name="Quantity" xml:space="preserve">
+    <value>Количество</value>
+  </data>
+  <data name="QuantityContainers" xml:space="preserve">
+    <value>Количество контейнеров</value>
+  </data>
+  <data name="SealNumber" xml:space="preserve">
+    <value>Номер пломбы</value>
+  </data>
+  <data name="SettingsLanguageTitle" xml:space="preserve">
+    <value>Языковые настройки</value>
+  </data>
+  <data name="SettingsPageAboutText" xml:space="preserve">
+    <value>Production Supply System - это приложение...</value>
+  </data>
+  <data name="SettingsPageAboutTitle" xml:space="preserve">
+    <value>О приложении</value>
+  </data>
+  <data name="SettingsPageChooseThemeText" xml:space="preserve">
+    <value>Цвет оформления</value>
+  </data>
+  <data name="SettingsPageLogOutButtonText" xml:space="preserve">
+    <value>Выйти</value>
+  </data>
+  <data name="SettingsPagePersonalizationTitle" xml:space="preserve">
+    <value>Настройки оформления</value>
+  </data>
+  <data name="SettingsPageRadioButtonDarkTheme" xml:space="preserve">
+    <value>Тёмная</value>
+  </data>
+  <data name="SettingsPageRadioButtonLightTheme" xml:space="preserve">
+    <value>Светлая</value>
+  </data>
+  <data name="SettingsPageRadioButtonWindowsDefaultTheme" xml:space="preserve">
+    <value>Стандартная из Windows</value>
+  </data>
+  <data name="SettingsPageRadioEnLanguage" xml:space="preserve">
+    <value>Английский</value>
+  </data>
+  <data name="SettingsPageRadioRuLanguage" xml:space="preserve">
+    <value>Русский</value>
+  </data>
+  <data name="SettingsPageThemeColor" xml:space="preserve">
+    <value>Цвет темы</value>
+  </data>
+  <data name="SettingsPageTitle" xml:space="preserve">
+    <value>Настройки</value>
+  </data>
+  <data name="SettingsPageUserTitle" xml:space="preserve">
+    <value>О пользователе</value>
+  </data>
+  <data name="SheetName" xml:space="preserve">
+    <value>Название листа</value>
+  </data>
+  <data name="ShellActive" xml:space="preserve">
+    <value>Активен</value>
+  </data>
+  <data name="ShellAdd" xml:space="preserve">
+    <value>Добавить</value>
+  </data>
+  <data name="ShellCancelButton" xml:space="preserve">
+    <value>Отменить</value>
+  </data>
+  <data name="ShellChangeLanguage" xml:space="preserve">
+    <value>Переключение языка</value>
+  </data>
+  <data name="ShellClose" xml:space="preserve">
+    <value>Закрыть</value>
+  </data>
+  <data name="ShellDelete" xml:space="preserve">
+    <value>Удалить</value>
+  </data>
+  <data name="ShellDeliveryPage" xml:space="preserve">
+    <value>Журнал лотов</value>
+  </data>
+  <data name="ShellDetails" xml:space="preserve">
+    <value>Общая информация</value>
+  </data>
+  <data name="ShellDocumentMapperEditPage" xml:space="preserve">
+    <value>Изменение шаблона</value>
+  </data>
+  <data name="ShellDocumentMapperNewPage" xml:space="preserve">
+    <value>Добавление нового шаблона</value>
+  </data>
+  <data name="ShellDocumentMapperPage" xml:space="preserve">
+    <value>Управление шаблонами</value>
+  </data>
+  <data name="ShellEdit" xml:space="preserve">
+    <value>Редактировать</value>
+  </data>
+  <data name="ShellEditDeliveryPage" xml:space="preserve">
+    <value>Редактирование лота</value>
+  </data>
+  <data name="ShellEmptyLotList" xml:space="preserve">
+    <value>Список лотов пуст. Нажмите на кнопку 'Подгрузить список лотов' для обновления списка.</value>
+  </data>
+  <data name="ShellError" xml:space="preserve">
+    <value>Ошибка</value>
+  </data>
+  <data name="ShellExportFileCompleted" xml:space="preserve">
+    <value>Экспорт файла завершён</value>
+  </data>
+  <data name="ShellExportFiles" xml:space="preserve">
+    <value>Экспорт файлов</value>
+  </data>
+  <data name="ShellFileName" xml:space="preserve">
+    <value>Имя файла</value>
+  </data>
+  <data name="ShellGoBackButton" xml:space="preserve">
+    <value>Назад</value>
+  </data>
+  <data name="ShellHamburgerButtonName" xml:space="preserve">
+    <value>Откройте или закройте навигацию</value>
+  </data>
+  <data name="ShellMainPage" xml:space="preserve">
+    <value>Главная</value>
+  </data>
+  <data name="ShellMessageChangeLanguage" xml:space="preserve">
+    <value>Для корректного отображения выбранного языка требуется перезапустить приложение</value>
+  </data>
+  <data name="ShellNewDeliveryPage" xml:space="preserve">
+    <value>Добавление лота</value>
+  </data>
+  <data name="ShellNoActive" xml:space="preserve">
+    <value>Не активен</value>
+  </data>
+  <data name="ShellProcessForbidden" xml:space="preserve">
+    <value>Вы не обладаете необходимыми правами для выполнения этого процесса</value>
+  </data>
+  <data name="ShellSaveButton" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
+  <data name="ShellSearch" xml:space="preserve">
+    <value>Поиск</value>
+  </data>
+  <data name="ShellSelectDate" xml:space="preserve">
+    <value>Выберите дату</value>
+  </data>
+  <data name="ShellTotalQuantity" xml:space="preserve">
+    <value>Сумма</value>
+  </data>
+  <data name="ShellUploadButton" xml:space="preserve">
+    <value>Загрузить</value>
+  </data>
+  <data name="ShellUploadSuccess" xml:space="preserve">
+    <value>Загрузка успешно завершена. </value>
+  </data>
+  <data name="ShellUse" xml:space="preserve">
+    <value>Использовать</value>
+  </data>
+  <data name="ShellWait" xml:space="preserve">
+    <value>Пожалуйста подождите...</value>
+  </data>
+  <data name="ShellXLSX" xml:space="preserve">
+    <value>.xlsx</value>
+  </data>
+  <data name="ShipperName" xml:space="preserve">
+    <value>Отправитель</value>
+  </data>
+  <data name="StatusLoginFails" xml:space="preserve">
+    <value>Ошибка авторизации</value>
+  </data>
+  <data name="StatusNotConnectionToDb" xml:space="preserve">
+    <value>Нет соединения с базой данных</value>
+  </data>
+  <data name="StatusUnauthorized" xml:space="preserve">
+    <value>Не авторизован</value>
+  </data>
+  <data name="StatusUnknownError" xml:space="preserve">
+    <value>Не предвиденная ошибка</value>
+  </data>
+  <data name="TitlePartsForContainer" xml:space="preserve">
+    <value>Список деталей для контейнера </value>
+  </data>
+  <data name="TransportDocument" xml:space="preserve">
+    <value>Документ транспорта</value>
+  </data>
+  <data name="TransportName" xml:space="preserve">
+    <value>Название транспорта</value>
+  </data>
+  <data name="TransportType" xml:space="preserve">
+    <value>Тип перевозки</value>
+  </data>
+  <data name="ValidationPageTitle" xml:space="preserve">
+    <value>Валидация документа</value>
+  </data>
+</root>

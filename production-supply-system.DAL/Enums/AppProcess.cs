@@ -16,6 +16,10 @@
         /// <summary>
         /// Загрузка локальных VIN
         /// </summary>
-        UploadLocalVinsPartner2
+        UploadLocalVinsPartner2,
+        /// <summary>
+        /// Экспорт трейсинга
+        /// </summary>
+        ExportFileToExcelPartner2
     }
 }

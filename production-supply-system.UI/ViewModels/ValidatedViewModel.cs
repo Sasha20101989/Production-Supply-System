@@ -5,10 +5,15 @@ using System.Linq;
 using System.Reflection;
 using BLL.Helpers;
 
+using CommunityToolkit.Mvvm.ComponentModel;
+
 using DAL.Models.Document;
 
 using Microsoft.Extensions.Logging;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
+
+using UI_Interface.Properties;
+
+using Windows.Foundation;
 
 namespace UI_Interface.ViewModels
 {
@@ -18,43 +23,26 @@ namespace UI_Interface.ViewModels
     /// </summary>
     /// <typeparam name="TViewModel">Тип ViewModel, для которой проводится валидация.</typeparam>
     /// <typeparam name="TModelCollection">Тип коллекции моделей, используемых для валидации свойств ViewModel.</typeparam>
-    public class ValidatedViewModel<TViewModel, TModelCollection> : ObservableObject, IDataErrorInfo
+    /// <remarks>
+    /// Инициализирует новый экземпляр <see cref="ValidatedViewModel"/> class.
+    /// </remarks>
+    /// <param name="models">Список типов моделей, используемых для валидации свойств ViewModel.</param>
+    public partial class ValidatedViewModel<TViewModel, TModelCollection>(List<Type> models, ILogger logger) : ObservableObject, IDataErrorInfo
     {
-        private readonly ILogger _logger;
-
+        [ObservableProperty]
         private bool _hasErrors;
 
-        private readonly Dictionary<string, string> ErrorsByPropertyName = new();
-
-        /// <summary>
-        /// Инициализирует новый экземпляр <see cref="ValidatedViewModel"/> class.
-        /// </summary>
-        /// <param name="models">Список типов моделей, используемых для валидации свойств ViewModel.</param>
-        public ValidatedViewModel(List<Type> models, ILogger logger)
-        {
-            _logger = logger;
-
-            Models = models;
-        }
+        private readonly Dictionary<string, string> ErrorsByPropertyName = [];
 
         /// <summary>
         /// Список типов моделей, используемых для валидации свойств ViewModel.
         /// </summary>
-        public List<Type> Models { get; }
+        public List<Type> Models { get; } = models;
 
         /// <summary>
         /// Возвращает строку ошибки, обобщенную для всей ViewModel.
         /// </summary>
         public string Error => string.Empty;
-
-        /// <summary>
-        /// Возвращает или задает значение, указывающее, содержит ли ViewModel ошибки.
-        /// </summary>
-        public bool HasErrors
-        {
-            get => _hasErrors;
-            set => _ = SetProperty(ref _hasErrors, value);
-        }
 
         /// <summary>
         /// Индексатор, реализующий валидацию свойств модели документа.
@@ -67,9 +55,9 @@ namespace UI_Interface.ViewModels
         {
             get
             {
-                List<CustomError> customErrors = new();
+                List<CustomError> customErrors = [];
 
-                List<CustomError> validatedCollection = new();
+                List<CustomError> validatedCollection = [];
 
                 PropertyInfo propertyViewModelInfo = typeof(TViewModel).GetProperty(columnName);
 
@@ -79,7 +67,7 @@ namespace UI_Interface.ViewModels
 
                     if (propertyValue is not null)
                     {
-                        _logger.LogInformation($"The beginning of value validation: '{propertyValue}' in column '{columnName}'");
+                        logger.LogInformation(string.Format(Resources.LogValueValidation, propertyValue, columnName));
 
                         validatedCollection = ValidationHelper.ValidatePropertyInCollection(columnName, propertyValue, Models);
 
@@ -99,14 +87,14 @@ namespace UI_Interface.ViewModels
                         {
                             ClearError(columnName);
 
-                            _logger.LogInformation($"Value validation: '{propertyValue}' in column '{columnName}' completed.");
+                            logger.LogInformation($"{string.Format(Resources.LogValueValidation, propertyValue, columnName)} {Resources.Completed}");
                         }
                     }
                 }
 
                 HasErrorsUpdated?.Invoke(this, HasErrors);
 
-                List<string> errors = new();
+                List<string> errors = [];
 
                 foreach (CustomError customError in customErrors)
                 {
@@ -117,7 +105,7 @@ namespace UI_Interface.ViewModels
 
                 if (!string.IsNullOrEmpty(result))
                 {
-                    _logger.LogWarning($"Value validation in column '{columnName}' completed with warning: '{result}'.");
+                    logger.LogWarning(string.Format(Resources.LogValueValidationWarning, columnName, result));
                 }
 
                 return result;
@@ -139,18 +127,19 @@ namespace UI_Interface.ViewModels
         /// <param name="message">Строковое представление ошибки валидации.</param>
         private void AddError(string propertyName, string customError)
         {
-            if (!ErrorsByPropertyName.ContainsKey(propertyName))
+            if (!ErrorsByPropertyName.TryGetValue(propertyName, out string value))
             {
-                ErrorsByPropertyName[propertyName] = string.Empty;
+                value = string.Empty;
+                ErrorsByPropertyName[propertyName] = value;
             }
 
-            if (!ErrorsByPropertyName[propertyName].Contains(customError))
+            if (!value.Contains(customError))
             {
                 ErrorsByPropertyName[propertyName] = customError;
                 OnErrorsChanged(propertyName);
             }
 
-            HasErrors = ErrorsByPropertyName.Any();
+            HasErrors = ErrorsByPropertyName.Count != 0;
         }
 
         /// <summary>
@@ -165,7 +154,7 @@ namespace UI_Interface.ViewModels
                 OnErrorsChanged(propertyName);
             }
 
-            HasErrors = ErrorsByPropertyName.Any();
+            HasErrors = ErrorsByPropertyName.Count != 0;
         }
 
         /// <summary>

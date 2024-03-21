@@ -5,10 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DAL.Data.SqlServer
 {
-    public class UserSqlServerData : SqlServerData<User>
+    public class UserSqlServerData(ISqlDataAccess db) : SqlServerData<User>(db, StoredProcedureUsers.GetAllUsers)
     {
-        public UserSqlServerData(ISqlDataAccess db, ILogger<UserSqlServerData> logger)
-            : base(db, logger, StoredProcedureUsers.GetAllUsers)
-        { }
     }
 }

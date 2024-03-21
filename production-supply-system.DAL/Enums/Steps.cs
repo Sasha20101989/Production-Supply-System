@@ -18,6 +18,10 @@
         /// </summary>
         UploadPrice,
         /// <summary>
+        /// Экспорт трейсинга
+        /// </summary>
+        ExportTracing,
+        /// <summary>
         /// 
         /// </summary>
         PPP

@@ -15,7 +15,7 @@ namespace DAL.Data.Repositories.Contracts
 
         Task RemoveAsync(int id, Enum storedProcedure);
 
-        Task UpdateAsync(TModel entity, Enum storedProcedure, object parameters);
+        Task UpdateAsync(Enum storedProcedure, object parameters);
 
         Task<bool> ExistsAsync(TModel entity);
 

@@ -6,10 +6,7 @@ using DAL.Models.Inbound;
 
 namespace DAL.Data.SqlServer
 {
-    public class TracingSqlServerData : SqlServerData<Tracing>
+    public class TracingSqlServerData(ISqlDataAccess db) : SqlServerData<Tracing>(db, StoredProcedureInbound.GetAllTracing)
     {
-        public TracingSqlServerData(ISqlDataAccess db, ILogger<TracingSqlServerData> logger)
-            : base(db, logger, StoredProcedureInbound.GetAllTracing)
-        { }
     }
 }

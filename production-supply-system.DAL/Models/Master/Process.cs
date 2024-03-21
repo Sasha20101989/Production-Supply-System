@@ -16,9 +16,7 @@ namespace DAL.Models.Master
         public int Id { get; set; }
 
         [Required]
-        [MaxLength(300, ErrorMessage = "Process Namemust not exceed 300 characters.")]
+        [MaxLength(300, ErrorMessage = "Process Name must not exceed 300 characters.")]
         public AppProcess ProcessName { get; set; }
-
-        public virtual ICollection<ProcessStep> ProcessSteps { get; set; }
     }
 }

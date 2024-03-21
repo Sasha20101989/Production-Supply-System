@@ -11,6 +11,11 @@ using Cache.Manager.WPF;
 using UI_Interface.HostBuilders;
 using MahApps.Metro.Controls;
 using MahApps.Metro.Controls.Dialogs;
+using System.Threading;
+using CommunityToolkit.WinUI.Notifications;
+using UI_Interface.Activation;
+using System.Collections.Generic;
+using UI_Interface.Multilang;
 
 namespace UI_Interface
 {
@@ -33,12 +38,27 @@ namespace UI_Interface
 
         private async void OnStartup(object sender, StartupEventArgs e)
         {
+            ToastNotificationManagerCompat.OnActivated += (toastArgs) => {
+                _ = Current.Dispatcher.Invoke(async () =>
+                {
+                    IConfiguration config = GetService<IConfiguration>();
+                    config[ToastNotificationActivationHandler.ActivationArguments] = toastArgs.Argument;
+                    await _host.StartAsync();
+                });
+            };
+
+            Dictionary<string, string> activationArgs = new()
+            {
+                { ToastNotificationActivationHandler.ActivationArguments, string.Empty }
+            };
+
             string appLocation = Path.GetDirectoryName(System.AppContext.BaseDirectory);
 
             _host = Host.CreateDefaultBuilder(e.Args)
                     .ConfigureAppConfiguration(c =>
                     {
                         _ = c.SetBasePath(appLocation);
+                        _ = c.AddInMemoryCollection(activationArgs);
                     })
                     .ConfigureServices(ConfigureServices)
                     .Build();
@@ -46,6 +66,12 @@ namespace UI_Interface
             _ = _host.ConfigurePages();
 
             DispatcherUnhandledException += OnDispatcherUnhandledException;
+
+            if (ToastNotificationManagerCompat.WasCurrentProcessToastActivated())
+            {
+                // ToastNotificationActivator code will run after this completes and will show a window if necessary.
+                return;
+            }
 
             await _host.StartAsync();
         }
@@ -88,7 +114,7 @@ namespace UI_Interface
             logger.LogError($"Unhandled exception occured: {e.Exception}");
 
             //TODO: Убрать в продакшене
-            e.Handled = true;
+            //e.Handled = true;
         }
     }
 }

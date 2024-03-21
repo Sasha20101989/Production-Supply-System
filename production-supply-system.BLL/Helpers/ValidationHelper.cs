@@ -43,7 +43,7 @@ namespace BLL.Helpers
         /// <returns>Список строковых представлений ошибок валидации или null, если ошибок нет.</returns>
         public static List<CustomError> ValidateProperty(string propertyName, object propertyValue, PropertyInfo propertyInfo)
         {
-            List<CustomError> errors = new();
+            List<CustomError> errors = [];
 
             if (Attribute.IsDefined(propertyInfo, typeof(RequiredAttribute)))
             {
@@ -111,7 +111,7 @@ namespace BLL.Helpers
                 }
             }
 
-            return errors.Any() ? errors : null;
+            return errors.Count != 0 ? errors : null;
         }
 
         /// <summary>

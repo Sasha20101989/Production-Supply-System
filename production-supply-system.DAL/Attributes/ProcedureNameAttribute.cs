@@ -7,21 +7,17 @@ namespace DAL.Attributes
     /// <summary>
     /// Атрибут, используемый для указания схемы базы данных в перечислении.
     /// </summary>
+    /// <remarks>
+    /// Инициализирует новый экземпляр атрибута с указанием схемы базы данных.
+    /// </remarks>
+    /// <param name="schema">Схема базы данных.</param>
     [AttributeUsage(AttributeTargets.Enum)]
-    internal sealed class ProcedureNameAttribute : Attribute
+    internal sealed class ProcedureNameAttribute(DatabaseSchemas schema) : Attribute
     {
-        /// <summary>
-        /// Инициализирует новый экземпляр атрибута с указанием схемы базы данных.
-        /// </summary>
-        /// <param name="schema">Схема базы данных.</param>
-        public ProcedureNameAttribute(DatabaseSchemas schema)
-        {
-            Schema = schema;
-        }
 
         /// <summary>
         /// Получает схему базы данных.
         /// </summary>
-        public DatabaseSchemas Schema { get; }
+        public DatabaseSchemas Schema { get; } = schema;
     }
 }

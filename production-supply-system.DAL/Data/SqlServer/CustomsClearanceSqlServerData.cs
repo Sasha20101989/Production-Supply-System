@@ -8,10 +8,7 @@ namespace DAL.Data.SqlServer
     /// <summary>
     /// Реализация SQL Server для получения информации о таможенных процедурах.
     /// </summary>
-    public class CustomsClearanceSqlServerData : SqlServerData<CustomsClearance>
+    public class CustomsClearanceSqlServerData(ISqlDataAccess db) : SqlServerData<CustomsClearance>(db, StoredProcedureCustoms.GetAllCustomsClearance)
     {
-        public CustomsClearanceSqlServerData(ISqlDataAccess db, ILogger<CustomsClearanceSqlServerData> logger)
-             : base(db, logger, StoredProcedureCustoms.GetAllCustomsClearance)
-        { }
     }
 }

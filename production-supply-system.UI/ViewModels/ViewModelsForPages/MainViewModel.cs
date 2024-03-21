@@ -1,19 +1,16 @@
-﻿using Microsoft.Toolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
 using NavigationManager.Frame.Extension.WPF;
 
+using UI_Interface.Multilang;
+
 namespace UI_Interface.ViewModels.ViewModelsForPages
 {
-    public class MainViewModel : ObservableObject, INavigationAware
+    public class MainViewModel(IMultilangManager multilangManager) : ObservableObject, INavigationAware
     {
-        public MainViewModel()
-        {
-
-        }
-
         public void OnNavigatedTo(object parameter)
         {
-
+            multilangManager.InitializeLanguage();
         }
 
         public void OnNavigatedFrom()

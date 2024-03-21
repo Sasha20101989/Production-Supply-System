@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+
+using CommunityToolkit.Mvvm.ComponentModel;
+
 using DAL.Models.Document;
 
 using Microsoft.Extensions.Logging;
@@ -11,17 +14,10 @@ namespace UI_Interface.ViewModels
     /// Наследует от ObservableObject для уведомлений об изменении свойств.
     /// Реализует IDataErrorInfo для поддержки валидации данных.
     /// </summary>
-    public class DocumentViewModel : ValidatedViewModel<DocumentViewModel, List<Type>>
+    public partial class DocumentViewModel(List<Type> models, ILogger logger) : ValidatedViewModel<DocumentViewModel, List<Type>>(models, logger)
     {
-        public DocumentViewModel(List<Type> models, ILogger logger) : base(models, logger)
-        {
-
-        }
-
-        /// <summary>
-        /// Получает или задает документ.
-        /// </summary>
-        public Docmapper Document { get; set; } = new();
+        [ObservableProperty]
+        private Docmapper _document = new();
 
         /// <summary>
         /// Получает или задает уникальный идентификатор шаблона документа.

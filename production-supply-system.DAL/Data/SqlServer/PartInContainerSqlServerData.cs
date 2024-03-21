@@ -5,10 +5,7 @@ using DAL.Models;
 
 namespace DAL.Data.SqlServer
 {
-    public class PartInContainerSqlServerData : SqlServerData<PartsInContainer>
+    public class PartInContainerSqlServerData(ISqlDataAccess db) : SqlServerData<PartsInContainer>(db, StoredProcedureInbound.GetAllPartsInContainer)
     {
-        public PartInContainerSqlServerData(ISqlDataAccess db, ILogger<PartInContainerSqlServerData> logger)
-            : base(db, logger, StoredProcedureInbound.GetAllPartsInContainer)
-        { }
     }
 }

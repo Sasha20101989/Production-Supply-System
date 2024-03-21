@@ -8,15 +8,9 @@ namespace UI_Interface.Extensions
     {
         public static void AddRange<T>(this ObservableCollection<T> collection, IEnumerable<T> items)
         {
-            if (collection == null)
-            {
-                throw new ArgumentNullException(nameof(collection));
-            }
+            ArgumentNullException.ThrowIfNull(collection);
 
-            if (items == null)
-            {
-                throw new ArgumentNullException(nameof(items));
-            }
+            ArgumentNullException.ThrowIfNull(items);
 
             foreach (T item in items)
             {

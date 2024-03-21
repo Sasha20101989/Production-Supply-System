@@ -5,10 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DAL.Data.SqlServer
 {
-    public class PurchaseOrderSqlServerData : SqlServerData<PurchaseOrder>
+    public class PurchaseOrderSqlServerData(ISqlDataAccess db) : SqlServerData<PurchaseOrder>(db, StoredProcedurePartscontrol.GetAllPurchaseOrders)
     {
-        public PurchaseOrderSqlServerData(ISqlDataAccess db, ILogger<PurchaseOrderSqlServerData> logger)
-            : base(db, logger, StoredProcedurePartscontrol.GetAllPurchaseOrders)
-        { }
     }
 }

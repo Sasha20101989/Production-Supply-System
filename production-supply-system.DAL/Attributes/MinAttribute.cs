@@ -7,22 +7,17 @@ namespace DAL.Attributes
     /// Пользовательский атрибут валидации для проверки, что целочисленное свойство
     /// имеет значение больше или равное указанному минимальному значению.
     /// </summary>
+    /// <remarks>
+    /// Инициализирует новый экземпляр класса <see cref="MinAttribute"/>.
+    /// </remarks>
+    /// <param name="min">Минимальное значение.</param>
     [AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
-    public sealed class MinAttribute : ValidationAttribute
+    public sealed class MinAttribute(int min) : ValidationAttribute
     {
         /// <summary>
         /// Минимальное значение, которому должно соответствовать свойство.
         /// </summary>
-        public int Min { get; }
-
-        /// <summary>
-        /// Инициализирует новый экземпляр класса <see cref="MinAttribute"/>.
-        /// </summary>
-        /// <param name="min">Минимальное значение.</param>
-        public MinAttribute(int min)
-        {
-            Min = min;
-        }
+        public int Min { get; } = min;
 
         /// <summary>
         /// Проверяет, соответствует ли значение свойства условиям атрибута.

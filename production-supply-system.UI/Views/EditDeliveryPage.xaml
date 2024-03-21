@@ -99,7 +99,8 @@
 
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding ContainerNumber}" />
+                                    <TextBox Text="{Binding ContainerNumber}"
+                                             Style="{StaticResource MahApps.Styles.TextBox.ComboBox.Editable}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -347,17 +348,29 @@
                                                 <Style TargetType="Expander">
                                                 </Style>
                                             </Expander.Style>
-                                            <DockPanel LastChildFill="True">
-                                                <iconPacks:PackIconMaterial VerticalAlignment="Center"
-                                                                            Kind="Filter"
-                                                                            DockPanel.Dock="Right"
-                                                                            Margin="{StaticResource XSmallLeftMargin}" />
-                                                <TextBox mah:TextBoxHelper.Watermark="{x:Static properties:Resources.Filter}"
-                                                         Margin="{StaticResource SmallTopBottomMargin}"
-                                                         VerticalAlignment="Center"
-                                                         FontStyle="Italic"
-                                                         Text="{Binding DataContext.FilterQuantity, ElementName=EditPage, UpdateSourceTrigger=PropertyChanged}" />
-                                            </DockPanel>
+                                            <StackPanel>
+                                                <DockPanel LastChildFill="True">
+                                                    <TextBlock VerticalAlignment="Center"
+                                                               Text="{Binding DataContext.TotalQuantityParts, ElementName=EditPage, UpdateSourceTrigger=PropertyChanged}"
+                                                               DockPanel.Dock="Right"
+                                                               Margin="{StaticResource SmallTopMargin}" />
+                                                    <TextBlock Margin="{StaticResource SmallTopRightMargin}"
+                                                               VerticalAlignment="Center"
+                                                               FontStyle="Italic"
+                                                               Text="{x:Static properties:Resources.ShellTotalQuantity}" />
+                                                </DockPanel>
+                                                <DockPanel LastChildFill="True">
+                                                    <iconPacks:PackIconMaterial VerticalAlignment="Center"
+                                                                                Kind="Filter"
+                                                                                DockPanel.Dock="Right"
+                                                                                Margin="{StaticResource XSmallLeftMargin}" />
+                                                    <TextBox mah:TextBoxHelper.Watermark="{x:Static properties:Resources.Filter}"
+                                                             Margin="{StaticResource SmallTopBottomMargin}"
+                                                             VerticalAlignment="Center"
+                                                             FontStyle="Italic"
+                                                             Text="{Binding DataContext.FilterQuantity, ElementName=EditPage, UpdateSourceTrigger=PropertyChanged}" />
+                                                </DockPanel>
+                                            </StackPanel>
                                         </Expander>
                                     </StackPanel>
                                 </DataTemplate>
@@ -479,17 +492,29 @@
                                                 <Style TargetType="Expander">
                                                 </Style>
                                             </Expander.Style>
-                                            <DockPanel LastChildFill="True">
-                                                <iconPacks:PackIconMaterial VerticalAlignment="Center"
-                                                                            Kind="Filter"
-                                                                            DockPanel.Dock="Right"
-                                                                            Margin="{StaticResource XSmallLeftMargin}" />
-                                                <TextBox mah:TextBoxHelper.Watermark="{x:Static properties:Resources.Filter}"
-                                                         Margin="{StaticResource SmallTopBottomMargin}"
-                                                         VerticalAlignment="Center"
-                                                         FontStyle="Italic"
-                                                         Text="{Binding DataContext.FilterNetWeight, ElementName=EditPage, UpdateSourceTrigger=PropertyChanged}" />
-                                            </DockPanel>
+                                            <StackPanel>
+                                                <DockPanel LastChildFill="True">
+                                                    <TextBlock VerticalAlignment="Center"
+                                                               Text="{Binding DataContext.TotalQuantityNetWeight, ElementName=EditPage, UpdateSourceTrigger=PropertyChanged}"
+                                                               DockPanel.Dock="Right"
+                                                               Margin="{StaticResource SmallTopMargin}" />
+                                                    <TextBlock Margin="{StaticResource SmallTopRightMargin}"
+                                                               VerticalAlignment="Center"
+                                                               FontStyle="Italic"
+                                                               Text="{x:Static properties:Resources.ShellTotalQuantity}" />
+                                                </DockPanel>
+                                                <DockPanel LastChildFill="True">
+                                                    <iconPacks:PackIconMaterial VerticalAlignment="Center"
+                                                                                Kind="Filter"
+                                                                                DockPanel.Dock="Right"
+                                                                                Margin="{StaticResource XSmallLeftMargin}" />
+                                                    <TextBox mah:TextBoxHelper.Watermark="{x:Static properties:Resources.Filter}"
+                                                             Margin="{StaticResource SmallTopBottomMargin}"
+                                                             VerticalAlignment="Center"
+                                                             FontStyle="Italic"
+                                                             Text="{Binding DataContext.FilterNetWeight, ElementName=EditPage, UpdateSourceTrigger=PropertyChanged}" />
+                                                </DockPanel>
+                                            </StackPanel>
                                         </Expander>
                                     </StackPanel>
                                 </DataTemplate>
@@ -512,17 +537,29 @@
                                                 <Style TargetType="Expander">
                                                 </Style>
                                             </Expander.Style>
-                                            <DockPanel LastChildFill="True">
-                                                <iconPacks:PackIconMaterial VerticalAlignment="Center"
-                                                                            Kind="Filter"
-                                                                            DockPanel.Dock="Right"
-                                                                            Margin="{StaticResource XSmallLeftMargin}" />
-                                                <TextBox mah:TextBoxHelper.Watermark="{x:Static properties:Resources.Filter}"
-                                                         Margin="{StaticResource SmallTopBottomMargin}"
-                                                         VerticalAlignment="Center"
-                                                         FontStyle="Italic"
-                                                         Text="{Binding DataContext.FilterGrossWeight, ElementName=EditPage, UpdateSourceTrigger=PropertyChanged}" />
-                                            </DockPanel>
+                                            <StackPanel>
+                                                <DockPanel LastChildFill="True">
+                                                    <TextBlock VerticalAlignment="Center"
+                                                               Text="{Binding DataContext.TotalQuantityGrossWeight, ElementName=EditPage, UpdateSourceTrigger=PropertyChanged}"
+                                                               DockPanel.Dock="Right"
+                                                               Margin="{StaticResource SmallTopMargin}" />
+                                                    <TextBlock Margin="{StaticResource SmallTopRightMargin}"
+                                                               VerticalAlignment="Center"
+                                                               FontStyle="Italic"
+                                                               Text="{x:Static properties:Resources.ShellTotalQuantity}" />
+                                                </DockPanel>
+                                                <DockPanel LastChildFill="True">
+                                                    <iconPacks:PackIconMaterial VerticalAlignment="Center"
+                                                                                Kind="Filter"
+                                                                                DockPanel.Dock="Right"
+                                                                                Margin="{StaticResource XSmallLeftMargin}" />
+                                                    <TextBox mah:TextBoxHelper.Watermark="{x:Static properties:Resources.Filter}"
+                                                             Margin="{StaticResource SmallTopBottomMargin}"
+                                                             VerticalAlignment="Center"
+                                                             FontStyle="Italic"
+                                                             Text="{Binding DataContext.FilterGrossWeight, ElementName=EditPage, UpdateSourceTrigger=PropertyChanged}" />
+                                                </DockPanel>
+                                            </StackPanel>
                                         </Expander>
                                     </StackPanel>
                                 </DataTemplate>

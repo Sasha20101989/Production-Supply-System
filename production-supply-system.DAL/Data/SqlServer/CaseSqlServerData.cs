@@ -8,10 +8,7 @@ namespace DAL.Data.SqlServer
     /// <summary>
     /// Реализация SQL Server для получения перевозчиков.
     /// </summary>
-    public class CaseSqlServerData : SqlServerData<Case>
+    public class CaseSqlServerData(ISqlDataAccess db) : SqlServerData<Case>(db, StoredProcedureInbound.GetAllCases)
     {
-        public CaseSqlServerData(ISqlDataAccess db, ILogger<CaseSqlServerData> logger)
-             : base(db, logger, StoredProcedureInbound.GetAllCases)
-        { }
     }
 }

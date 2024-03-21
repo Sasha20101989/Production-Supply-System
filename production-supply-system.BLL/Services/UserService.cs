@@ -3,44 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BLL.Contracts;
+using BLL.Properties;
+
 using DAL.Data.Repositories.Contracts;
 using DAL.Models;
 
 using DocumentFormat.OpenXml.Spreadsheet;
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
+
+using production_supply_system.EntityFramework.DAL.Context;
 
 namespace BLL.Services
 {
     /// <summary>
     /// Сервис, отвечающий за операции, связанные с пользователями.
     /// </summary>
-    public class UserService : IUserService
+    /// <remarks>
+    /// Инициализирует новый экземпляр класса <see cref="UserService"/>.
+    /// </remarks>
+    /// <param name="userRepository">Репозиторий для доступа к информации о пользователях.</param>
+    public class UserService(IRepository<User> userRepository,
+        IStaticDataService staticDataService,
+        ILogger<UserService> logger) : IUserService
     {
-        private readonly IRepository<User> _userRepository;
-
-        private readonly IRepository<Section> _sectionRepository;
-
-        private readonly ILogger<UserService> _logger;
-
         private User _user;
-
-        /// <summary>
-        /// Инициализирует новый экземпляр класса <see cref="UserService"/>.
-        /// </summary>
-        /// <param name="userRepository">Репозиторий для доступа к информации о пользователях.</param>
-        public UserService(IRepository<User> userRepository, 
-            IRepository<Section> sectionRepository,
-            ILogger<UserService> logger)
-        {
-            _userRepository = userRepository;
-
-            _sectionRepository = sectionRepository;
-
-            _logger = logger;
-        }
 
         /// <inheritdoc />
         public async Task<User> GetUserInfoAsync(string userAccount)
@@ -49,41 +39,40 @@ namespace BLL.Services
 
             try
             {
-                users = await _userRepository.GetAllAsync();
+                using(PSSContext db = new())
+                {
+                    production_supply_system.EntityFramework.DAL.Models.UsersSchema.User user = await db.Users.FirstOrDefaultAsync(u => u.Account == userAccount);
+                };
+
+                logger.LogInformation($"{Resources.LogUsersGet}");
+
+                users = await userRepository.GetAllAsync();
+
+                logger.LogInformation($"{Resources.LogUsersGet} {Resources.Completed}");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get all users list: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogUsersGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw;
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
 
-            _logger.LogInformation($"Get user by account from received list: {userAccount}");
+            logger.LogInformation($"{string.Format(Resources.LogUsersGet, userAccount)}");
 
             _user = users.SingleOrDefault(u => u.Account == userAccount);
 
+            logger.LogInformation($"{string.Format(Resources.LogUsersGet, userAccount)} {Resources.Completed}");
+
             if (_user is null)
             {
-                _logger.LogWarning($"User with account: {userAccount} not found.");
+                logger.LogError($"{string.Format(Resources.LogUsersNotFoundWithAccount, userAccount)}");
 
                 return null;
             }
 
-            try
-            {
-                if (_user.SectionId <= 0)
-                {
-                    throw new Exception("SectionId should be greater than 0.");
-                }
-
-                _user.Section = await _sectionRepository.GetByIdAsync(_user.SectionId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error get section by section id {_user.SectionId}: {JsonConvert.SerializeObject(ex)}");
-
-                throw;
-            }
+            _user.Section = await staticDataService.GetSectionByIdAsync(_user.SectionId);
 
             return _user;
         }
@@ -91,13 +80,13 @@ namespace BLL.Services
         /// <inheritdoc />
         public User GetCurrentUser()
         {
-            return _user;
+            return _user is null ? throw new Exception(Resources.LogUsersNotFound) : _user;
         }
 
         /// <inheritdoc />
         public async Task<bool> IsAccessAllowedAsync()
         {
-            return await _userRepository.TestConnectionAsync();
+            return await userRepository.TestConnectionAsync();
         }
     }
 }

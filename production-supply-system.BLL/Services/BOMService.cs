@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using BLL.Contracts;
+using BLL.Properties;
+
 using DAL.Data.Repositories.Contracts;
 using DAL.Enums;
 using DAL.Models.BOM;
@@ -13,64 +15,70 @@ using Newtonsoft.Json;
 
 namespace BLL.Services
 {
-    public class BOMService : IBOMService
+    public class BOMService(IRepository<BomPart> bomPartRepository, ILogger<DeliveryService> logger) : IBOMService
     {
-        private readonly IRepository<BomPart> _bomPartRepository;
-
-        private readonly ILogger<DeliveryService> _logger;
-
-        /// <param name="logger">Регистратор для отслеживания информации и ошибок.</param>
-        public BOMService(IRepository<BomPart> bomPartRepository, ILogger<DeliveryService> logger)
-        {
-            _bomPartRepository = bomPartRepository;
-
-            _logger = logger;
-        }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<BomPart>> GetAllBomPartsAsync()
-        {
-            try
-            {
-                return await _bomPartRepository.GetAllAsync();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error get list parts: {JsonConvert.SerializeObject(ex)}");
-
-                throw new Exception($"Ошибка получения деталей из сборки материалов.");
-            }
-        }
-
-        /// <inheritdoc />
-        public async Task<BomPart> SaveNewBomPart(BomPart newBomPart)
+        public async Task<BomPart> SaveNewBomPartAsync(BomPart newBomPart)
         {
             CreateBomPartParameters parameters = new(newBomPart);
 
             try
             {
-                return await _bomPartRepository.CreateAsync(newBomPart, StoredProcedureDbo.AddNewBomPart, parameters);
+                logger.LogInformation(Resources.LogBomPartAdd);
+
+                BomPart part = await bomPartRepository.CreateAsync(newBomPart, StoredProcedureDbo.AddNewBomPart, parameters);
+
+                logger.LogInformation($"{Resources.LogBomPartAdd} {Resources.Completed}");
+
+                return part;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error add new part {JsonConvert.SerializeObject(newBomPart)}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogBomPartAdd}: {JsonConvert.SerializeObject(newBomPart)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка добавления детали в базу данных сборки материалов.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
         /// <inheritdoc />
-        public async Task<BomPart> GetExistingBomPart(string partNumber)
+        public async Task<BomPart> GetExistingBomPartByPartNumberAsync(string partNumber)
         {
-            _logger.LogInformation($"Start searching for an existing part by part number '{partNumber}'");
+            string message = string.Format(Resources.LogBomPartGetExisting, partNumber);
+
+            logger.LogInformation(message);
 
             IEnumerable<BomPart> parts = await GetAllBomPartsAsync();
 
             BomPart part = parts.FirstOrDefault(c => c.PartNumber == partNumber);
 
-            _logger.LogInformation($"Searching for an existing part by part number '{partNumber}' completed with result: '{part}'");
+            logger.LogInformation($"{message} {Resources.Completed} {string.Format(Resources.LogWithResult, JsonConvert.SerializeObject(part))}");
 
             return part;
+        }
+
+        private async Task<IEnumerable<BomPart>> GetAllBomPartsAsync()
+        {
+            try
+            {
+                logger.LogInformation(Resources.LogBomPartsGet);
+
+                IEnumerable<BomPart> parts = await bomPartRepository.GetAllAsync();
+
+                logger.LogInformation($"{Resources.LogBomPartsGet} {Resources.Completed}");
+
+                return parts;
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {Resources.LogBomPartsGet}: {JsonConvert.SerializeObject(ex)}";
+
+                logger.LogError(message);
+
+                throw new Exception(message);
+            }
         }
     }
 }

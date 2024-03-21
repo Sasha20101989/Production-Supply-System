@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-
 using BLL.Contracts;
 using BLL.Models;
-
+using BLL.Properties;
 using DAL.Data.Repositories.Contracts;
 using DAL.Enums;
 using DAL.Extensions;
@@ -20,33 +20,32 @@ using DAL.Models.Planning;
 using DAL.Parameters.Customs;
 using DAL.Parameters.Inbound;
 using DAL.Parameters.Planning;
-
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.Extensions.Logging;
-
 using Newtonsoft.Json;
 
 namespace BLL.Services
 {
-    public class DeliveryService : IDeliveryService
+    public partial class DeliveryService(
+        IUserService userService,
+        IRepository<Invoice> invoiceRepository,
+        IProcessService processService,
+        IExcelService excelService,
+        IRepository<Lot> lotRepository,
+        IRepository<ContainersInLot> containerRepository,
+        IRepository<PartsInContainer> partInContainerRepository,
+        IRepository<PartsInInvoice> partInInvoiceRepository,
+        IRepository<CustomsPart> customsPartRepository,
+        IRepository<Case> caseRepository,
+        IRepository<BodyModelVariant> bodyModelVariantRepository,
+        IRepository<VinsInContainer> vinContainerRepository,
+        IRepository<CustomsClearance> customsClearanceRepository,
+        IRepository<PurchaseOrder> purchaseOrderRepository,
+        IRepository<Tracing> tracingRepository,
+        IStaticDataService staticDataService,
+        IBOMService bomService,
+        ILogger<DeliveryService> logger) : IDeliveryService
     {
-        private readonly ILogger<DeliveryService> _logger;
-        private readonly IUserService _userService;
-        private readonly IProcessService _processService;
-        private readonly IStaticDataService _staticDataService;
-        private readonly IExcelService _excelService;
-        private readonly IBOMService _bomService;
-        private readonly IRepository<Invoice> _invoiceRepository;
-        private readonly IRepository<Lot> _lotRepository;
-        private readonly IRepository<ContainersInLot> _containerRepository;
-        private readonly IRepository<PartsInContainer> _partInContainerRepository;
-        private readonly IRepository<PartsInInvoice> _partInInvoiceRepository;
-        private readonly IRepository<CustomsPart> _customsPartRepository;
-        private readonly IRepository<Case> _caseRepository;
-        private readonly IRepository<BodyModelVariant> _bodyModelVariantRepository;
-        private readonly IRepository<VinsInContainer> _vinContainerRepository;
-        private readonly IRepository<CustomsClearance> _customsClearanceRepository;
-        private readonly IRepository<PurchaseOrder> _purchaseOrderRepository;
-        private readonly IRepository<Tracing> _tracingRepository;
         private List<ProcessStep> _stepCollection;
         private List<VinsInContainer> _vinContainers;
         private List<CustomsClearance> _customsClearances;
@@ -55,53 +54,27 @@ namespace BLL.Services
         private List<CustomsPart> _customsParts;
         private List<PartsInContainer> _partsInContainer;
 
-        public DeliveryService(
-            IUserService userService,
-            IRepository<Invoice> invoiceRepository,
-            IProcessService processService,
-            IExcelService excelService,
-            IRepository<Lot> lotRepository,
-            IRepository<ContainersInLot> containerRepository,
-            IRepository<PartsInContainer> partInContainerRepository,
-            IRepository<PartsInInvoice> partInInvoiceRepository,
-            IRepository<CustomsPart> customsPartRepository,
-            IRepository<Case> caseRepository,
-            IRepository<BodyModelVariant> bodyModelVariantRepository,
-            IRepository<VinsInContainer> vinContainerRepository,
-            IRepository<CustomsClearance> customsClearanceRepository,
-            IRepository<PurchaseOrder> purchaseOrderRepository,
-            IRepository<Tracing> tracingRepository,
-            IStaticDataService staticDataService,
-            IBOMService bomService,
-            ILogger<DeliveryService> logger)
+        public EventHandler<List<ProcessStep>> NavigatedWithStepCollection { get; set; }
+
+        private static string ConvertDateTimeToString(DateTime? date)
         {
-            _userService = userService;
-            _invoiceRepository = invoiceRepository;
-            _processService = processService;
-            _excelService = excelService;
-            _lotRepository = lotRepository;
-            _containerRepository = containerRepository;
-            _partInContainerRepository = partInContainerRepository;
-            _partInInvoiceRepository = partInInvoiceRepository;
-            _customsPartRepository = customsPartRepository;
-            _caseRepository = caseRepository;
-            _bodyModelVariantRepository = bodyModelVariantRepository;
-            _vinContainerRepository = vinContainerRepository;
-            _customsClearanceRepository = customsClearanceRepository;
-            _purchaseOrderRepository = purchaseOrderRepository;
-            _tracingRepository = tracingRepository;
-            _staticDataService = staticDataService;
-            _bomService = bomService;
-            _logger = logger;
+            return date is null ? null : (date?.ToString(Resources.ExportFormatDate));
         }
 
-        public EventHandler<List<ProcessStep>> NavigatedWithStepCollection { get; set; }
+        private static Cell CreateCell(string text)
+        {
+            Cell cell = new()
+            {
+                DataType = CellValues.String,
+                CellValue = new CellValue(text)
+            };
+
+            return cell;
+        }
 
         private static bool IsValidVinNumber(string vin)
         {
-            string vinPattern = @"^[A-HJ-NPR-Z0-9]{17}$";
-
-            return Regex.IsMatch(vin, vinPattern);
+            return VinRegex().IsMatch(vin);
         }
 
         private static CustomsClearance CreateCustomsClearance(ContainersInLot container, PartsInContainer partInContainer, Lot lot)
@@ -114,7 +87,7 @@ namespace BLL.Services
             };
 
             return customsClearance.InvoceNumber is null
-                ? throw new Exception($"Ошибка формирования номера инвойса для таможенной процедуры.")
+                ? throw new Exception(Resources.ErrorInvoceNumberCustomsClearance)
                 : customsClearance;
         }
 
@@ -162,10 +135,7 @@ namespace BLL.Services
 
         private static string CreateCustomsClearanceNumber(Lot lot, PartsInContainer partInContainer)
         {
-            string symbolBody = "A";
-            string symbolParts = "B";
-
-            string symbol = partInContainer?.PartNumber?.PartType?.PartType == PartTypes.Body ? symbolBody : partInContainer?.PartNumber?.PartType?.PartType == PartTypes.Parts ? symbolParts : null;
+            string symbol = partInContainer?.PartNumber?.PartType?.PartType == PartTypes.Body ? Resources.SymbolBody : partInContainer?.PartNumber?.PartType?.PartType == PartTypes.Parts ? Resources.SymbolParts : null;
 
             return symbol != null ? $"{lot.LotNumber}-{symbol}" : null;
         }
@@ -209,29 +179,127 @@ namespace BLL.Services
             }
 
             return !string.IsNullOrWhiteSpace(vinsInContainer.SupplierVinNumber) && !IsValidVinNumber(vinsInContainer.SupplierVinNumber)
-                ? throw new Exception($"Не валидный VIN номер '{vinsInContainer.SupplierVinNumber}'")
+                ? throw new Exception(string.Format(Resources.NotValidVIN, vinsInContainer.SupplierVinNumber))
                 : vinsInContainer;
         }
 
-        public async Task ExportAllTracing(string exportFilePath)
+        public async Task<SheetData> GetAllTracingForPartner2ToExport(List<DocmapperContent> content)
         {
-            _logger.LogInformation($"Start of export file.");
+            logger.LogInformation(Resources.Partner2GetAllTracing);
 
-            List<Tracing> tracingInOpenLots = new();
+            SheetData sheetData = new();
 
-            foreach (Tracing item in await GetAllTracingAsync())
+            List<Tracing> tracing = await GetAllTracingAsync();
+
+            IOrderedEnumerable<DocmapperContent> orderedByColumnContent = content.OrderBy(c => c.ColumnNr);
+
+            IEnumerable<Task<(Tracing TracingItem, ContainersInLot ContainerInOpenLot)>> tasks = tracing.Select(async tracingItem =>
             {
-                if (await GetContainerInOpenLot(item.ContainerInLot.ContainerNumber) is not null)
+                ContainersInLot containerInOpenLot = await GetContainerInOpenLot(tracingItem.ContainerInLot.ContainerNumber);
+
+                return (TracingItem: tracingItem, ContainerInOpenLot: containerInOpenLot);
+            });
+
+            (Tracing TracingItem, ContainersInLot ContainerInOpenLot)[] results = await Task.WhenAll(tasks);
+
+            List<Tracing> filteredTracing = results
+                .Where(result => result.ContainerInOpenLot is not null)
+                .Select(result => result.TracingItem)
+                .ToList();
+
+            Row headerRow = new();
+
+            foreach (DocmapperContent item in orderedByColumnContent)
+            {
+                headerRow.Append(CreateCell(item.DocmapperColumn.ElementName));
+            }
+
+            sheetData.Append(headerRow);
+
+            List<Partner2TracingExport> tracingExportData = [];
+
+            List<Tracing> containersInTransshipment = filteredTracing.Where(t => t.TraceLocation.LocationType.LocationType == EnumExtensions.GetDescription(LocationType.TransshipmentPort)).ToList();
+            List<Tracing> containersInStp = filteredTracing.Where(t => t.TraceLocation.LocationType.LocationType == EnumExtensions.GetDescription(LocationType.ArrivalTerminal)).ToList();
+            List<Tracing> containersInCustomClearance = filteredTracing.Where(t => t.TraceLocation.LocationType.LocationType == EnumExtensions.GetDescription(LocationType.CustomsTerminal)).ToList();
+            List<Tracing> containersInContainerYard = filteredTracing.Where(t => t.TraceLocation.LocationType.LocationType == EnumExtensions.GetDescription(LocationType.ContainerYard)).ToList();
+            List<Tracing> containersInPlant = filteredTracing.Where(t => t.TraceLocation.LocationType.LocationType == EnumExtensions.GetDescription(LocationType.FinalLocation)).ToList();
+
+            foreach (Tracing item in filteredTracing)
+            {
+                if (!tracingExportData.Any(ted => ted.ContainerNumber == item.ContainerInLot.ContainerNumber))
                 {
-                    item.ContainerInLot.CargoType = await GetContainerCargoType(item.ContainerInLotId);
+                    ContainersInLot container = item.ContainerInLot;
 
-                    item.TraceLocation = await _staticDataService.GetLocationByIdAsync(item.TraceLocationId);
+                    Lot lot = item.ContainerInLot.Lot;
 
-                    tracingInOpenLots.Add(item);
+                    Partner2TracingExport exportItem = new()
+                    {
+                        CarrierName = lot.Carrier.CarrierName,
+                        CargoType = await GetContainerCargoType(item.ContainerInLotId),
+                        LotNumber = lot.LotNumber,
+                        ContainerNumber = container.ContainerNumber,
+                        InvoiceNumber = lot.LotInvoice.InvoiceNumber,
+                        TransportType = lot.LotTransportType.TransportType,
+                        ImoCargo = container.ImoCargo,
+                        SealNumber = container.SealNumber,
+                        LotEtd = ConvertDateTimeToString(lot.LotEtd),
+                        LotDepartureLocation = lot.LotDepartureLocation.LocationName,
+                        TransshipmentPort = containersInTransshipment.FirstOrDefault(c => c.ContainerInLotId == item.ContainerInLotId)?.TraceLocation.LocationName,
+                        TransshipmentEtd = ConvertDateTimeToString(containersInTransshipment.FirstOrDefault(c => c.ContainerInLotId == item.ContainerInLotId)?.TraceEtd),
+                        TransshipmentAtd = ConvertDateTimeToString(containersInTransshipment.FirstOrDefault(c => c.ContainerInLotId == item.ContainerInLotId)?.TraceAtd),
+                        TransshipmentEta = ConvertDateTimeToString(containersInTransshipment.FirstOrDefault(c => c.ContainerInLotId == item.ContainerInLotId)?.TraceEta),
+                        TransshipmentAta = ConvertDateTimeToString(containersInTransshipment.FirstOrDefault(c => c.ContainerInLotId == item.ContainerInLotId)?.TraceAta),
+                        StpTerminal = containersInStp.FirstOrDefault(c => c.ContainerInLotId == item.ContainerInLotId)?.TraceLocation.LocationName,
+                        StpAta = ConvertDateTimeToString(containersInStp.FirstOrDefault(c => c.ContainerInLotId == item.ContainerInLotId)?.TraceAta),
+                        StpEta = ConvertDateTimeToString(containersInStp.FirstOrDefault(c => c.ContainerInLotId == item.ContainerInLotId)?.TraceEta),
+                        StorageLastFreeDay = ConvertDateTimeToString(container.StorageLastFreeDay),
+                        DetentionLastFreeDay = ConvertDateTimeToString(container.DetentionLastFreeDay),
+                        CustomsClearanceTerminal = containersInCustomClearance.FirstOrDefault(c => c.ContainerInLotId == item.ContainerInLotId)?.TraceLocation.LocationName,
+                        CustomsClearanceAta = ConvertDateTimeToString(containersInCustomClearance.FirstOrDefault(c => c.ContainerInLotId == item.ContainerInLotId)?.TraceAta),
+                        CustomsClearanceEta = ConvertDateTimeToString(containersInCustomClearance.FirstOrDefault(c => c.ContainerInLotId == item.ContainerInLotId)?.TraceAta),
+                        DocstoCsbDate = ConvertDateTimeToString(await GetCustomsBrokerDocumentByMaxDate(item.ContainerInLotId)),
+                        ContainerYardAta = ConvertDateTimeToString(containersInContainerYard.FirstOrDefault(c => c.ContainerInLotId == item.ContainerInLotId)?.TraceAta),
+                        ContainerYardAtd = ConvertDateTimeToString(containersInContainerYard.FirstOrDefault(c => c.ContainerInLotId == item.ContainerInLotId)?.TraceAtd),
+                        AtaNmgr = ConvertDateTimeToString(containersInPlant.FirstOrDefault(c => c.ContainerInLotId == item.ContainerInLotId)?.TraceAta),
+                        TargetEta = ConvertDateTimeToString(lot.LotEta),
+                        CiOnTheWay = container.CiOnTheWay,
+                        Comment = container.ContainerComment
+                    };
+
+                    tracingExportData.Add(exportItem);
                 }
             }
 
-            IEnumerable<Tracing> containersInTransshipment = tracingInOpenLots.Where(t => t.TraceLocation.LocationType.LocationType == EnumExtensions.GetDescription(LocationType.TransshipmentPort));
+            foreach (Partner2TracingExport item in tracingExportData)
+            {
+                Row dataRow = new();
+
+                foreach (DocmapperContent contentItem in orderedByColumnContent)
+                {
+                    object propValue = item.GetPropertyByColumnAttribute(contentItem.DocmapperColumn.SystemColumnName);
+
+                    dataRow.Append(CreateCell(propValue?.ToString()));
+                }
+
+                sheetData.Append(dataRow);
+            }
+
+            logger.LogInformation($"{Resources.Partner2GetAllTracing} {Resources.Completed}");
+
+            return sheetData;
+        }
+
+        private async Task<DateTime?> GetCustomsBrokerDocumentByMaxDate(int containerInLotId)
+        {
+            CustomsClearance customsClearance = (await GetAllCustomsClearanceAsync())
+
+                .Where(cc => cc.ContainerInLotId == containerInLotId)
+
+                .OrderByDescending(cc => cc.DocsToCustomsDate)
+
+                .FirstOrDefault();
+
+            return customsClearance?.DocsToCustomsDate;
         }
 
         public async Task<CargoTypes> GetContainerCargoType(int containerInLotId)
@@ -256,12 +324,9 @@ namespace BLL.Services
             return CargoTypes.Unknown;
         }
 
-        public async Task<Lot> StartProcessAsync(List<ProcessStep> steps, Lot lotDetails)
+        public async Task<Lot> StartUploadLotAsync(List<ProcessStep> steps, Lot lotDetails)
         {
-            if (_stepCollection == null)
-            {
-                _stepCollection = steps.OrderBy(collection => collection.Step).ToList();
-            }
+            _stepCollection ??= [.. steps.OrderBy(collection => collection.Step)];
 
             return await UploadLotContentAsync(lotDetails, _stepCollection);
         }
@@ -308,7 +373,7 @@ namespace BLL.Services
 
         private List<PartPrice> UploadPartPrices(List<ProcessStep> stepCollection)
         {
-            List<PartPrice> partPrices = new();
+            List<PartPrice> partPrices = [];
 
             foreach (ProcessStep step in stepCollection.Where(HasAccess).Where(step => step.StepName == Steps.UploadPrice))
             {
@@ -326,7 +391,7 @@ namespace BLL.Services
                     {
                         if (previousPartPrice != null && partPrice.Price != previousPartPrice.Price)
                         {
-                            throw new Exception($"Номер детали '{group.Key}' имеет разные цены.");
+                            throw new Exception(string.Format(Resources.PartNumberDifferentPrice, group.Key));
                         }
                         else
                         {
@@ -346,7 +411,7 @@ namespace BLL.Services
 
         private List<ContainersInLot> UploadContainerTypes(List<ProcessStep> stepCollection)
         {
-            List<ContainersInLot> containers = new();
+            List<ContainersInLot> containers = [];
 
             foreach (ProcessStep step in stepCollection.Where(HasAccess).Where(step => step.StepName == Steps.UploadContainerTypes))
             {
@@ -391,8 +456,8 @@ namespace BLL.Services
             Invoice invoice = new()
             {
                 InvoiceDate = initialDate,
-                PurchaseOrder = await GetPurchaseOrderById(lot.LotPurchaseOrderId),
-                Shipper = await _staticDataService.GetShipperByIdAsync(lot.ShipperId)
+                PurchaseOrder = await GetPurchaseOrderByIdAsync(lot.LotPurchaseOrderId),
+                Shipper = await staticDataService.GetShipperByIdAsync(lot.ShipperId)
             };
 
             DocmapperContent content = document.DocmapperContents.FirstOrDefault(dc => dc.DocmapperColumn.SystemColumnName == typeof(Invoice).GetSystemColumnName(nameof(Invoice.InvoiceNumber)));
@@ -412,12 +477,12 @@ namespace BLL.Services
 
         private async Task ProcessContainersInLotAsync(ProcessStep step, Lot lot)
         {
-            _partsInContainer = new();
-            _containers = new();
-            _cases = new();
-            _customsClearances = new();
-            _vinContainers = new();
-            _customsParts = new();
+            _partsInContainer = [];
+            _containers = [];
+            _cases = [];
+            _customsClearances = [];
+            _vinContainers = [];
+            _customsParts = [];
 
             List<ContainersInLot> uploadedContainers = UploadContainerTypes(_stepCollection);
 
@@ -432,8 +497,8 @@ namespace BLL.Services
                 ControllerDetails controller = new()
                 {
                     ProgressValue = Convert.ToDouble(progress / totalProgress),
-                    Title = $"Пожалуйста подождите",
-                    Message = $"Проверка {progress} из {totalProgress} строк."
+                    Title = Resources.PleaseWait,
+                    Message = string.Format(Resources.CheckingProgress, progress, totalProgress)
                 };
 
                 DeliveryLoadProgressUpdated?.Invoke(this, controller);
@@ -475,18 +540,12 @@ namespace BLL.Services
             }
             else
             {
-                ContainersInLot containerWithType = uploadedContainers.FirstOrDefault(c => c.ContainerNumber == container.ContainerNumber);
-
-                if (containerWithType is null)
-                {
-                    throw new Exception($"Для контейнера '{container.ContainerNumber}' отсутствует информация о типе контейнера.");
-                }
-
-                container.ContainerType = await _staticDataService.GetContainerTypeByName(containerWithType.ContainerType.ContainerType);
+                ContainersInLot containerWithType = uploadedContainers.FirstOrDefault(c => c.ContainerNumber == container.ContainerNumber) ?? throw new Exception(string.Format(Resources.ContainerTypeMissing, container.ContainerNumber));
+                container.ContainerType = await staticDataService.GetContainerTypeByName(containerWithType.ContainerType.ContainerType);
 
                 if (container.ContainerType is null)
                 {
-                    throw new Exception($"Тип контейнера '{containerWithType.ContainerType.ContainerType}' не найден.");
+                    throw new Exception(string.Format(Resources.ContainerTypeMissingInStaticData, containerWithType.ContainerType.ContainerType));
                 }
             }
 
@@ -562,11 +621,11 @@ namespace BLL.Services
             }
             else
             {
-                partCase.PackingType = await _staticDataService.GetExistingPackingTypeByTypeAsync(partCase.PackingType.SupplierPackingType);
+                partCase.PackingType = await staticDataService.GetExistingPackingTypeByTypeAsync(partCase.PackingType.SupplierPackingType);
 
                 if (partCase.PackingType is null)
                 {
-                    throw new Exception($"В базе данных не обнаружен тип упаковки '{packingType}'.");
+                    throw new Exception(string.Format(Resources.PackingTypeMissingInStaticData, packingType));
                 }
             }
 
@@ -592,18 +651,13 @@ namespace BLL.Services
 
             part.PartNumber = await TryCreateCustomsPart(validationErrors, document, row);
 
-            if (string.IsNullOrWhiteSpace(vinsInContainer.SupplierVinNumber))
-            {
-                part.PartNumber.PartType = await _staticDataService.GetPartTypeByNameAsync(PartTypes.Parts);
-            }
-            else
-            {
-                part.PartNumber.PartType = await _staticDataService.GetPartTypeByNameAsync(PartTypes.Body);
-            }
+            part.PartNumber.PartType = string.IsNullOrWhiteSpace(vinsInContainer.SupplierVinNumber)
+                ? await staticDataService.GetPartTypeByNameAsync(PartTypes.Parts)
+                : await staticDataService.GetPartTypeByNameAsync(PartTypes.Body);
 
             if (part.PartNumber.PartType is null)
             {
-                throw new Exception($"Ошибка получения типа для детали.");
+                throw new Exception(Resources.ErrorGettingTypeForPart);
             }
 
             _customsParts.Add(part.PartNumber);
@@ -620,7 +674,7 @@ namespace BLL.Services
 
         private async Task<List<Tracing>> CreateTracing(Lot lot, ContainersInLot container)
         {
-            List<Tracing> tracing = new();
+            List<Tracing> tracing = [];
 
             if (lot.LotDepartureLocation is not null)
             {
@@ -668,13 +722,8 @@ namespace BLL.Services
                 TraceEta = lot.LotEta,
             };
 
-            Location finalLocation = await _staticDataService.GetFinalLocationAsync();
-
-            if (finalLocation is null)
-            {
-                throw new Exception($"Не найдена финальная локация при формировании трейсинга.");
-            }
-
+            DAL.Models.Location finalLocation = await staticDataService.GetFinalLocationAsync() ?? throw new Exception(Resources.FinalLocationNotFound);
+            
             trace.TraceLocation = finalLocation;
 
             tracing.Add(trace);
@@ -686,28 +735,22 @@ namespace BLL.Services
         {
             PartsInInvoice part = new()
             {
-                Invoice = lot.LotInvoice
+                Invoice = lot.LotInvoice,
+                PartNumber = (await GetAllCustomsPartsAsync()).FirstOrDefault(p => p.PartNumber == partInContainer.PartNumber.PartNumber)
             };
-
-            part.PartNumber = (await GetAllCustomsPartsAsync()).FirstOrDefault(p => p.PartNumber == partInContainer.PartNumber.PartNumber);
 
             if (part.PartNumber is null)
             {
-                throw new Exception($"Не найдена деталь по номеру '{partInContainer.PartNumber.PartNumber}'");
+                throw new Exception(string.Format(Resources.PartByNumberNotFound, partInContainer.PartNumber.PartNumber));
             }
 
-            PartPrice priceFromPrices = uploadedPartPrices.FirstOrDefault(pp => pp.PartNumber == part.PartNumber.PartNumber);
-
-            if (priceFromPrices is null)
-            {
-                throw new Exception($"Не найдена цена по номеру детали '{partInContainer.PartNumber.PartNumber}'");
-            }
-
+            PartPrice priceFromPrices = uploadedPartPrices.FirstOrDefault(pp => pp.PartNumber == part.PartNumber.PartNumber) ?? throw new Exception(string.Format(Resources.PriceByPartNumberNotFound, partInContainer.PartNumber.PartNumber));
+            
             part.Price = priceFromPrices.Price;
 
             part.Quantity = CalculateTotalQuantities(partsInContainer).TryGetValue(part.PartNumber.Id, out decimal quantity)
                 ? quantity
-                : throw new Exception($"Не найдено количество для детали с PartNumberId '{part.PartNumber.PartNumber}'");
+                : throw new Exception(string.Format(Resources.QuantityByPartNumberNotFound, partInContainer.PartNumber.PartNumber));
 
             return part;
         }
@@ -737,7 +780,7 @@ namespace BLL.Services
                     PartName = customsPart.PartNameEng
                 };
 
-                BomPart bomPart = await _bomService.GetExistingBomPart(customsPart.PartNumber) ?? await _bomService.SaveNewBomPart(newBomPart);
+                BomPart bomPart = await bomService.GetExistingBomPartByPartNumberAsync(customsPart.PartNumber) ?? await bomService.SaveNewBomPartAsync(newBomPart);
 
                 customsPart.PartNumberId = bomPart.Id;
             }
@@ -747,7 +790,7 @@ namespace BLL.Services
 
         private async Task<List<PartsInInvoice>> CreateUniquePartsInInvoiceAsync(List<PartsInContainer> partsInContainer, Lot lot, List<PartPrice> uploadedPartPrices)
         {
-            List<PartsInInvoice> partsInInvoices = new();
+            List<PartsInInvoice> partsInInvoices = [];
 
             foreach (IGrouping<int, PartsInContainer> group in partsInContainer.GroupBy(part => part.PartNumberId))
             {
@@ -767,7 +810,7 @@ namespace BLL.Services
 
         private async Task<List<Tracing>> CreateUniqueContainersTracingAsync(Lot lot, List<ContainersInLot> containers)
         {
-            List<Tracing> tracing = new();
+            List<Tracing> tracing = [];
 
             foreach (IGrouping<string, ContainersInLot> group in containers.GroupBy(container => container.ContainerNumber))
             {
@@ -789,11 +832,11 @@ namespace BLL.Services
         {
             if (step.ValidationErrors.Any(s => s.Key != nameof(VinsInContainer.SupplierVinNumber)))
             {
-                _excelService.ColorCellsInDocument(step.ValidationErrors, step.Docmapper.SheetName, step.Docmapper.NgFolder, step.Docmapper.Folder);
+                excelService.ColorCellsInDocument(step.ValidationErrors, step.Docmapper.SheetName, step.Docmapper.NgFolder, step.Docmapper.Folder);
 
                 step.ValidationErrors.Clear();
 
-                throw new Exception($"Имеются ошибки препятствующие дальнейшему продолжению, исправьте ошибки в файле '{step.Docmapper.Folder}'");
+                throw new Exception(string.Format(Resources.ErrorsInFile, step.Docmapper.Folder));
             }
         }
 
@@ -803,7 +846,7 @@ namespace BLL.Services
         {
             return await GetExistingInvoiceAsync(lot) is null
                 ? await SaveNewInvoiceAsync(lot)
-                : throw new Exception($"Документ с номером инвойса '{lot.LotInvoice.InvoiceNumber}' уже загружен.");
+                : throw new Exception(string.Format(Resources.InvoiceNumberHasBeenUploaded, lot.LotInvoice.InvoiceNumber));
         }
 
         private async Task<Lot> SaveLotAsync(Lot lot)
@@ -824,8 +867,8 @@ namespace BLL.Services
                 ControllerDetails controller = new()
                 {
                     ProgressValue = Convert.ToDouble(progress / totalProgress),
-                    Title = $"Пожалуйста подождите",
-                    Message = $"Сохранение детали в контейнер {progress} из {totalProgress}."
+                    Title = Resources.PleaseWait,
+                    Message = string.Format(Resources.SavingProgressDetailInContainer, progress, totalProgress)
                 };
 
                 DeliveryLoadProgressUpdated?.Invoke(this, controller);
@@ -865,8 +908,8 @@ namespace BLL.Services
                 ControllerDetails controller = new()
                 {
                     ProgressValue = Convert.ToDouble(progress / totalProgress),
-                    Title = $"Пожалуйста подождите",
-                    Message = $"Сохранение детали {progress} из {totalProgress}."
+                    Title = Resources.PleaseWait,
+                    Message = string.Format(Resources.SavingProgressCustomsPart, progress, totalProgress)
                 };
 
                 DeliveryLoadProgressUpdated?.Invoke(this, controller);
@@ -888,8 +931,8 @@ namespace BLL.Services
                 ControllerDetails controller = new()
                 {
                     ProgressValue = Convert.ToDouble(progress / totalProgress),
-                    Title = $"Пожалуйста подождите",
-                    Message = $"Сохранение кейса {progress} из {totalProgress}."
+                    Title = Resources.PleaseWait,
+                    Message = string.Format(Resources.SavingProgressCase, progress, totalProgress)
                 };
 
                 DeliveryLoadProgressUpdated?.Invoke(this, controller);
@@ -920,8 +963,8 @@ namespace BLL.Services
                 ControllerDetails controller = new()
                 {
                     ProgressValue = Convert.ToDouble(progress / totalProgress),
-                    Title = $"Пожалуйста подождите",
-                    Message = $"Сохранение контейнера {progress} из {totalProgress}."
+                    Title = Resources.PleaseWait,
+                    Message = string.Format(Resources.SavingProgressContainer, progress, totalProgress)
                 };
 
                 DeliveryLoadProgressUpdated?.Invoke(this, controller);
@@ -955,8 +998,8 @@ namespace BLL.Services
                 ControllerDetails controller = new()
                 {
                     ProgressValue = Convert.ToDouble(progress / totalProgress),
-                    Title = $"Пожалуйста подождите",
-                    Message = $"Сохранение вин-контейнер {progress} из {totalProgress}."
+                    Title = Resources.PleaseWait,
+                    Message = string.Format(Resources.SavingProgressVinContainer, progress, totalProgress)
                 };
 
                 DeliveryLoadProgressUpdated?.Invoke(this, controller);
@@ -965,7 +1008,7 @@ namespace BLL.Services
 
                 if (vinContainer.ModvarId == 0)
                 {
-                    throw new Exception($"Не найден релиз для кузова '{vinContainer.SupplierVinNumber}' и детали '{vinContainer.PartNumber}' проверьте корректность ввода или обратитесь в ДСС.");
+                    throw new Exception(string.Format(Resources.ReleaseNotFound, vinContainer.SupplierVinNumber, vinContainer.PartNumber));
                 }
 
                 vinContainer.Lot = lot;
@@ -988,8 +1031,8 @@ namespace BLL.Services
                 ControllerDetails controller = new()
                 {
                     ProgressValue = Convert.ToDouble(progress / totalProgress),
-                    Title = $"Пожалуйста подождите",
-                    Message = $"Сохранение таможенной очистки {progress} из {totalProgress}."
+                    Title = Resources.PleaseWait,
+                    Message = string.Format(Resources.SavingProgressCustomsClearance, progress, totalProgress)
                 };
 
                 DeliveryLoadProgressUpdated?.Invoke(this, controller);
@@ -1020,8 +1063,8 @@ namespace BLL.Services
                 ControllerDetails controller = new()
                 {
                     ProgressValue = Convert.ToDouble(progress / totalProgress),
-                    Title = $"Пожалуйста подождите",
-                    Message = $"Сохранение детали в инвойсе {progress} из {totalProgress}."
+                    Title = Resources.PleaseWait,
+                    Message = string.Format(Resources.SavingProgressPartInInvoice, progress, totalProgress)
                 };
 
                 DeliveryLoadProgressUpdated?.Invoke(this, controller);
@@ -1043,8 +1086,8 @@ namespace BLL.Services
                 ControllerDetails controller = new()
                 {
                     ProgressValue = Convert.ToDouble(progress / totalProgress),
-                    Title = $"Пожалуйста подождите",
-                    Message = $"Сохранение трейсинга {progress} из {totalProgress}."
+                    Title = Resources.PleaseWait,
+                    Message = string.Format(Resources.SavingProgressTracing, progress, totalProgress)
                 };
 
                 DeliveryLoadProgressUpdated?.Invoke(this, controller);
@@ -1058,7 +1101,7 @@ namespace BLL.Services
         #region Get Existing data
         private bool HasAccess(ProcessStep step)
         {
-            return step.Section.Id == _userService.GetCurrentUser().Section?.Id;
+            return step.Section.Id == userService.GetCurrentUser().Section?.Id;
         }
 
         private async Task<Tracing> GetExistingTraceAsync(Tracing trace)
@@ -1092,37 +1135,16 @@ namespace BLL.Services
                 return null;
             }
 
-            partInContainer.ContainerInLot = (await GetAllContainersAsync()).
-                FirstOrDefault(c => c.Id == partInContainer.ContainerInLotId);
+            partInContainer.ContainerInLot = await GetContainerByIdAsync(partInContainer.ContainerInLotId);
 
-            if (partInContainer.ContainerInLot is null)
+            if (partInContainer.CaseId is not null)
             {
-                throw new Exception($"Не обнаружен контейнер по уникальному идентификатору {partInContainer.ContainerInLotId}");
+                partInContainer.Case = await GetCaseByIdAsync((int)partInContainer.CaseId);
             }
 
-            partInContainer.Case = (await GetAllCasesAsync()).
-                FirstOrDefault(c => c.Id == partInContainer.CaseId);
+            partInContainer.PartNumber = await GetPartNumberByIdAsync(partInContainer.PartNumberId);
 
-            if (partInContainer.Case is null)
-            {
-                throw new Exception($"Не обнаружен кейс по уникальному идентификатору {partInContainer.CaseId}");
-            }
-
-            partInContainer.PartNumber = (await GetAllCustomsPartsAsync()).
-                FirstOrDefault(c => c.Id == partInContainer.PartNumberId);
-
-            if (partInContainer.PartNumber is null)
-            {
-                throw new Exception($"Не обнаружена деталь по уникальному идентификатору {partInContainer.PartNumberId}");
-            }
-
-            partInContainer.PartInvoice = (await GetAllInvoiceItemsAsync()).
-                FirstOrDefault(c => c.Id == partInContainer.PartInvoiceId);
-
-            if (partInContainer.PartInvoice is null)
-            {
-                throw new Exception($"Не обнаружен инвойс по уникальному идентификатору {partInContainer.PartInvoiceId}");
-            }
+            partInContainer.PartInvoice = await GetInvoiceByIdAsync(partInContainer.PartInvoiceId);
 
             return partInContainer;
         }
@@ -1151,22 +1173,22 @@ namespace BLL.Services
             if (existingLot is not null)
             {
                 existingLot.LotInvoice ??= await GetInvoiceByIdAsync(lot.LotInvoiceId);
-                existingLot.Carrier ??= await _staticDataService.GetCarrierByIdAsync(lot.CarrierId);
-                existingLot.DeliveryTerms ??= await _staticDataService.GetDeliveryTermByIdAsync(lot.DeliveryTermsId);
-                existingLot.LotArrivalLocation ??= await _staticDataService.GetLocationByIdAsync(lot.LotArrivalLocationId);
-                existingLot.LotDepartureLocation ??= await _staticDataService.GetLocationByIdAsync(lot.LotDepartureLocationId);
-                existingLot.LotTransportType ??= await _staticDataService.GetTransportTypeByIdAsync(lot.LotTransportTypeId);
-                existingLot.Shipper ??= await _staticDataService.GetShipperByIdAsync(lot.ShipperId);
+                existingLot.Carrier ??= await staticDataService.GetCarrierByIdAsync(lot.CarrierId);
+                existingLot.DeliveryTerms ??= await staticDataService.GetDeliveryTermByIdAsync(lot.DeliveryTermsId);
+                existingLot.LotArrivalLocation ??= await staticDataService.GetLocationByIdAsync(lot.LotArrivalLocationId);
+                existingLot.LotDepartureLocation ??= await staticDataService.GetLocationByIdAsync(lot.LotDepartureLocationId);
+                existingLot.LotTransportType ??= await staticDataService.GetTransportTypeByIdAsync(lot.LotTransportTypeId);
+                existingLot.Shipper ??= await staticDataService.GetShipperByIdAsync(lot.ShipperId);
                 existingLot.LotPurchaseOrder ??= await GetPurchaseOrderByIdAsync(lot.LotPurchaseOrderId);
 
                 if (lot.LotTransportId is not null)
                 {
-                    existingLot.LotTransport = await _staticDataService.GetTransportByIdAsync((int)lot.LotTransportId);
+                    existingLot.LotTransport = await staticDataService.GetTransportByIdAsync((int)lot.LotTransportId);
                 }
 
                 if (lot.LotCustomsLocationId is not null)
                 {
-                    existingLot.LotCustomsLocation = await _staticDataService.GetLocationByIdAsync((int)lot.LotCustomsLocationId);
+                    existingLot.LotCustomsLocation = await staticDataService.GetLocationByIdAsync((int)lot.LotCustomsLocationId);
                 }
 
                 return existingLot;
@@ -1203,7 +1225,7 @@ namespace BLL.Services
 
         private static object GraftLotNumber(Lot lot, Docmapper document)
         {
-            if (lot.LotNumber == "-" || string.IsNullOrWhiteSpace(lot.LotNumber))
+            if (lot.LotNumber == Resources.LotNumberEmptySymbol || string.IsNullOrWhiteSpace(lot.LotNumber))
             {
                 object result = document.GetValue(typeof(Invoice), nameof(Invoice.InvoiceNumber));
 
@@ -1221,128 +1243,179 @@ namespace BLL.Services
 
         private async Task<Tracing> SaveNewTraceAsync(Tracing newTrace)
         {
-            CreateTraceParameters parameters = new(newTrace);
-
             try
             {
-                return await _tracingRepository.CreateAsync(newTrace, StoredProcedureInbound.AddNewTrace, parameters);
+                CreateTraceParameters parameters = new(newTrace);
+
+                logger.LogInformation($"{Resources.LogTracingAdd}: '{JsonConvert.SerializeObject(newTrace)}'");
+
+                Tracing tracing = await tracingRepository.CreateAsync(newTrace, StoredProcedureInbound.AddNewTrace, parameters);
+
+                logger.LogInformation($"{Resources.LogTracingAdd} {Resources.Completed}");
+
+                return tracing;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error add new trace {JsonConvert.SerializeObject(newTrace)}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogTracingAdd}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка добавления трейсинга в базу данных.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
         private async Task<PartsInInvoice> SaveNewPartInInvoiceAsync(PartsInInvoice newPart)
         {
-            CreatePartInInvoiceParameters parameters = new(newPart);
-
             try
             {
-                return await _partInInvoiceRepository.CreateAsync(newPart, StoredProcedureInbound.AddNewPartInInvoice, parameters);
+                CreatePartInInvoiceParameters parameters = new(newPart);
+
+                logger.LogInformation($"{Resources.LogPartsInInvoiceAdd}: '{JsonConvert.SerializeObject(newPart)}'");
+
+                PartsInInvoice partInInvoice = await partInInvoiceRepository.CreateAsync(newPart, StoredProcedureInbound.AddNewPartInInvoice, parameters);
+
+                logger.LogInformation($"{Resources.LogPartsInInvoiceAdd} {Resources.Completed}");
+
+                return partInInvoice;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error add new part in invoice {JsonConvert.SerializeObject(newPart)}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogPartsInInvoiceAdd}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка добавления детали в инвойсе в базу данных.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
         private async Task<PartsInContainer> SaveNewPartInContainer(PartsInContainer newPart)
         {
-            CreatePartInContainerParameters parameters = new(newPart);
-
             try
             {
-                return await _partInContainerRepository.CreateAsync(newPart, StoredProcedureInbound.AddNewPartInContainer, parameters);
+                CreatePartInContainerParameters parameters = new(newPart);
+
+                logger.LogInformation($"{Resources.LogPartsInContainerAdd}: '{JsonConvert.SerializeObject(newPart)}'");
+
+                PartsInContainer partInContainer = await partInContainerRepository.CreateAsync(newPart, StoredProcedureInbound.AddNewPartInContainer, parameters);
+
+                logger.LogInformation($"{Resources.LogPartsInContainerAdd} {Resources.Completed}");
+
+                return partInContainer;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error add new part in container {JsonConvert.SerializeObject(newPart)}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogPartsInContainerAdd}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка добавления детали в контейнере в базу данных.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
         private async Task<CustomsClearance> SaveNewCustomsClearance(CustomsClearance newCustomsClearance)
         {
-
-            CreateCustomsClearanceParameters parameters = new(newCustomsClearance);
-
             try
             {
-                return await _customsClearanceRepository.CreateAsync(newCustomsClearance, StoredProcedureCustoms.AddNewCustomsClearance, parameters);
+                CreateCustomsClearanceParameters parameters = new(newCustomsClearance);
+
+                logger.LogInformation($"{Resources.LogCustomsClearanceAdd}: '{JsonConvert.SerializeObject(newCustomsClearance)}'");
+
+                CustomsClearance customsClearance = await customsClearanceRepository.CreateAsync(newCustomsClearance, StoredProcedureCustoms.AddNewCustomsClearance, parameters);
+
+                logger.LogInformation($"{Resources.LogCustomsClearanceAdd} {Resources.Completed}");
+
+                return customsClearance;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error add new customs clearance {JsonConvert.SerializeObject(newCustomsClearance)}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogCustomsClearanceAdd}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка добавления таможенной процедуры в базу данных.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
         private async Task<VinsInContainer> SaveNewVinContainer(VinsInContainer newVinContainer)
         {
-            CreateVinContainerParameters parameters = new(newVinContainer);
-
             try
             {
-                return await _vinContainerRepository.CreateAsync(newVinContainer, StoredProcedurePlanning.AddNewVinContainer, parameters);
+                CreateVinContainerParameters parameters = new(newVinContainer);
+
+                logger.LogInformation($"{Resources.LogVinsInContainerAdd}: '{JsonConvert.SerializeObject(newVinContainer)}'");
+
+                VinsInContainer vinInContainer = await vinContainerRepository.CreateAsync(newVinContainer, StoredProcedurePlanning.AddNewVinContainer, parameters);
+
+                logger.LogInformation($"{Resources.LogVinsInContainerAdd} {Resources.Completed}");
+
+                return vinInContainer;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error add new vin container {JsonConvert.SerializeObject(newVinContainer)}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogVinsInContainerAdd}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка добавления вин-контейнер в базу данных.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
         private async Task<Invoice> SaveNewInvoiceAsync(Lot lot)
         {
-            CreateInvoiceParameters parameters = new(lot.LotInvoice);
-
             try
             {
-                return await _invoiceRepository.CreateAsync(lot.LotInvoice, StoredProcedureInbound.AddNewInvoice, parameters);
+                CreateInvoiceParameters parameters = new(lot.LotInvoice);
+
+                logger.LogInformation($"{Resources.LogInvoiceAdd}: '{JsonConvert.SerializeObject(lot.LotInvoice)}'");
+
+                Invoice invoice = await invoiceRepository.CreateAsync(lot.LotInvoice, StoredProcedureInbound.AddNewInvoice, parameters);
+
+                logger.LogInformation($"{Resources.LogInvoiceAdd} {Resources.Completed}");
+
+                return invoice;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error add new invoice {JsonConvert.SerializeObject(lot.LotInvoice)}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogInvoiceAdd}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка добавления инвойса в базу данных.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
         private async Task<Lot> SaveNewLotAsync(Lot newLot)
         {
-            CreateLotParameters parameters = new(newLot);
-
             try
             {
-                Lot lot = await _lotRepository.CreateAsync(newLot, StoredProcedureInbound.AddNewLot, parameters);
+                CreateLotParameters parameters = new(newLot);
+
+                logger.LogInformation($"{Resources.LogLotAdd}: '{JsonConvert.SerializeObject(newLot)}'");
+
+                Lot lot = await lotRepository.CreateAsync(newLot, StoredProcedureInbound.AddNewLot, parameters);
+
+                logger.LogInformation($"{Resources.LogLotAdd} {Resources.Completed}");
 
                 if (lot is not null)
                 {
                     lot.LotInvoice ??= await GetInvoiceByIdAsync(lot.LotInvoiceId);
-                    lot.Carrier ??= await _staticDataService.GetCarrierByIdAsync(lot.CarrierId);
-                    lot.DeliveryTerms ??= await _staticDataService.GetDeliveryTermByIdAsync(lot.DeliveryTermsId);
-                    lot.LotArrivalLocation ??= await _staticDataService.GetLocationByIdAsync(lot.LotArrivalLocationId);
-                    lot.LotDepartureLocation ??= await _staticDataService.GetLocationByIdAsync(lot.LotDepartureLocationId);
-                    lot.LotTransportType ??= await _staticDataService.GetTransportTypeByIdAsync(lot.LotTransportTypeId);
-                    lot.Shipper ??= await _staticDataService.GetShipperByIdAsync(lot.ShipperId);
+                    lot.Carrier ??= await staticDataService.GetCarrierByIdAsync(lot.CarrierId);
+                    lot.DeliveryTerms ??= await staticDataService.GetDeliveryTermByIdAsync(lot.DeliveryTermsId);
+                    lot.LotArrivalLocation ??= await staticDataService.GetLocationByIdAsync(lot.LotArrivalLocationId);
+                    lot.LotDepartureLocation ??= await staticDataService.GetLocationByIdAsync(lot.LotDepartureLocationId);
+                    lot.LotTransportType ??= await staticDataService.GetTransportTypeByIdAsync(lot.LotTransportTypeId);
+                    lot.Shipper ??= await staticDataService.GetShipperByIdAsync(lot.ShipperId);
                     lot.LotPurchaseOrder ??= await GetPurchaseOrderByIdAsync(lot.LotPurchaseOrderId);
 
                     if (lot.LotTransportId is not null)
                     {
-                        lot.LotTransport = await _staticDataService.GetTransportByIdAsync((int)lot.LotTransportId);
+                        lot.LotTransport = await staticDataService.GetTransportByIdAsync((int)lot.LotTransportId);
                     }
 
                     if (lot.LotCustomsLocationId is not null)
                     {
-                        lot.LotCustomsLocation = await _staticDataService.GetLocationByIdAsync((int)lot.LotCustomsLocationId);
+                        lot.LotCustomsLocation = await staticDataService.GetLocationByIdAsync((int)lot.LotCustomsLocationId);
                     }
 
                     return lot;
@@ -1352,57 +1425,83 @@ namespace BLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error add new lot {JsonConvert.SerializeObject(newLot)}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogLotAdd}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка добавления лота в базу данных.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
         private async Task<CustomsPart> SaveNewCustomsPart(CustomsPart newCustomsPart)
         {
-            CreateCustomsPartParameters parameters = new(newCustomsPart);
-
             try
             {
-                return await _customsPartRepository.CreateAsync(newCustomsPart, StoredProcedureCustoms.AddNewCustomsPart, parameters);
+                CreateCustomsPartParameters parameters = new(newCustomsPart);
+
+                logger.LogInformation($"{Resources.LogCustomsPartAdd}: '{JsonConvert.SerializeObject(newCustomsPart)}'");
+
+                CustomsPart customsPart = await customsPartRepository.CreateAsync(newCustomsPart, StoredProcedureCustoms.AddNewCustomsPart, parameters);
+
+                logger.LogInformation($"{Resources.LogCustomsPartAdd} {Resources.Completed}");
+
+                return customsPart;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error add new customs part {JsonConvert.SerializeObject(newCustomsPart)}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogCustomsPartAdd}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка добавления детали в базу данных.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
         private async Task<Case> SaveNewCase(Case newCase)
         {
-            CreateCaseParameters parameters = new(newCase);
-
             try
             {
-                return await _caseRepository.CreateAsync(newCase, StoredProcedureInbound.AddNewCase, parameters);
+                CreateCaseParameters parameters = new(newCase);
+
+                logger.LogInformation($"{Resources.LogCaseAdd}: '{JsonConvert.SerializeObject(newCase)}'");
+
+                Case caseItem = await caseRepository.CreateAsync(newCase, StoredProcedureInbound.AddNewCase, parameters);
+
+                logger.LogInformation($"{Resources.LogCaseAdd} {Resources.Completed}");
+
+                return caseItem;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error add new case {JsonConvert.SerializeObject(newCase)}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogCaseAdd}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка добавления кейса в базу данных.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
         private async Task<ContainersInLot> SaveNewContainerAsync(ContainersInLot newContainer)
         {
-            CreateContainerParameters parameters = new(newContainer);
-
             try
             {
-                return await _containerRepository.CreateAsync(newContainer, StoredProcedureInbound.AddNewContainer, parameters);
+                CreateContainerParameters parameters = new(newContainer);
+
+                logger.LogInformation($"{Resources.LogContainersInLotAdd}: '{JsonConvert.SerializeObject(newContainer)}'");
+
+                ContainersInLot containerInLot = await containerRepository.CreateAsync(newContainer, StoredProcedureInbound.AddNewContainer, parameters);
+
+                logger.LogInformation($"{Resources.LogContainersInLotAdd} {Resources.Completed}");
+
+                return containerInLot;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error add new container {JsonConvert.SerializeObject(newContainer)}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogContainersInLotAdd}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка добавления контейнера в базу данных.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -1423,16 +1522,22 @@ namespace BLL.Services
 
             try
             {
-                lot = await _lotRepository.GetByIdAsync(lotId);
+                logger.LogTrace($"{string.Format(Resources.LogLotGetById, lotId)}");
+
+                lot = await lotRepository.GetByIdAsync(lotId);
+
+                logger.LogTrace($"{string.Format(Resources.LogLotGetById, lotId)} {Resources.Completed}");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get lot by id {lotId}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogLotGetById, lotId)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения лота по уникальному идентификатору '{lotId}'");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
 
-            carrier = await _staticDataService.GetCarrierByIdAsync(lot.CarrierId);
+            carrier = await staticDataService.GetCarrierByIdAsync(lot.CarrierId);
 
             lot.Carrier = carrier;
 
@@ -1440,7 +1545,7 @@ namespace BLL.Services
 
             lot.LotPurchaseOrder = order;
 
-            orderType = await _staticDataService.GetPurchaseOrderTypeById(lot.LotPurchaseOrder.OrderTypeId);
+            orderType = await staticDataService.GetPurchaseOrderTypeById(lot.LotPurchaseOrder.OrderTypeId);
 
             lot.LotPurchaseOrder.OrderType = orderType;
 
@@ -1448,48 +1553,48 @@ namespace BLL.Services
 
             lot.LotInvoice = invoice;
 
-            shipper = await _staticDataService.GetShipperByIdAsync(lot.LotInvoice.ShipperId);
+            shipper = await staticDataService.GetShipperByIdAsync(lot.LotInvoice.ShipperId);
 
             lot.Shipper = shipper;
             lot.LotPurchaseOrder.Shipper = shipper;
             invoice.Shipper = shipper;
             invoice.PurchaseOrder = order;
 
-            termsOfDelivery = await _staticDataService.GetDeliveryTermByIdAsync(lot.DeliveryTermsId);
+            termsOfDelivery = await staticDataService.GetDeliveryTermByIdAsync(lot.DeliveryTermsId);
 
             lot.DeliveryTerms = termsOfDelivery;
 
-            lot.LotArrivalLocation = await _staticDataService.GetLocationByIdAsync(lot.LotArrivalLocationId);
+            lot.LotArrivalLocation = await staticDataService.GetLocationByIdAsync(lot.LotArrivalLocationId);
 
             if (lot.LotArrivalLocation is not null)
             {
-                lot.LotArrivalLocation.LocationType = await _staticDataService.GetLocationTypeByIdAsync(lot.LotArrivalLocation.LocationTypeId);
+                lot.LotArrivalLocation.LocationType = await staticDataService.GetLocationTypeByIdAsync(lot.LotArrivalLocation.LocationTypeId);
             }
 
             if (lot.LotCustomsLocationId is not null)
             {
-                lot.LotCustomsLocation = await _staticDataService.GetLocationByIdAsync((int)lot.LotCustomsLocationId);
+                lot.LotCustomsLocation = await staticDataService.GetLocationByIdAsync((int)lot.LotCustomsLocationId);
 
                 if (lot.LotCustomsLocation is not null)
                 {
-                    lot.LotCustomsLocation.LocationType = await _staticDataService.GetLocationTypeByIdAsync(lot.LotCustomsLocation.LocationTypeId);
+                    lot.LotCustomsLocation.LocationType = await staticDataService.GetLocationTypeByIdAsync(lot.LotCustomsLocation.LocationTypeId);
                 }
             }
 
-            lot.LotDepartureLocation = await _staticDataService.GetLocationByIdAsync(lot.LotDepartureLocationId);
+            lot.LotDepartureLocation = await staticDataService.GetLocationByIdAsync(lot.LotDepartureLocationId);
 
             if (lot.LotDepartureLocation is not null)
             {
-                lot.LotDepartureLocation.LocationType = await _staticDataService.GetLocationTypeByIdAsync(lot.LotDepartureLocation.LocationTypeId);
+                lot.LotDepartureLocation.LocationType = await staticDataService.GetLocationTypeByIdAsync(lot.LotDepartureLocation.LocationTypeId);
             }
 
             if (lot.LotTransportId is not null)
             {
-                lot.LotTransport = await _staticDataService.GetTransportByIdAsync((int)lot.LotTransportId);
+                lot.LotTransport = await staticDataService.GetTransportByIdAsync((int)lot.LotTransportId);
 
                 if (lot.LotTransport is not null)
                 {
-                    lot.LotTransportType = await _staticDataService.GetTransportTypeByIdAsync(lot.LotTransportTypeId);
+                    lot.LotTransportType = await staticDataService.GetTransportTypeByIdAsync(lot.LotTransportTypeId);
                 }
             }
 
@@ -1501,21 +1606,27 @@ namespace BLL.Services
         {
             try
             {
+                logger.LogTrace($"{string.Format(Resources.LogContainersInLotGetByLotId, lotId)}");
+
                 IEnumerable<ContainersInLot> containers = (await GetAllContainersAsync())
                     .Where(c => c.LotId == lotId);
 
+                logger.LogTrace($"{string.Format(Resources.LogContainersInLotGetByLotId, lotId)} {Resources.Completed}");
+
                 foreach (ContainersInLot container in containers)
                 {
-                    container.ContainerType = await _staticDataService.GetContainerTypeById(container.ContainerTypeId);
+                    container.ContainerType = await staticDataService.GetContainerTypeByIdAsync(container.ContainerTypeId);
                 }
 
                 return containers.ToList();
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get list containers by lot id {lotId}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogContainersInLotGetByLotId, lotId)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения контейнеров для лота.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -1524,32 +1635,46 @@ namespace BLL.Services
         {
             try
             {
-                return await _purchaseOrderRepository.GetAllAsync();
+                logger.LogTrace(Resources.LogPurchaseOrderGet);
+
+                IEnumerable<PurchaseOrder> purchaseOrders = await purchaseOrderRepository.GetAllAsync();
+
+                logger.LogInformation($"{Resources.LogPurchaseOrderGet} {Resources.Completed}");
+
+                return purchaseOrders;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get list purchase orders: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogPurchaseOrderGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения заказов.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
         /// <inheritdoc />
         public async Task<List<PartsInContainer>> GetPartsForContainerAsync(int containerId)
         {
-            List<PartsInContainer> parts = new();
+            List<PartsInContainer> parts = [];
 
             try
             {
+                logger.LogTrace($"{string.Format(Resources.LogPartsInContainerGetByContainerId, containerId)}");
+
                 parts = (await GetAllPartsInContainer())
                     .Where(c => c.ContainerInLotId == containerId)
                     .ToList();
+
+                logger.LogTrace($"{string.Format(Resources.LogPartsInContainerGetByContainerId, containerId)} {Resources.Completed}");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get list parts by container id {containerId}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogPartsInContainerGetByContainerId, containerId)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения деталей для контейнера.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
 
             foreach (PartsInContainer part in parts)
@@ -1565,7 +1690,7 @@ namespace BLL.Services
 
                 if (part.PartNumber is not null)
                 {
-                    part.PartNumber.PartType = await _staticDataService.GetPartTypeByIdAsync((int)part.PartNumber.PartTypeId);
+                    part.PartNumber.PartType = await staticDataService.GetPartTypeByIdAsync((int)part.PartNumber.PartTypeId);
                 }
             }
 
@@ -1575,33 +1700,33 @@ namespace BLL.Services
         /// <inheritdoc />
         public async Task<int> GetquantityContainersForLotId(int lotId)
         {
-            _logger.LogInformation($"Start getting quantity containers for lot with uniq id '{lotId}'");
-
-            List<ContainersInLot> containers = await GetAllContainersByLotIdAsync(lotId);
-
-            _logger.LogInformation($"Getting quantity containers for lot with uniq id '{lotId}' completed with result: '{containers.Count}'");
-
-            return containers.Count;
+            return (await GetAllContainersByLotIdAsync(lotId)).Count;
         }
 
         private async Task<CustomsPart> GetPartNumberByIdAsync(int partNumberId)
         {
             try
             {
-                CustomsPart part = await _customsPartRepository.GetByIdAsync(partNumberId);
+                logger.LogTrace($"{string.Format(Resources.LogCustomsPartGetById, partNumberId)}");
+
+                CustomsPart part = await customsPartRepository.GetByIdAsync(partNumberId);
+
+                logger.LogTrace($"{string.Format(Resources.LogCustomsPartGetById, partNumberId)} {Resources.Completed}");
 
                 if (part is not null)
                 {
-                    part.PartType = await _staticDataService.GetPartTypeByIdAsync(part.PartTypeId);
+                    part.PartType = await staticDataService.GetPartTypeByIdAsync(part.PartTypeId);
                 }
 
                 return part;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get customs part by id {partNumberId}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogCustomsPartGetById, partNumberId)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения таможенного обозначения детали по уникальному идентификатору '{partNumberId}'.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -1611,57 +1736,55 @@ namespace BLL.Services
 
             try
             {
-                caseItem = await _caseRepository.GetByIdAsync(caseId);
+                logger.LogTrace($"{string.Format(Resources.LogCaseGetById, caseId)}");
+
+                caseItem = await caseRepository.GetByIdAsync(caseId);
+
+                logger.LogTrace($"{string.Format(Resources.LogCaseGetById, caseId)} {Resources.Completed}");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get case by id {caseId}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogCaseGetById, caseId)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения кейса по уникальному идентификатору '{caseId}'.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
 
             if (caseItem.PackingTypeId is not null)
             {
-                caseItem.PackingType = await _staticDataService.GetPackingTypeByIdAsync((int)caseItem.PackingTypeId);
+                caseItem.PackingType = await staticDataService.GetPackingTypeByIdAsync((int)caseItem.PackingTypeId);
             }
 
             return caseItem;
         }
 
-        public async Task<PurchaseOrder> GetPurchaseOrderById(int lotPurchaseOrderId)
+        public async Task<PurchaseOrder> GetPurchaseOrderByIdAsync(int lotPurchaseOrderId)
         {
             try
             {
-                PurchaseOrder purchaseOrder = await _purchaseOrderRepository.GetByIdAsync(lotPurchaseOrderId);
+                logger.LogTrace($"{string.Format(Resources.LogPurchaseOrderGetById, lotPurchaseOrderId)}");
+
+                PurchaseOrder purchaseOrder = await purchaseOrderRepository.GetByIdAsync(lotPurchaseOrderId);
+
+                logger.LogTrace($"{string.Format(Resources.LogPurchaseOrderGetById, lotPurchaseOrderId)} {Resources.Completed}");
 
                 if (purchaseOrder is not null)
                 {
-                    purchaseOrder.Shipper = await _staticDataService.GetShipperByIdAsync(purchaseOrder.ShipperId);
+                    purchaseOrder.Shipper = await staticDataService.GetShipperByIdAsync(purchaseOrder.ShipperId);
 
-                    purchaseOrder.OrderType = await _staticDataService.GetPurchaseOrderTypeById(purchaseOrder.OrderTypeId);
+                    purchaseOrder.OrderType = await staticDataService.GetPurchaseOrderTypeById(purchaseOrder.OrderTypeId);
                 }
 
                 return purchaseOrder;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get order by id {lotPurchaseOrderId}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogPurchaseOrderGetById, lotPurchaseOrderId)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения заказа по уникальному идентификатору '{lotPurchaseOrderId}'");
-            }
-        }
+                logger.LogError(message);
 
-        private async Task<CustomsPart> GetPartByPartNumber(string partNumber)
-        {
-            try
-            {
-                return (await GetAllCustomsPartsAsync()).FirstOrDefault(p => p.PartNumber == partNumber);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error get customs part by part number '{partNumber}': {JsonConvert.SerializeObject(ex)}");
-
-                throw new Exception($"Ошибка получения таможенной детали по номеру детали '{partNumber}'.");
+                throw new Exception(message);
             }
         }
 
@@ -1671,27 +1794,26 @@ namespace BLL.Services
 
             try
             {
-                tracing = await _tracingRepository.GetAllAsync();
+                logger.LogTrace($"{Resources.LogTracingGet}");
+
+                tracing = await tracingRepository.GetAllAsync();
+
+                logger.LogTrace($"{Resources.LogTracingGet} {Resources.Completed}");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get list tracing: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogTracingGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения трейсинга.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
 
-            try
+            foreach (Tracing item in tracing)
             {
-                foreach (Tracing item in tracing)
-                {
-                    item.ContainerInLot = await GetContainerByIdAsync(item.ContainerInLotId);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error get list tracing: {JsonConvert.SerializeObject(ex)}");
+                item.ContainerInLot = await GetContainerByIdAsync(item.ContainerInLotId);
 
-                throw new Exception($"Ошибка получения трейсинга.");
+                item.TraceLocation = await staticDataService.GetLocationByIdAsync(item.TraceLocationId);
             }
 
             return tracing?.ToList();
@@ -1701,27 +1823,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _containerRepository.GetByIdAsync(containerInLotId);
+                logger.LogTrace($"{string.Format(Resources.LogContainersInLotGetById, containerInLotId)}");
+
+                ContainersInLot containerInLot = await containerRepository.GetByIdAsync(containerInLotId);
+
+                logger.LogTrace($"{string.Format(Resources.LogContainersInLotGetById, containerInLotId)} {Resources.Completed}");
+
+                return containerInLot;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get container by id '{containerInLotId}': {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogContainersInLotGetById, containerInLotId)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения контейнера по уникальному идентификатору '{containerInLotId}'.");
-            }
-        }
+                logger.LogError(message);
 
-        private async Task<PurchaseOrder> GetPurchaseOrderByIdAsync(int purchaseOrderId)
-        {
-            try
-            {
-                return await _purchaseOrderRepository.GetByIdAsync(purchaseOrderId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error get purchase order by id '{purchaseOrderId}': {JsonConvert.SerializeObject(ex)}");
-
-                throw new Exception($"Ошибка получения заказа по уникальному идентификатору '{purchaseOrderId}'.");
+                throw new Exception(message);
             }
         }
 
@@ -1729,15 +1845,19 @@ namespace BLL.Services
         {
             try
             {
-                Invoice invoice = await _invoiceRepository.GetByIdAsync(invoiceId);
+                logger.LogTrace($"{string.Format(Resources.LogInvoiceGetById, invoiceId)}");
+
+                Invoice invoice = await invoiceRepository.GetByIdAsync(invoiceId);
+
+                logger.LogTrace($"{string.Format(Resources.LogInvoiceGetById, invoiceId)} {Resources.Completed}");
 
                 if (invoice is not null)
                 {
-                    invoice.Shipper = await _staticDataService.GetShipperByIdAsync(invoice.ShipperId);
+                    invoice.Shipper = await staticDataService.GetShipperByIdAsync(invoice.ShipperId);
 
                     if (invoice.PurchaseOrderId is not null)
                     {
-                        invoice.PurchaseOrder = await GetPurchaseOrderById((int)invoice.PurchaseOrderId);
+                        invoice.PurchaseOrder = await GetPurchaseOrderByIdAsync((int)invoice.PurchaseOrderId);
                     }
                 }
 
@@ -1745,9 +1865,11 @@ namespace BLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get invoice by id {invoiceId}: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogInvoiceGetById, invoiceId)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения инвойса по уникальному идентификатору '{invoiceId}'.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -1755,7 +1877,11 @@ namespace BLL.Services
         {
             try
             {
-                IEnumerable<PartsInContainer> parts = await _partInContainerRepository.GetAllAsync();
+                logger.LogTrace($"{Resources.LogPartsInContainerGet}");
+
+                IEnumerable<PartsInContainer> parts = await partInContainerRepository.GetAllAsync();
+
+                logger.LogTrace($"{Resources.LogPartsInContainerGet} {Resources.Completed}");
 
                 if (parts is not null)
                 {
@@ -1769,9 +1895,11 @@ namespace BLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get list parts in container: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogPartsInContainerGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения деталей в контейнере.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -1779,13 +1907,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _partInInvoiceRepository.GetAllAsync();
+                logger.LogTrace($"{Resources.LogPartsInInvoiceGet}");
+
+                IEnumerable<PartsInInvoice> partsInInvoice = await partInInvoiceRepository.GetAllAsync();
+
+                logger.LogTrace($"{Resources.LogPartsInInvoiceGet} {Resources.Completed}");
+
+                return partsInInvoice;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get list parts in invoice: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogPartsInInvoiceGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения деталей в лоте.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -1793,13 +1929,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _customsClearanceRepository.GetAllAsync();
+                logger.LogTrace($"{Resources.LogCustomsClearanceGet}");
+
+                IEnumerable<CustomsClearance> customsClearances = await customsClearanceRepository.GetAllAsync();
+
+                logger.LogTrace($"{Resources.LogCustomsClearanceGet} {Resources.Completed}");
+
+                return customsClearances;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get all customs clearance items list: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogCustomsClearanceGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения списка таможенных процедур.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -1807,13 +1951,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _invoiceRepository.GetAllAsync();
+                logger.LogTrace($"{Resources.LogInvoiceGet}");
+
+                IEnumerable<Invoice> invoices = await invoiceRepository.GetAllAsync();
+
+                logger.LogTrace($"{Resources.LogInvoiceGet} {Resources.Completed}");
+
+                return invoices;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get all invoice items list: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogInvoiceGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения списка инвойсов.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -1821,13 +1973,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _vinContainerRepository.GetAllAsync();
+                logger.LogTrace($"{Resources.LogVinsInContainerGet}");
+
+                IEnumerable<VinsInContainer> vinsInContainers = await vinContainerRepository.GetAllAsync();
+
+                logger.LogTrace($"{Resources.LogVinsInContainerGet} {Resources.Completed}");
+
+                return vinsInContainers;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get all vin containers list: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogVinsInContainerGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения списка вин-контейнер.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -1835,13 +1995,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _bodyModelVariantRepository.GetAllAsync(beforeRefresh);
+                logger.LogTrace($"{Resources.LogBodyModelVariantGet}");
+
+                IEnumerable<BodyModelVariant> bodyModelVariants = await bodyModelVariantRepository.GetAllAsync(beforeRefresh);
+
+                logger.LogTrace($"{Resources.LogBodyModelVariantGet} {Resources.Completed}");
+
+                return bodyModelVariants;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get all model variants list: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogBodyModelVariantGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения списка вариантов моделей.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -1849,13 +2017,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _caseRepository.GetAllAsync();
+                logger.LogTrace($"{Resources.LogCaseGet}");
+
+                IEnumerable<Case> cases = await caseRepository.GetAllAsync();
+
+                logger.LogTrace($"{Resources.LogCaseGet} {Resources.Completed}");
+
+                return cases;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get cases list: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogCaseGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения списка кейсов.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -1864,34 +2040,38 @@ namespace BLL.Services
             IEnumerable<Lot> lots;
             try
             {
-                lots = await _lotRepository.GetAllAsync();
+                logger.LogTrace($"{Resources.LogLotGet}");
+
+                lots = await lotRepository.GetAllAsync();
+
+                logger.LogTrace($"{Resources.LogLotGet} {Resources.Completed}");
 
                 foreach (Lot lot in lots)
                 {
-                    lot.Carrier = await _staticDataService.GetCarrierByIdAsync(lot.CarrierId);
+                    lot.Carrier = await staticDataService.GetCarrierByIdAsync(lot.CarrierId);
 
-                    lot.DeliveryTerms = await _staticDataService.GetDeliveryTermByIdAsync(lot.DeliveryTermsId);
+                    lot.DeliveryTerms = await staticDataService.GetDeliveryTermByIdAsync(lot.DeliveryTermsId);
 
-                    lot.LotArrivalLocation = await _staticDataService.GetLocationByIdAsync(lot.LotArrivalLocationId);
+                    lot.LotArrivalLocation = await staticDataService.GetLocationByIdAsync(lot.LotArrivalLocationId);
 
-                    lot.LotDepartureLocation = await _staticDataService.GetLocationByIdAsync(lot.LotDepartureLocationId);
+                    lot.LotDepartureLocation = await staticDataService.GetLocationByIdAsync(lot.LotDepartureLocationId);
 
                     lot.LotInvoice = await GetInvoiceByIdAsync(lot.LotInvoiceId);
 
-                    lot.LotPurchaseOrder = await GetPurchaseOrderById(lot.LotPurchaseOrderId);
+                    lot.LotPurchaseOrder = await GetPurchaseOrderByIdAsync(lot.LotPurchaseOrderId);
 
-                    lot.LotTransportType = await _staticDataService.GetTransportTypeByIdAsync(lot.LotTransportTypeId);
+                    lot.LotTransportType = await staticDataService.GetTransportTypeByIdAsync(lot.LotTransportTypeId);
 
-                    lot.Shipper = await _staticDataService.GetShipperByIdAsync(lot.ShipperId);
+                    lot.Shipper = await staticDataService.GetShipperByIdAsync(lot.ShipperId);
 
                     if (lot.LotTransportId is not null)
                     {
-                        lot.LotTransport = await _staticDataService.GetTransportByIdAsync((int)lot.LotTransportId);
+                        lot.LotTransport = await staticDataService.GetTransportByIdAsync((int)lot.LotTransportId);
                     }
 
                     if (lot.LotCustomsLocationId is not null)
                     {
-                        lot.LotCustomsLocation = await _staticDataService.GetLocationByIdAsync((int)lot.LotCustomsLocationId);
+                        lot.LotCustomsLocation = await staticDataService.GetLocationByIdAsync((int)lot.LotCustomsLocationId);
                     }
                 }
 
@@ -1899,9 +2079,11 @@ namespace BLL.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get all lot items list: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogLotGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения списка лотов.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -1909,13 +2091,21 @@ namespace BLL.Services
         {
             try
             {
-                return await _customsPartRepository.GetAllAsync();
+                logger.LogTrace($"{Resources.LogCustomsPartGet}");
+
+                IEnumerable<CustomsPart> customsParts = await customsPartRepository.GetAllAsync();
+
+                logger.LogTrace($"{Resources.LogCustomsPartGet} {Resources.Completed}");
+
+                return customsParts;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get all customs part items list: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogCustomsPartGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения списка деталей.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
@@ -1923,81 +2113,71 @@ namespace BLL.Services
         {
             try
             {
-                return await _containerRepository.GetAllAsync();
+                logger.LogTrace($"{Resources.LogContainersInLotGet}");
+
+                IEnumerable<ContainersInLot> containers = await containerRepository.GetAllAsync();
+
+                logger.LogTrace($"{Resources.LogContainersInLotGet} {Resources.Completed}");
+
+                foreach (ContainersInLot container in containers)
+                {
+                    container.Lot = await GetLotByIdAsync(container.LotId);
+                }
+
+                return containers;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get all container items list: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {Resources.LogContainersInLotGet}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения списка контейнеров.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
 
         public async Task<List<ProcessStep>> GetProcessStepsByUserSectionAsync(AppProcess appProcess)
         {
-            try
-            {
-                return (await _processService.GetProcessStepsByUserSectionAsync(appProcess)).ToList();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error get operation for process '{appProcess}' from database: {JsonConvert.SerializeObject(ex)}");
-
-                throw new Exception($"Ошибка получения операций для процесса.");
-            }
+             return [.. (await processService.GetProcessStepsByUserSectionAsync(appProcess)).OrderBy(s => s.Step)];
         }
 
         private async Task<ContainersInLot> GetContainerInOpenLot(string containerNumber)
         {
             try
             {
+                logger.LogTrace($"{string.Format(Resources.LogContainersInLotByOpenLot, containerNumber)}");
+
                 IEnumerable<Lot> cachedLots = await GetAllLotsAsync();
 
-                return (await GetAllContainersAsync())
+                ContainersInLot container = (await GetAllContainersAsync())
                     .FirstOrDefault(c => c.ContainerNumber == containerNumber &&
                     cachedLots.Any(lot => lot.CloseDate == null && lot.Id == c.LotId));
+
+                logger.LogTrace($"{string.Format(Resources.LogContainersInLotByOpenLot, containerNumber)} {Resources.Completed}");
+
+                return container;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error get container '{containerNumber}' in open lot: {JsonConvert.SerializeObject(ex)}");
+                string message = $"{Resources.Error} {string.Format(Resources.LogContainersInLotByOpenLot, containerNumber)}: {JsonConvert.SerializeObject(ex)}";
 
-                throw new Exception($"Ошибка получения контейнера в открытых лотах.");
+                logger.LogError(message);
+
+                throw new Exception(message);
             }
         }
         #endregion
 
         #region Rollback
 
-        //Lot-Invoice---?-Container-tracing-parts-CustomsClerance-vinContainer-Plannedsequence
-
-        private async Task RollbackLotCreation(Lot lot)
-        {
-            if (lot.LotInvoice != null)
-            {
-                await RollbackInvoiceCreation(lot.LotInvoice);
-            }
-        }
-
-        private async Task RollbackInvoiceCreation(Invoice invoice)
-        {
-            try
-            {
-                await DeleteInvoice(invoice);
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        private async Task DeleteInvoice(Invoice invoice)
-        {
-            await _invoiceRepository.RemoveAsync(invoice.Id, StoredProcedureInbound.DeleteInvoice);
-        }
+        //TODO:Lot-Invoice---?-Container-tracing-parts-CustomsClerance-vinContainer-Plannedsequence
 
         #endregion Rollback
 
         /// <inheritdoc />
         public event EventHandler<ControllerDetails> DeliveryLoadProgressUpdated;
+
+        [GeneratedRegex(@"^[A-HJ-NPR-Z0-9]{17}$")]
+        private static partial Regex VinRegex();
     }
 }

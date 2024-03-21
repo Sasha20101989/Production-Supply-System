@@ -5,10 +5,7 @@ using DAL.Enums;
 
 namespace DAL.Data.SqlServer
 {
-    public class ProcessStepSqlServerData : SqlServerData<ProcessStep>
+    public class ProcessStepSqlServerData(ISqlDataAccess db) : SqlServerData<ProcessStep>(db, StoredProcedureMaster.GetAllProcessSteps)
     {
-        public ProcessStepSqlServerData(ISqlDataAccess db, ILogger<ProcessStepSqlServerData> logger)
-            : base(db, logger, StoredProcedureMaster.GetAllProcessSteps)
-        { }
     }
 }

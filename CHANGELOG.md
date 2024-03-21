@@ -4,6 +4,18 @@ CHANGELOG
 
 ### Added 
 
+ - a27c426 - Added observable prop - ALEKSANDR FELYUGIN
+ - d963523 - Added logging - ALEKSANDR FELYUGIN
+ - 372f1d7 - Added multilang bll - ALEKSANDR FELYUGIN
+ - 735e43e - Added logging - ALEKSANDR FELYUGIN
+ - 693f7a8 - Added logging - ALEKSANDR FELYUGIN
+ - 95f2cc2 - Added localization - ALEKSANDR FELYUGIN
+ - fb91ed3 - Added multilang - ALEKSANDR FELYUGIN
+ - e918bb9 - Added inin steps - ALEKSANDR FELYUGIN
+ - 8bae40c - Added summary for excel service - ALEKSANDR FELYUGIN
+ - e69e502 - Added export tracing - ALEKSANDR FELYUGIN
+ - a63e032 - Added collections - ALEKSANDR FELYUGIN
+ - e0894dd - Added export - ALEKSANDR FELYUGIN
  - f47b8d5 - Added static names - ALEKSANDR FELYUGIN
  - 7747ee1 - Added logging - ALEKSANDR FELYUGIN
  - c729f27 - Added static parameters - ALEKSANDR FELYUGIN
@@ -64,6 +76,7 @@ CHANGELOG
 
 ### Changed 
 
+ - c42c162 - Changed bom service - ALEKSANDR FELYUGIN
  - 74ae0f1 - Changed viewmodel - ALEKSANDR FELYUGIN
  - 1f924db - Changed wrap panel position - ALEKSANDR FELYUGIN
  - 934b68d - Changed style Flyouts - ALEKSANDR FELYUGIN

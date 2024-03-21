@@ -2,13 +2,8 @@
 
 namespace DAL.Parameters.Inbound
 {
-    public class CreateTransportParameters
+    public class CreateTransportParameters(Transport entity)
     {
-        public CreateTransportParameters(Transport entity)
-        {
-            TransportName = entity.TransportName;
-        }
-
-        public string TransportName { get; set; }
+        public string TransportName { get; set; } = entity.TransportName;
     }
 }

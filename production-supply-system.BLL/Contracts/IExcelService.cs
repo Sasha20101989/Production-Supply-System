@@ -3,6 +3,8 @@
 using DAL.Models;
 using DAL.Models.Document;
 
+using DocumentFormat.OpenXml.Spreadsheet;
+
 namespace BLL.Contracts
 {
     /// <summary>
@@ -15,18 +17,18 @@ namespace BLL.Contracts
         /// </summary>
         /// <param name="filePath">Путь к документу</param>
         /// <param name="sheetName">Лист документа</param>
-        /// <param name="targetRowIndex">Не обязательный параметр, указывающий на строку с заголовками табличной части документа</param>
         /// <returns></returns>
         object[,] ReadExcelFile(string filePath, string sheetName);
 
         /// <summary>
         /// Валидирует заголовки табличной части документа, что они совпадают с картой документов
         /// </summary>
-        /// <param name="excelData">Массив с данными из файла эксель</param>
         /// <param name="firstRow">Строка с заголовками</param>
         /// <param name="content">Список колонок</param>
-        /// <returns>Метод возвращающий результат валидации, если заголовки валидны то true, иначе false</returns>
-        bool ValidateExcelDataHeaders(object[,] excelData, int firstRow, List<DocmapperContent> content);
+        /// <param name="filePath">Путь к документу</param>
+        /// <param name="sheetName">Лист документа</param>
+        /// <returns>Метод возвращающий результат валидации, если заголовки валидны то возвращает массив с данными, иначе null</returns>
+        object[,] ValidateExcelDataHeaders(int firstRow, List<DocmapperContent> content, string filePath, string sheetName);
 
         /// <summary>
         /// Красит ячейки в документе
@@ -37,6 +39,30 @@ namespace BLL.Contracts
         /// <param name="destinationFilePath">Путь к оригинальному файлу</param>
         void ColorCellsInDocument(Dictionary<string, CellInfo> validationErrors, string sheetName, string ngFilePath, string destinationFilePath);
 
-        void ExportFile<T>(IEnumerable<T> data, string filePath);
+        /// <summary>
+        /// Выгружает данные в файл
+        /// </summary>
+        /// <example>
+        /// Пример использования:
+        /// <code>
+        /// SheetData sheetData = new();
+        /// 
+        /// Row headerRow = new();
+        /// 
+        /// foreach (DocmapperContent item in orderedByColumnContent)
+        /// {
+        ///     Cell cell = new();
+        ///     cell.DataType = CellValues.String;
+        ///     cell.CellValue = new CellValue(item.DocmapperColumn.ElementName);
+        ///     headerRow.Append(cell.CellValue);
+        /// }
+        /// 
+        /// sheetData.Append(headerRow);
+        /// </code>
+        /// </example>
+        /// <param name="data">Содержимое</param>
+        /// <param name="filePath">Путь к файлу</param>
+        /// <param name="sheetName">Имя листа</param>
+        void ExportFile(SheetData data, string filePath, string sheetName);
     }
 }
