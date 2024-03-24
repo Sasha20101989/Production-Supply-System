@@ -1,11 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 using NavigationManager.Frame.Extension.WPF;
-
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 using Theme.Manager.MahApps.WPF;
 
@@ -17,10 +17,10 @@ using UI_Interface.Properties;
 namespace UI_Interface.ViewModels.ViewModelsForPages
 {
     public partial class SettingsViewModel(
-        IThemeManager themeManager, 
-        IUserDataService userDataService, 
-        IIdentityService identityService, 
-        IMultilangManager multilangManager, 
+        IThemeManager themeManager,
+        IUserDataService userDataService,
+        IIdentityService identityService,
+        IMultilangManager multilangManager,
         IToastNotificationsService toastNotificationsService) : ObservableObject, INavigationAware
     {
         [ObservableProperty]

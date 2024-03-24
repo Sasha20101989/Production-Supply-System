@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
-using DAL.Attributes;
-using DAL.Models.Document;
+
+using production_supply_system.EntityFramework.DAL.Attributes;
+using production_supply_system.EntityFramework.DAL.DocumentMapperContext.Models;
 
 namespace BLL.Helpers
 {
@@ -34,6 +35,7 @@ namespace BLL.Helpers
 
             return null;
         }
+
         /// <summary>
         /// Выполняет валидацию значения свойства объекта на основе определенных атрибутов.
         /// </summary>

@@ -1,10 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
 using PageManager.WPF;
+
 using UI_Interface.ViewModels.ViewModelsForPages;
-using UI_Interface.ViewModels;
 using UI_Interface.Views;
-using System;
 
 namespace UI_Interface.HostBuilders
 {

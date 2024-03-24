@@ -5,8 +5,10 @@ using UI_Interface.Contracts;
 
 using Windows.UI.Notifications;
 
-namespace UI_Interface.Services {
-    public partial class ToastNotificationsService : IToastNotificationsService {
+namespace UI_Interface.Services
+{
+    public partial class ToastNotificationsService : IToastNotificationsService
+    {
         public ToastNotificationsService()
         {
         }

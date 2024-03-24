@@ -1,7 +1,6 @@
-﻿
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-using DAL.Models;
+using production_supply_system.EntityFramework.DAL.LotContext.Models;
 
 namespace UI_Interface.ViewModels
 {

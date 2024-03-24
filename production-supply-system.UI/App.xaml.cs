@@ -1,21 +1,29 @@
-﻿using System.Windows;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using System.Windows.Threading;
-using NLog.Extensions.Logging;
+﻿using System.Collections.Generic;
 using System.IO;
-using UI_Interface.Services;
+using System.Windows;
+using System.Windows.Threading;
+
 using Cache.Manager.WPF;
-using UI_Interface.HostBuilders;
-using MahApps.Metro.Controls;
-using MahApps.Metro.Controls.Dialogs;
-using System.Threading;
+
 using CommunityToolkit.WinUI.Notifications;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+
+using Newtonsoft.Json;
+
+using NLog.Extensions.Logging;
+
+using production_supply_system.EntityFramework.DAL.Context;
+using production_supply_system.EntityFramework.DAL.DocumentMapperContext.Context;
+using production_supply_system.EntityFramework.DAL.LotContext;
+
 using UI_Interface.Activation;
-using System.Collections.Generic;
-using UI_Interface.Multilang;
+using UI_Interface.HostBuilders;
+using UI_Interface.Services;
 
 namespace UI_Interface
 {
@@ -38,7 +46,8 @@ namespace UI_Interface
 
         private async void OnStartup(object sender, StartupEventArgs e)
         {
-            ToastNotificationManagerCompat.OnActivated += (toastArgs) => {
+            ToastNotificationManagerCompat.OnActivated += (toastArgs) =>
+            {
                 _ = Current.Dispatcher.Invoke(async () =>
                 {
                     IConfiguration config = GetService<IConfiguration>();
@@ -63,6 +72,13 @@ namespace UI_Interface
                     .ConfigureServices(ConfigureServices)
                     .Build();
 
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                PreserveReferencesHandling = PreserveReferencesHandling.Objects
+            };
+
             _ = _host.ConfigurePages();
 
             DispatcherUnhandledException += OnDispatcherUnhandledException;
@@ -78,6 +94,24 @@ namespace UI_Interface
 
         private void ConfigureServices(HostBuilderContext context, IServiceCollection services)
         {
+            _ = services.AddDbContext<PSSContext>(options =>
+            {
+                _ = options.UseSqlServer(context.Configuration.GetConnectionString("Default"));
+                _ = options.EnableSensitiveDataLogging();
+            });
+
+            _ = services.AddDbContext<LotContext>(options =>
+            {
+                _ = options.UseSqlServer(context.Configuration.GetConnectionString("Default"));
+                _ = options.EnableSensitiveDataLogging();
+            });
+
+            _ = services.AddDbContext<DocmapperContext>(options =>
+            {
+                _ = options.UseSqlServer(context.Configuration.GetConnectionString("Default"));
+                _ = options.EnableSensitiveDataLogging();
+            });
+
             _ = services.AddHostedService<ApplicationHostService>();
 
             _ = services.Configure<AppConfig>(context.Configuration.GetSection(nameof(AppConfig)));
@@ -89,14 +123,10 @@ namespace UI_Interface
                 _ = builder.AddNLog();
             });
 
-            _ = services.AddSqlServerData();
-
-            _ = services.ConfigureSqlServerData();
-
             _ = services.AddBusinessLogic();
 
-            _ = services.AddViewsAndViewModels();     
-            
+            _ = services.AddViewsAndViewModels();
+
             _ = services.AddUiServices();
         }
 

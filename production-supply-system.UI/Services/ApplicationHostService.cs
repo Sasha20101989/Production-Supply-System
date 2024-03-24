@@ -3,13 +3,17 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+
 using Cache.Manager.WPF;
-using DAL.Models;
+
 using Microsoft.Extensions.Hosting;
+
 using NavigationManager.Frame.Extension.WPF;
+
+using production_supply_system.EntityFramework.DAL.Models.UsersSchema;
+
 using Theme.Manager.MahApps.WPF;
 
-using UI_Interface.Contracts;
 using UI_Interface.Contracts.Services;
 using UI_Interface.Contracts.Views;
 using UI_Interface.Multilang;

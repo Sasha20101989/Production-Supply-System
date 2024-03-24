@@ -3,8 +3,6 @@ using System.Collections.Generic;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 
-using DAL.Models.Document;
-
 using Microsoft.Extensions.Logging;
 
 namespace UI_Interface.ViewModels
@@ -20,24 +18,9 @@ namespace UI_Interface.ViewModels
     public partial class DocumentColumnViewModel(List<Type> models, ILogger logger) : ValidatedViewModel<DocumentColumnViewModel, List<Type>>(models, logger)
     {
         [ObservableProperty]
-        private DocmapperColumn _documentColumn = new();
+        private string _elementName;
 
-        /// <summary>
-        /// Получает или задает значение названия.
-        /// </summary>
-        public string ElementName
-        {
-            get => DocumentColumn.ElementName;
-            set => _ = SetProperty(DocumentColumn.ElementName, value, DocumentColumn, (model, elemName) => model.ElementName = elemName);
-        }
-
-        /// <summary>
-        /// Получает или задает значение системного названия.
-        /// </summary>
-        public string SystemColumnName
-        {
-            get => DocumentColumn.SystemColumnName;
-            set => _ = SetProperty(DocumentColumn.SystemColumnName, value, DocumentColumn, (model, sysName) => model.SystemColumnName = sysName);
-        }
+        [ObservableProperty]
+        private string _systemColumnName;
     }
 }

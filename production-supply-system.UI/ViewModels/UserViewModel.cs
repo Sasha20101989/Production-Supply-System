@@ -2,7 +2,8 @@
 
 using CommunityToolkit.Mvvm.ComponentModel;
 
-using DAL.Models;
+using production_supply_system.EntityFramework.DAL.Models.UsersSchema;
+
 using UI_Interface.Helpers;
 using UI_Interface.Properties;
 

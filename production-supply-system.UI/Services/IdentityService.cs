@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
-using System.Windows;
 
 using BLL.Contracts;
-using DAL.Models;
 
 using Microsoft.Extensions.Logging;
+
+using production_supply_system.EntityFramework.DAL.Models.UsersSchema;
 
 using UI_Interface.Contracts.Services;
 using UI_Interface.Helpers;
@@ -39,23 +39,16 @@ namespace UI_Interface.Services
         /// <returns>True, если пользователь существует, в противном случае - false.</returns>
         private async Task<bool> IsUserExistsAsync()
         {
-            _user = await userService.GetUserInfoAsync(GetAccountUserName());
+            _user = await userService.GetCurrentUser(GetAccountUserName());
 
             return _user is not null;
         }
 
         /// <inheritdoc />
         public async Task<LoginResultType> LoginAsync()
-        {  
+        {
             try
             {
-                bool isAccessAllowed = await userService.IsAccessAllowedAsync();
-
-                if (!isAccessAllowed)
-                {
-                    return LoginResultType.NotConnectionToDb;
-                }
-
                 if (!await IsUserExistsAsync())
                 {
                     return LoginResultType.Unauthorized;

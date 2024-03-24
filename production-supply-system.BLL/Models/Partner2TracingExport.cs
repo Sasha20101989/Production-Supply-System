@@ -1,10 +1,8 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using DAL.Attributes;
-using DAL.Enums;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 using DocumentFormat.OpenXml.Wordprocessing;
+
+using production_supply_system.EntityFramework.DAL.Enums;
 
 namespace BLL.Models
 {

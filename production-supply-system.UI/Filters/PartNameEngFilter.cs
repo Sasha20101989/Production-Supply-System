@@ -1,5 +1,7 @@
-﻿using DAL.Models;
-using System;
+﻿using System;
+
+using production_supply_system.EntityFramework.DAL.LotContext.Models;
+
 using UI_Interface.Contracts;
 
 namespace UI_Interface.Filters

@@ -1,0 +1,88 @@
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace production_supply_system.EntityFramework.DAL.LotContext.Models;
+
+[Table("tbd_VIN_Numbers_Local", Schema = "Planning")]
+public partial class VinNumbersLocal
+{
+    [Key]
+    [Column("VIN_Number_Local_Id")]
+    public int VinNumberLocalId { get; set; }
+
+    [Column("Order_Count")]
+    public int? OrderCount { get; set; }
+
+    public int? Plant { get; set; }
+
+    public int? Line { get; set; }
+
+    [StringLength(5)]
+    public string? Model { get; set; }
+
+    [Column("Local_VIN")]
+    [StringLength(17)]
+    public string LocalVin { get; set; } = null!;
+
+    [Column("Date_Position")]
+    public DateOnly DatePosition { get; set; }
+
+    [Column("PJI")]
+    [StringLength(20)]
+    public string? Pji { get; set; }
+
+    [Column("Local_Code")]
+    [StringLength(17)]
+    public string LocalCode { get; set; } = null!;
+
+    [Column("Local_Color")]
+    [StringLength(5)]
+    public string? LocalColor { get; set; }
+
+    [Column("BC_Label")]
+    [StringLength(50)]
+    public string? BcLabel { get; set; }
+
+    [Column("MOFF")]
+    [StringLength(255)]
+    public string? Moff { get; set; }
+
+    public int? Status { get; set; }
+
+    [Column("N_In_Day")]
+    public int? NInDay { get; set; }
+
+    [Column("Next_Status")]
+    public long? NextStatus { get; set; }
+
+    [StringLength(20)]
+    public string? Version { get; set; }
+
+    [Column("Order_Number")]
+    public int? OrderNumber { get; set; }
+
+    [Column("Market_Code")]
+    [StringLength(10)]
+    public string? MarketCode { get; set; }
+
+    public int? Countermark { get; set; }
+
+    [StringLength(10)]
+    public string? Millenium { get; set; }
+
+    [Column("Week_Position")]
+    [StringLength(8)]
+    public string? WeekPosition { get; set; }
+
+    [Column("Day_Position")]
+    public int? DayPosition { get; set; }
+
+    [Column("Order_ID")]
+    public int OrderId { get; set; }
+
+    [Column("VCD")]
+    public string? Vcd { get; set; }
+
+    [InverseProperty("VinNumberLocal")]
+    public virtual BoundVin? BoundVin { get; set; }
+}

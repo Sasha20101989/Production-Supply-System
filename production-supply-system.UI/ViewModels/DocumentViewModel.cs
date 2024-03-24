@@ -3,8 +3,6 @@ using System.Collections.Generic;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 
-using DAL.Models.Document;
-
 using Microsoft.Extensions.Logging;
 
 namespace UI_Interface.ViewModels
@@ -17,60 +15,21 @@ namespace UI_Interface.ViewModels
     public partial class DocumentViewModel(List<Type> models, ILogger logger) : ValidatedViewModel<DocumentViewModel, List<Type>>(models, logger)
     {
         [ObservableProperty]
-        private Docmapper _document = new();
+        private int _id;
 
-        /// <summary>
-        /// Получает или задает уникальный идентификатор шаблона документа.
-        /// </summary>
-        public int DocmapperId
-        {
-            get => Document.Id;
-            set => _ = SetProperty(Document.Id, value, Document, (model, id) => model.Id = id);
-        }
+        [ObservableProperty]
+        private string _docmapperName;
 
-        /// <summary>
-        /// Получает или задает имя шаблона документа.
-        /// </summary>
-        public string DocmapperName
-        {
-            get => Document.DocmapperName;
-            set => _ = SetProperty(Document.DocmapperName, value, Document, (model, name) => model.DocmapperName = name);
-        }
+        [ObservableProperty]
+        private string? _defaultFolder;
 
-        /// <summary>
-        /// Получает или задает путь документа.
-        /// </summary>
-        public string DefaultFolder
-        {
-            get => Document.DefaultFolder;
-            set => _ = SetProperty(Document.DefaultFolder, value, Document, (model, defFolder) => model.DefaultFolder = defFolder);
-        }
+        [ObservableProperty]
+        private string _sheetName;
 
-        /// <summary>
-        /// Получает или задает имя листа с которого необходимо извлекать данные.
-        /// </summary>
-        public string SheetName
-        {
-            get => Document.SheetName;
-            set => SetProperty(Document.SheetName, value, Document, (model, sheetName) => model.SheetName = sheetName);
-        }
+        [ObservableProperty]
+        private int? _firstDataRow;
 
-        /// <summary>
-        /// Получает или задает строку с которой начинаются данные.
-        /// </summary>
-        public int FirstDataRow
-        {
-            get => Document.FirstDataRow;
-            set => SetProperty(Document.FirstDataRow, value, Document, (model, firstDataRow) => model.FirstDataRow = firstDataRow);
-        }
-
-        /// <summary>
-        /// Получает или задает активность документа.
-        /// </summary>
-        public bool IsActive
-        {
-            get => Document.IsActive;
-            set => _ = SetProperty(Document.IsActive, value, Document, (model, isActive) => model.IsActive = isActive);
-        }
+        [ObservableProperty]
+        private bool _isActive;
     }
 }

@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
 using BLL.Contracts;
 using BLL.Properties;
-using DAL.Enums;
-using DAL.Models;
-using DAL.Models.Master;
+
 using Microsoft.Extensions.Logging;
+
+using production_supply_system.EntityFramework.DAL.Enums;
+using production_supply_system.EntityFramework.DAL.Models.MasterSchema;
+using production_supply_system.EntityFramework.DAL.Models.UsersSchema;
 
 namespace BLL.Services
 {
@@ -19,15 +22,15 @@ namespace BLL.Services
     {
 
         /// <inheritdoc />
-        public async Task<IEnumerable<ProcessStep>> GetProcessStepsByUserSectionAsync(AppProcess appProcess)
+        public async Task<IEnumerable<ProcessesStep>> GetProcessStepsByUserSectionAsync(AppProcess appProcess)
         {
             logger.LogInformation($"{string.Format(Resources.LogProcessStepGet, appProcess)}");
 
-            User user = userService.GetCurrentUser();
+            User user = await userService.GetCurrentUser(Environment.UserName);
 
-            IEnumerable<ProcessStep> steps = await staticDataService.GetProcessStepsByUserAsync(user);
+            IEnumerable<ProcessesStep> steps = await staticDataService.GetProcessStepsByUserAsync(user);
 
-            foreach (ProcessStep processStep in steps)
+            foreach (ProcessesStep processStep in steps)
             {
                 processStep.Section = await staticDataService.GetSectionByIdAsync(processStep.SectionId);
 
@@ -36,7 +39,7 @@ namespace BLL.Services
                 processStep.Process = await staticDataService.GetProcessByIdAsync(processStep.ProcessId);
             }
 
-            IEnumerable<ProcessStep> filteredSteps = steps.Where(c => c.Process.ProcessName == appProcess);
+            IEnumerable<ProcessesStep> filteredSteps = steps.Where(c => c.Process.ProcessName == appProcess);
 
             logger.LogInformation($"{string.Format(Resources.LogProcessStepGet, appProcess)} {Resources.Completed}");
 

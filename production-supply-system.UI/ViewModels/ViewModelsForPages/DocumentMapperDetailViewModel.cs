@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Media;
 
 using BLL.Contracts;
@@ -11,16 +10,15 @@ using BLL.Contracts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
-using DAL.Models.Document;
-
-using MahApps.Metro.Controls;
-
 using Microsoft.Extensions.Logging;
 
 using NavigationManager.Frame.Extension.WPF;
 
 using Newtonsoft.Json;
 
+using production_supply_system.EntityFramework.DAL.DocumentMapperContext.Models;
+
+using UI_Interface.Extensions;
 using UI_Interface.Properties;
 
 namespace UI_Interface.ViewModels.ViewModelsForPages
@@ -30,10 +28,13 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
     /// Наследует от ControlledViewModel для уведомлений об изменении свойств и уведомлений.
     /// </summary>
     public partial class DocumentMapperDetailViewModel(
-        ILogger<DocumentMapperDetailViewModel> logger, 
-        IDocumentService documentService, 
+        ILogger<DocumentMapperDetailViewModel> logger,
+        IDocumentService documentService,
         INavigationManager navigationManager) : ControlledViewModel(logger), INavigationAware
     {
+        [ObservableProperty]
+        private Docmapper _docmapper;
+
         [ObservableProperty]
         private bool _hasErrors;
 
@@ -47,10 +48,10 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         private ObservableCollection<DocmapperColumn> _documentColumns = [];
 
         [ObservableProperty]
-        private ObservableCollection<DocumentContentViewModel> _documentContent;
+        private ObservableCollection<DocumentContentViewModel> _documentContentViewModels = [];
 
         [ObservableProperty]
-        private DocumentContentViewModel _documentContentItem;
+        private DocumentContentViewModel _documentContentItemViewModel;
 
         [ObservableProperty]
         private DocumentColumnViewModel _documentColumnViewModel;
@@ -82,11 +83,42 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
             PageTitle = IsNewDocument ? Resources.ShellDocumentMapperNewPage : Resources.ShellDocumentMapperEditPage;
 
-            await CreateDocument(parameter);
+            if (parameter is int docmapperId)
+            {
+                Docmapper = await documentService.GetDocumentByIdAsync(docmapperId);
+
+                DocumentViewModel = CreateNewDocumentViewModel(Docmapper);
+
+                DocumentContentViewModels = [];
+
+                foreach (DocmapperContent content in Docmapper.DocmapperContents)
+                {
+                    DocumentContentViewModel documentContentViewModel = new(ValidatedModels, logger)
+                    {
+                        DocmapperContentId = content.Id,
+                        DocmapperColumnId = content.DocmapperColumnId,
+                        DocmapperId = content.DocmapperId,
+                        ElementName = content.DocmapperColumn.ElementName,
+                        SystemColumnName = content.DocmapperColumn.SystemColumnName,
+                        ColumnNr = content.ColumnNr,
+                        RowNr = content.RowNr
+                    };
+
+                    documentContentViewModel.HasErrorsUpdated += OnHasErrorsUpdated;
+
+                    DocumentContentViewModels.Add(documentContentViewModel);
+                }
+
+                DocumentViewModel.HasErrorsUpdated += OnHasErrorsUpdated;
+            }
+            else
+            {
+                Docmapper = new();
+
+                DocumentViewModel = CreateNewDocumentViewModel();
+            }
 
             await CreateColumns();
-
-            await TryToCreateDocumentContent(parameter);
         }
 
         /// <summary>
@@ -117,13 +149,9 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
                 logger.LogInformation(string.Format(Resources.LogDocmapperColumnAdd, JsonConvert.SerializeObject(documentColumn)));
 
-                documentColumn = await documentService.AddDocumentColumnAsync(documentColumn);
-
-                DocumentColumns.Add(documentColumn);
+                await documentService.AddDocumentColumnAsync(documentColumn);
 
                 logger.LogInformation($"{string.Format(Resources.LogDocmapperColumnAdd, JsonConvert.SerializeObject(documentColumn))} {Resources.Completed}");
-
-                SortOrderColumns();
 
                 CloseAddNewFlyout();
             }
@@ -136,6 +164,8 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
             finally
             {
                 await ControllerPostProcess();
+
+                await CreateColumns();
             }
         }
 
@@ -148,7 +178,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         {
             if (item is DocumentContentViewModel selectedItem)
             {
-                _ = DocumentContent.Remove(selectedItem);
+                _ = DocumentContentViewModels.Remove(selectedItem);
             }
 
             OnHasErrorsUpdated(null, false);
@@ -182,27 +212,31 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         {
             try
             {
-                List<DocmapperContent> content = [];
+                Docmapper.DocmapperName = DocumentViewModel.DocmapperName;
+                Docmapper.DefaultFolder = DocumentViewModel.DefaultFolder;
+                Docmapper.SheetName = DocumentViewModel.SheetName;
+                Docmapper.FirstDataRow = DocumentViewModel.FirstDataRow;
+                Docmapper.IsActive = DocumentViewModel.IsActive;
+                Docmapper.DocmapperContents = [];
 
-                foreach (DocumentContentViewModel documentContentItem in DocumentContent)
+                foreach (DocumentContentViewModel documentContentItem in DocumentContentViewModels)
                 {
                     DocmapperContent item = new()
                     {
-                        DocmapperId = DocumentViewModel.Document.Id,
-                        ColumnNr = documentContentItem.ColumnNumber,
-                        DocmapperColumnId = documentContentItem.DocumentColumn.Id,
                         Id = documentContentItem.DocmapperContentId,
-                        Docmapper = documentContentItem.Document,
-                        RowNr = documentContentItem.RowNumber,
+                        DocmapperId = documentContentItem.DocmapperId,
+                        DocmapperColumnId = documentContentItem.DocmapperColumnId,
+                        ColumnNr = documentContentItem.ColumnNr,
+                        RowNr = documentContentItem.RowNr,
                         DocmapperColumn = new()
                         {
-                            Id = documentContentItem.DocumentColumn.Id,
-                            ElementName = documentContentItem.DocumentColumn.ElementName,
-                            SystemColumnName = documentContentItem.DocumentColumn.SystemColumnName,
+                            Id = documentContentItem.DocmapperColumnId,
+                            ElementName = documentContentItem.ElementName,
+                            SystemColumnName = documentContentItem.SystemColumnName,
                         }
                     };
 
-                    content.Add(item);
+                    Docmapper.DocmapperContents.Add(item);
                 }
 
                 if (IsNewDocument)
@@ -211,7 +245,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
                     logger.LogInformation(Resources.LogAddNewDocument);
 
-                    DocumentViewModel.Document = await documentService.CreateDocumentAsync(DocumentViewModel.Document, content);
+                    await documentService.CreateDocumentAsync(Docmapper);
 
                     await WaitForMessageUnlock(Resources.BllAddNewDocument, Resources.BllAddNewDocumentSuccess, Brushes.IndianRed);
 
@@ -223,11 +257,13 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
                     logger.LogInformation(Resources.LogUpdateDocument);
 
-                    await documentService.UpdateDocumentAsync(DocumentViewModel.Document, content);
+                    await documentService.UpdateDocumentContentsAsync(Docmapper.DocmapperContents, Docmapper.Id);
+
+                    await documentService.UpdateDocumentAsync(Docmapper);
 
                     await WaitForMessageUnlock(Resources.BllUpdateDocument, Resources.BllUpdateDocumentSuccess, Brushes.IndianRed);
 
-                    logger.LogInformation($"{string.Format(Resources.LogUpdateDocument, DocumentViewModel.Document.Id)} {Resources.Completed}");
+                    logger.LogInformation($"{string.Format(Resources.LogUpdateDocument, Docmapper.Id)} {Resources.Completed}");
                 }
 
                 _ = navigationManager.NavigateTo(typeof(DocumentMapperViewModel).FullName);
@@ -252,30 +288,23 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         {
             if (item is not null)
             {
-                DocumentContentItem = new(ValidatedModels, logger)
+                DocumentContentItemViewModel = new(ValidatedModels, logger)
                 {
-                    ColumnNumber = 0,
-                    RowNumber = null,
-                    DocumentColumn = item,
+                    DocmapperColumnId = item.Id,
+                    DocmapperId = Docmapper.Id,
+                    ElementName = item.ElementName,
+                    SystemColumnName = item.SystemColumnName
                 };
 
-                DocumentContentItem.HasErrorsUpdated += OnHasErrorsUpdated;
+                DocumentContentItemViewModel.HasErrorsUpdated += OnHasErrorsUpdated;
 
-                DocumentContent.Add(DocumentContentItem);
+                DocumentContentViewModels.Add(DocumentContentItemViewModel);
             }
         }
 
         private bool CanAddNewDocumentContentItem(DocmapperColumn item)
         {
-            return DocumentContent is null || !DocumentContent.Any(dc => dc.DocumentColumn.Id == item.Id);
-        }
-
-        /// <summary>
-        /// Сортирует коллекцию колонок по имени
-        /// </summary>
-        private void SortOrderColumns()
-        {
-            DocumentColumns = new ObservableCollection<DocmapperColumn>(DocumentColumns.OrderBy(dc => dc.ElementName));
+            return DocumentContentViewModels is null || !DocumentContentViewModels.Any(dc => dc.DocmapperColumnId == item.Id);
         }
 
         /// <summary>
@@ -285,20 +314,15 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         /// <returns></returns>
         private DocumentViewModel CreateNewDocumentViewModel(Docmapper document = null)
         {
-
             return document is null
-                ? (new(ValidatedModels, logger) {
-                    DefaultFolder = string.Empty,
-                    DocmapperName = string.Empty,
-                    SheetName = string.Empty,
-                })
+                ? (new(ValidatedModels, logger))
                 : (new(ValidatedModels, logger)
                 {
+                    Id = document.Id,
                     DefaultFolder = document.DefaultFolder,
                     DocmapperName = document.DocmapperName,
                     SheetName = document.SheetName,
                     FirstDataRow = document.FirstDataRow,
-                    DocmapperId = document.Id,
                     IsActive = document.IsActive
                 }
             );
@@ -312,42 +336,8 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         private void OnHasErrorsUpdated(object _, bool result)
         {
             bool hasErrorsInDocument = DocumentViewModel.HasErrors;
-            bool hasErrorsInContent = DocumentContent is null || !(DocumentContent.Count > 0) || DocumentContent.Any(dc => dc.HasErrors);
+            bool hasErrorsInContent = DocumentContentViewModels is null || !(DocumentContentViewModels.Count > 0) || DocumentContentViewModels.Any(dc => dc.HasErrors);
             HasErrors = hasErrorsInDocument || hasErrorsInContent || result;
-        }
-
-        /// <summary>
-        /// Пробует создать модель представления длокумента если есть переданный уникальный идентификатор документа
-        /// </summary>
-        /// <param name="parameter">уникальный идентификатор документа</param>
-        private async Task TryToCreateDocumentContent(object parameter)
-        {
-            DocumentContent = [];
-
-            if (parameter is int mapId)
-            {
-                logger.LogInformation(Resources.LogDocmapperContentAdd);
-
-                foreach (DocmapperContent item in await documentService.GetAllDocumentContentItemsByIdAsync(mapId))
-                {
-                    DocumentContentViewModel documentContentViewModel = new(ValidatedModels, logger)
-                    {
-                        ColumnNumber = item.ColumnNr,
-                        RowNumber = item.RowNr,
-                        DocmapperColumnId = item.DocmapperColumnId,
-                        DocmapperContentId = item.Id,
-                        DocmapperId = item.DocmapperId,
-                        Document = item.Docmapper,
-                        DocumentColumn = item.DocmapperColumn
-                    };
-
-                    documentContentViewModel.HasErrorsUpdated += OnHasErrorsUpdated;
-
-                    DocumentContent.Add(documentContentViewModel);
-                }
-
-                logger.LogInformation($"{Resources.LogDocmapperContentAdd} {Resources.Completed}");
-            }
         }
 
         /// <summary>
@@ -360,23 +350,13 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
             {
                 await CreateController(Resources.BllGetAllDocumentColumns);
 
+                DocumentColumns.Clear();
+
                 logger.LogInformation(Resources.LogDocmapperColumnGet);
 
-                foreach (DocmapperColumn column in await documentService.GetAllColumnsAsync())
-                {
-                    DocmapperColumn columnViewModel = new()
-                    {
-                        Id = column.Id,
-                        ElementName = column.ElementName,
-                        SystemColumnName = column.SystemColumnName
-                    };
-
-                    DocumentColumns.Add(columnViewModel);
-                }
+                DocumentColumns.AddRange(await documentService.GetAllColumnsAsync());
 
                 logger.LogInformation($"{Resources.LogDocmapperColumnGet} {Resources.Completed}");
-
-                SortOrderColumns();
             }
             catch (Exception ex)
             {
@@ -387,46 +367,6 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
             finally
             {
                 await ControllerPostProcess();
-            }
-        }
-
-        /// <summary>
-        /// Создает документ
-        /// </summary>
-        /// <param name="parameter"></param>
-        /// <returns></returns>
-        private async Task CreateDocument(object parameter)
-        {
-            if (parameter is int mapId)
-            {
-                try
-                {
-                    await CreateController(Resources.BllGetDocument);
-
-                    logger.LogInformation(string.Format(Resources.LogDocmapperGetById, mapId));
-
-                    Docmapper document = await documentService.GetDocumentByIdAsync(mapId);
-
-                    logger.LogInformation($"{string.Format(Resources.LogDocmapperGetById, mapId)} {Resources.Completed}");
-
-                    DocumentViewModel = CreateNewDocumentViewModel(document);
-
-                    DocumentViewModel.HasErrorsUpdated += OnHasErrorsUpdated;
-                }
-                catch (Exception ex)
-                {
-                    await WaitForMessageUnlock(Resources.ShellError, ex.Message, Brushes.IndianRed);
-
-                    return;
-                }
-                finally
-                {
-                    await ControllerPostProcess();
-                }
-            }
-            else
-            {
-                DocumentViewModel = CreateNewDocumentViewModel();
             }
         }
     }

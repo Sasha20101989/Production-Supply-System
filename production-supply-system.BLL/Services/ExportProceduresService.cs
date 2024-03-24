@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using BLL.Contracts;
 using BLL.Properties;
 
-using DAL.Enums;
-using DAL.Models.Document;
-
 using Microsoft.Extensions.Logging;
+
+using production_supply_system.EntityFramework.DAL.DocumentMapperContext.Models;
+using production_supply_system.EntityFramework.DAL.Enums;
 
 namespace BLL.Services
 {

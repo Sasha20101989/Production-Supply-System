@@ -1,8 +1,8 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Windows;
 
-using DAL.Extensions;
+using production_supply_system.EntityFramework.DAL.Extensions;
+
 
 namespace UI_Interface.Multilang
 {
@@ -14,7 +14,7 @@ namespace UI_Interface.Multilang
             {
                 string language = Application.Current.Properties["Language"].ToString();
 
-                if(language == EnumExtensions.GetDescription(Languages.ru))
+                if (language == EnumExtensions.GetDescription(Languages.ru))
                 {
                     return Languages.ru;
                 }

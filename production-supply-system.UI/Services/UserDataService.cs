@@ -1,9 +1,14 @@
 ﻿using System;
 using System.IO;
+
 using Cache.Manager.WPF;
-using DAL.Models;
+
 using File.Manager;
+
 using Microsoft.Extensions.Options;
+
+using production_supply_system.EntityFramework.DAL.Models.UsersSchema;
+
 using UI_Interface.Contracts.Services;
 using UI_Interface.ViewModels;
 
@@ -45,11 +50,11 @@ namespace UI_Interface.Services
             return userData is null
                 ? null
                 : new UserViewModel()
-            {
-                Name = userData.Name,
-                Patronymic = userData.Patronymic,
-                Account = userData.Account
-            };
+                {
+                    Name = userData.Name,
+                    Patronymic = userData.Patronymic,
+                    Account = userData.Account
+                };
         }
 
         /// <summary>
@@ -74,6 +79,7 @@ namespace UI_Interface.Services
             if (user is not null)
             {
                 SaveUserToCache(user);
+
                 _userViewModel = GetUserViewModelFromData(user);
 
                 UserDataUpdated?.Invoke(this, _userViewModel);

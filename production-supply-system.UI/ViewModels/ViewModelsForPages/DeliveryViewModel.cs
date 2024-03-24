@@ -1,22 +1,26 @@
-﻿using DAL.Models;
-using MahApps.Metro.Controls;
-using NavigationManager.Frame.Extension.WPF;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using UI_Interface.Properties;
-using System.Windows;
-using System.Linq;
+
 using BLL.Contracts;
-using DAL.Models.Master;
-using System.Collections.Generic;
 using BLL.Models;
-using System.Collections.ObjectModel;
-using System;
-using Microsoft.Extensions.Logging;
-using DAL.Enums;
-using UI_Interface.Contracts;
-using CommunityToolkit.Mvvm.Input;
+
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+
+using Microsoft.Extensions.Logging;
+
+using NavigationManager.Frame.Extension.WPF;
+
+using production_supply_system.EntityFramework.DAL.Enums;
+using production_supply_system.EntityFramework.DAL.LotContext.Models;
+using production_supply_system.EntityFramework.DAL.Models.MasterSchema;
+
+using UI_Interface.Contracts;
+using UI_Interface.Properties;
 
 namespace UI_Interface.ViewModels.ViewModelsForPages
 {
@@ -43,7 +47,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
         [ObservableProperty]
         private bool _isProcessStepsShow;
-    
+
         [ObservableProperty]
         private bool _hasErrorsInDetails;
 
@@ -54,7 +58,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         private DeliveryDetailViewModel _deliveryDetailViewModel;
 
         [ObservableProperty]
-        private List<ProcessStep> _processSteps;
+        private List<ProcessesStep> _processSteps;
 
         [ObservableProperty]
         private ObservableCollection<StepViewModel> _masterCollection;
@@ -67,15 +71,15 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         /// </summary>
         /// <param name="stepCollection">Список view models</param>
         /// <returns></returns>
-        private static List<ProcessStep> AdaptStepsToService(List<StepViewModel> stepCollection)
+        private static List<ProcessesStep> AdaptStepsToService(List<StepViewModel> stepCollection)
         {
-            List<ProcessStep> steps = [];
+            List<ProcessesStep> steps = [];
 
             foreach (StepViewModel stepViewModel in stepCollection)
             {
                 steps.Add(new()
                 {
-                    Id = stepViewModel.ProcessStep.Id,
+                    ProcessStepId = stepViewModel.ProcessStep.ProcessStepId,
                     Docmapper = stepViewModel.ProcessStep.Docmapper,
                     DocmapperId = stepViewModel.ProcessStep.DocmapperId,
                     Process = stepViewModel.ProcessStep.Process,
@@ -135,7 +139,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
                 foreach (Lot lot in await deliveryService.GetAllLotsAsync())
                 {
-                    int quantityContainers = await deliveryService.GetquantityContainersForLotId(lot.Id);
+                    int quantityContainers = await deliveryService.GetquantityContainersForLotId(lot.LotId);
 
                     LotViewModel lotViewModel = new(lot, quantityContainers);
 
@@ -196,7 +200,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
                 await WaitForMessageUnlock(Resources.BllUploadLot, Resources.ShellUploadSuccess, Brushes.Green);
 
-                logger.LogInformation(string.Format(Resources.LogUploadLotCompleted, lot.Id));
+                logger.LogInformation(string.Format(Resources.LogUploadLotCompleted, lot.LotId));
 
                 NavigateToDetails(lot);
             }
@@ -223,7 +227,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
             {
                 logger.LogInformation(Resources.LogRedirectToEditingLot);
 
-                _ = navigationManager.NavigateTo(typeof(EditDeliveryViewModel).FullName, lot.Id);
+                _ = navigationManager.NavigateTo(typeof(EditDeliveryViewModel).FullName, lot.LotId);
 
                 logger.LogInformation($"{Resources.LogRedirectToEditingLot} {Resources.Completed}");
             }
@@ -251,7 +255,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
                     return;
                 }
 
-                foreach (ProcessStep masterItem in ProcessSteps)
+                foreach (ProcessesStep masterItem in ProcessSteps)
                 {
                     StepViewModel stepViewModel = new(excelService, logger, exportProcedures, toastNotificationsService, masterItem);
 
@@ -286,7 +290,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
             {
                 if (DeliveryDetailViewModel is null)
                 {
-                    List<Type> validatedModels = 
+                    List<Type> validatedModels =
                     [
                         typeof(Lot),
                         typeof(Shipper),
@@ -314,7 +318,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
                     return;
                 }
 
-                foreach (ProcessStep masterItem in ProcessSteps)
+                foreach (ProcessesStep masterItem in ProcessSteps)
                 {
                     StepViewModel stepViewModel = new(excelService, logger, exportProcedures, toastNotificationsService, masterItem);
 
@@ -380,43 +384,45 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         /// <param name="result">значение наличия ошибок в детальной информации</param>
         private bool HasErrorsInLotDetails(bool result)
         {
-            if (DeliveryDetailViewModel is not null)
-            {
-                bool hasErrorsInDetails = DeliveryDetailViewModel.HasErrors;
-                bool hasShipperNotSelected = DeliveryDetailViewModel.Lot.Shipper is null;
-                bool hasCarrierNotSelected = DeliveryDetailViewModel.Lot.Carrier is null;
-                bool hasDeliveryTermNotSelected = DeliveryDetailViewModel.Lot.DeliveryTerms is null;
-                bool hasTransportTypeNotSelected = DeliveryDetailViewModel.Lot.LotTransportType is null;
-                bool hasArrivalLocationNotSelected = DeliveryDetailViewModel.Lot.LotArrivalLocation is null;
-                bool hasDepartureLocationNotSelected = DeliveryDetailViewModel.Lot.LotDepartureLocation is null;
-                bool hasEtaNotSelected = DeliveryDetailViewModel.Lot.LotEta is null;
-                bool hasPurchaseOrderNotSelected = DeliveryDetailViewModel.Lot.LotPurchaseOrder is null;
-                bool hasTransportNameNotSelected = DeliveryDetailViewModel.Lot.LotTransport.TransportName is null;
-                bool hasTransportNameNotAdded = DeliveryDetailViewModel.IsAddTransportVisible;
+            //if (DeliveryDetailViewModel is not null)
+            //{
+            //    bool hasErrorsInDetails = DeliveryDetailViewModel.HasErrors;
+            //    bool hasShipperNotSelected = DeliveryDetailViewModel.Lot.Shipper is null;
+            //    bool hasCarrierNotSelected = DeliveryDetailViewModel.Lot.Carrier is null;
+            //    bool hasDeliveryTermNotSelected = DeliveryDetailViewModel.Lot.DeliveryTerms is null;
+            //    bool hasTransportTypeNotSelected = DeliveryDetailViewModel.Lot.LotTransportType is null;
+            //    bool hasArrivalLocationNotSelected = DeliveryDetailViewModel.Lot.LotArrivalLocation is null;
+            //    bool hasDepartureLocationNotSelected = DeliveryDetailViewModel.Lot.LotDepartureLocation is null;
+            //    bool hasEtaNotSelected = DeliveryDetailViewModel.Lot.LotEta is null;
+            //    bool hasPurchaseOrderNotSelected = DeliveryDetailViewModel.Lot.LotPurchaseOrder is null;
+            //    bool hasTransportNameNotSelected = DeliveryDetailViewModel.Lot.LotTransport.TransportName is null;
+            //    bool hasTransportNameNotAdded = DeliveryDetailViewModel.IsAddTransportVisible;
 
-                return
-                    hasErrorsInDetails ||
-                    hasShipperNotSelected ||
-                    hasCarrierNotSelected ||
-                    hasDeliveryTermNotSelected ||
-                    hasTransportTypeNotSelected ||
-                    hasArrivalLocationNotSelected ||
-                    hasDepartureLocationNotSelected ||
-                    hasEtaNotSelected ||
-                    hasPurchaseOrderNotSelected ||
-                    hasTransportNameNotSelected ||
-                    hasTransportNameNotAdded ||
-                    result;
-            }
+            //    return
+            //        hasErrorsInDetails ||
+            //        hasShipperNotSelected ||
+            //        hasCarrierNotSelected ||
+            //        hasDeliveryTermNotSelected ||
+            //        hasTransportTypeNotSelected ||
+            //        hasArrivalLocationNotSelected ||
+            //        hasDepartureLocationNotSelected ||
+            //        hasEtaNotSelected ||
+            //        hasPurchaseOrderNotSelected ||
+            //        hasTransportNameNotSelected ||
+            //        hasTransportNameNotAdded ||
+            //        result;
+            //}
 
-            return true;
+            //return true;
+
+            throw new NotImplementedException();
         }
 
-        private async Task<List<ProcessStep>> GetProcessStepsAsync(AppProcess appProcess)
+        private async Task<List<ProcessesStep>> GetProcessStepsAsync(AppProcess appProcess)
         {
             logger.LogInformation(Resources.LogProcessStepsGet);
 
-            List<ProcessStep> result = await deliveryService.GetProcessStepsByUserSectionAsync(appProcess);
+            List<ProcessesStep> result = await deliveryService.GetProcessStepsByUserSectionAsync(appProcess);
 
             logger.LogInformation($"{string.Format(Resources.LogProcessStepsGet, appProcess)} {Resources.Completed}");
 

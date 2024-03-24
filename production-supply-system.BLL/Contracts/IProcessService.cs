@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using DAL.Enums;
-using DAL.Models.Master;
+
+using production_supply_system.EntityFramework.DAL.Enums;
+using production_supply_system.EntityFramework.DAL.Models.MasterSchema;
 
 namespace BLL.Contracts
 {
@@ -16,6 +17,6 @@ namespace BLL.Contracts
         /// <param name="sectionId">уникальный индентификатор секции пользователя</param>
         /// <param name="appProcess">индентификатор процесса прилодения</param>
         /// <returns>Задача, представляющая асинхронную операцию, возвращающая шаги процесса по уникальному секции и процессу приложения</returns>
-        Task<IEnumerable<ProcessStep>> GetProcessStepsByUserSectionAsync(AppProcess appProcess);
+        Task<IEnumerable<ProcessesStep>> GetProcessStepsByUserSectionAsync(AppProcess appProcess);
     }
 }

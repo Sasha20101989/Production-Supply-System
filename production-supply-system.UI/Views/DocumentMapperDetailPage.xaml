@@ -49,7 +49,7 @@
                                      Header="{x:Static properties:Resources.DocumentColumnElementName}"
                                      VerticalAlignment="Center">
                         <TextBox IsEnabled="False"
-                                 Text="{Binding DocumentColumn.ElementName}"
+                                 Text="{Binding ElementName}"
                                  TextWrapping="WrapWithOverflow" />
                     </mah:MetroHeader>
                     <mah:MetroHeader Grid.Column="1"
@@ -57,7 +57,7 @@
                                      Header="{x:Static properties:Resources.DocumentColumnSystemColumnName}"
                                      VerticalAlignment="Center">
                         <TextBox IsEnabled="False"
-                                 Text="{Binding DocumentColumn.SystemColumnName}"
+                                 Text="{Binding SystemColumnName}"
                                  TextWrapping="WrapWithOverflow" />
                     </mah:MetroHeader>
                     <mah:MetroHeader Grid.Column="2"
@@ -77,7 +77,7 @@
                             </DataTemplate>
                         </mah:MetroHeader.HeaderTemplate>
                         <TextBox SpellCheck.IsEnabled="True"
-                                 Text="{Binding ColumnNumber, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToNullableIntConverter}, ValidatesOnDataErrors=True}" />
+                                 Text="{Binding ColumnNr, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToNullableIntConverter}, ValidatesOnDataErrors=True}" />
                     </mah:MetroHeader>
                     <mah:MetroHeader Grid.Column="3"
                                      Margin="{StaticResource SmallLeftMargin}"
@@ -96,7 +96,7 @@
                             </DataTemplate>
                         </mah:MetroHeader.HeaderTemplate>
                         <TextBox SpellCheck.IsEnabled="True"
-                                 Text="{Binding RowNumber, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToNullableIntConverter}, ValidatesOnDataErrors=True}" />
+                                 Text="{Binding RowNr, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToNullableIntConverter}, ValidatesOnDataErrors=True}" />
                     </mah:MetroHeader>
                     <Button Grid.Column="4"
                             Width="28"
@@ -353,7 +353,7 @@
                       VerticalAlignment="Top"
                       Margin="{StaticResource SmallLeftTopRightBottomMargin}"
                       HorizontalAlignment="Stretch"
-                      ItemsSource="{Binding DocumentContent}"
+                      ItemsSource="{Binding DocumentContentViewModels}"
                       ItemTemplate="{StaticResource ItemTemplate}">
             </ListView>
 

@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using DAL.Enums;
-using DAL.Models;
-using DAL.Models.Master;
-using DAL.Models.Partscontrol;
+using production_supply_system.EntityFramework.DAL.Enums;
+using production_supply_system.EntityFramework.DAL.LotContext.Models;
+using production_supply_system.EntityFramework.DAL.Models.dboSchema;
+using production_supply_system.EntityFramework.DAL.Models.MasterSchema;
+using production_supply_system.EntityFramework.DAL.Models.UsersSchema;
 
 namespace BLL.Contracts
 {
@@ -190,7 +191,7 @@ namespace BLL.Contracts
         /// </summary>
         /// <param name="user">Пользователь для которого будут подобраны процессы</param>
         /// <returns>Задача, представляющая асинхронную операцию, возвращающая процессы для пользователя по его секции.</returns>
-        Task<IEnumerable<ProcessStep>> GetProcessStepsByUserAsync(User user);
+        Task<IEnumerable<ProcessesStep>> GetProcessStepsByUserAsync(User user);
 
         /// <summary>
         /// Получает секцию по уникальному идентификатору

@@ -4,15 +4,21 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Media;
+
 using BLL.Contracts;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using DAL.Enums;
-using DAL.Models;
+
 using MahApps.Metro.Controls.Dialogs;
+
 using Microsoft.Extensions.Logging;
+
 using Newtonsoft.Json;
+
+using production_supply_system.EntityFramework.DAL.Enums;
+using production_supply_system.EntityFramework.DAL.LotContext.Models;
+
 using UI_Interface.Properties;
 
 namespace UI_Interface.ViewModels
@@ -110,7 +116,7 @@ namespace UI_Interface.ViewModels
         /// <summary>
         /// Получает или задает дату закрытия лота.
         /// </summary>
-        public DateTime? CloseDate
+        public DateOnly? CloseDate
         {
             get => Lot.CloseDate;
             set => _ = SetProperty(Lot.CloseDate, value, Lot, (model, date) => model.CloseDate = date);
@@ -119,7 +125,7 @@ namespace UI_Interface.ViewModels
         /// <summary>
         /// Получает или задает Expected time Delivery.
         /// </summary>
-        public DateTime? LotEtd
+        public DateOnly? LotEtd
         {
             get => Lot.LotEtd;
             set => _ = SetProperty(Lot.LotEtd, value, Lot, (model, date) => model.LotEtd = date);
@@ -128,7 +134,7 @@ namespace UI_Interface.ViewModels
         /// <summary>
         /// Получает или задает Actual time Delivery.
         /// </summary>
-        public DateTime? LotAtd
+        public DateOnly? LotAtd
         {
             get => Lot.LotAtd;
             set => _ = SetProperty(Lot.LotAtd, value, Lot, (model, date) => model.LotAtd = date);
@@ -137,7 +143,7 @@ namespace UI_Interface.ViewModels
         /// <summary>
         /// Получает или задает Expected time Arrival.
         /// </summary>
-        public DateTime? LotEta
+        public DateOnly LotEta
         {
             get => Lot.LotEta;
             set => _ = SetProperty(Lot.LotEta, value, Lot, (model, date) => model.LotEta = date);
@@ -146,7 +152,7 @@ namespace UI_Interface.ViewModels
         /// <summary>
         /// Получает или задает Actual time Arrival.
         /// </summary>
-        public DateTime? LotAta
+        public DateOnly? LotAta
         {
             get => Lot.LotAta;
             set => _ = SetProperty(Lot.LotAta, value, Lot, (model, date) => model.LotAta = date);
@@ -331,11 +337,11 @@ namespace UI_Interface.ViewModels
         {
             if (Shipper is not null)
             {
-                _logger.LogInformation(string.Format(Resources.LogOrdersGetForShipper, Shipper.Id));
+                _logger.LogInformation(string.Format(Resources.LogOrdersGetForShipper, Shipper.ShipperId));
 
-                PurchaseOrdersForShipper = AllPurchaseOrders.Where(shipper => shipper.Id == Shipper.Id).ToList();
+                PurchaseOrdersForShipper = AllPurchaseOrders.Where(shipper => shipper.ShipperId == Shipper.ShipperId).ToList();
 
-                _logger.LogInformation($"{string.Format(Resources.LogOrdersGetForShipper, Shipper.Id)} {Resources.Completed}");
+                _logger.LogInformation($"{string.Format(Resources.LogOrdersGetForShipper, Shipper.ShipperId)} {Resources.Completed}");
             }
         }
 

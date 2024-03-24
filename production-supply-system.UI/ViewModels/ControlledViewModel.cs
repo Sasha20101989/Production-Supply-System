@@ -1,12 +1,16 @@
-﻿using System.Threading.Tasks;
-using System.Windows.Media;
-using MahApps.Metro.Controls.Dialogs;
-using MahApps.Metro.Controls;
-using UI_Interface.Properties;
-using CommunityToolkit.Mvvm.ComponentModel;
-using Microsoft.Extensions.Logging;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
-using System.Linq;
+using System.Windows.Media;
+
+using CommunityToolkit.Mvvm.ComponentModel;
+
+using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
+
+using Microsoft.Extensions.Logging;
+
+using UI_Interface.Properties;
 
 namespace UI_Interface.ViewModels
 {

@@ -1,6 +1,7 @@
-﻿using MahApps.Metro.Controls;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
+
+using MahApps.Metro.Controls;
 
 namespace UI_Interface.Helpers
 {

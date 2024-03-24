@@ -1,8 +1,6 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Input;
 
-using DAL.Models;
-
 using UI_Interface.ViewModels;
 using UI_Interface.ViewModels.ViewModelsForPages;
 

@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 
-using DAL.Models;
-using DAL.Models.Document;
-
 using DocumentFormat.OpenXml.Spreadsheet;
+
+using production_supply_system.EntityFramework.DAL.DocumentMapperContext.Models;
 
 namespace BLL.Contracts
 {

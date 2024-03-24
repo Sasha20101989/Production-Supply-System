@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
-using DAL.Models.BOM;
+
+using production_supply_system.EntityFramework.DAL.BomModels;
 
 namespace BLL.Contracts
 {

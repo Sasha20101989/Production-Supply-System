@@ -1,22 +1,26 @@
 ﻿using System;
-using System.Threading.Tasks;
-using BLL.Contracts;
-using DAL.Models;
-using MahApps.Metro.Controls;
-using NavigationManager.Frame.Extension.WPF;
-using System.Windows.Media;
-using UI_Interface.Properties;
-using System.Windows;
-using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows.Data;
 using System.ComponentModel;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Data;
+using System.Windows.Media;
+
+using BLL.Contracts;
+
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+
+using Microsoft.Extensions.Logging;
+
+using NavigationManager.Frame.Extension.WPF;
+
+using production_supply_system.EntityFramework.DAL.LotContext.Models;
+
 using UI_Interface.Contracts;
 using UI_Interface.Filters;
-using Microsoft.Extensions.Logging;
-using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.ComponentModel;
+using UI_Interface.Properties;
 
 namespace UI_Interface.ViewModels.ViewModelsForPages
 {
@@ -25,8 +29,8 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
     /// Наследует от ControlledViewModel для уведомлений об изменении свойств и выдачи уведомлений.
     /// </summary>
     public partial class EditDeliveryViewModel(
-        IStaticDataService staticDataService, 
-        IDeliveryService deliveryService, 
+        IStaticDataService staticDataService,
+        IDeliveryService deliveryService,
         ILogger<EditDeliveryViewModel> logger) : ControlledViewModel(logger), INavigationAware
     {
         [ObservableProperty]
@@ -94,7 +98,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
                     TitleParts += SelectedContainer.ContainerNumber;
 
-                    LoadPartsForContainerAsync(SelectedContainer.Id);
+                    LoadPartsForContainerAsync(SelectedContainer.ContainerInLotId);
                 }
                 else
                 {
@@ -628,27 +632,27 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
             if (lot is not null)
             {
                 DeliveryDetailViewModel ??= new DeliveryDetailViewModel([], staticDataService, deliveryService, logger, _progressController)
-                    {
-                        Carrier = lot.Carrier,
-                        LotArrivalLocation = lot.LotArrivalLocation,
-                        LotAta = lot.LotAta,
-                        LotAtd = lot.LotAtd,
-                        LotComment = lot.LotComment,
-                        LotCustomsLocation = lot.LotCustomsLocation,
-                        LotDepartureLocation = lot.LotDepartureLocation,
-                        LotEta = lot.LotEta,
-                        LotEtd = lot.LotEtd,
-                        LotNumber = lot.LotNumber,
-                        LotPurchaseOrder = lot.LotPurchaseOrder,
-                        LotTransport = lot.LotTransport,
-                        LotTransportDocument = lot.LotTransportDocument,
-                        Shipper = lot.Shipper,
-                        TermsOfDelivery = lot.DeliveryTerms,
-                        TypeOfTransport = lot.LotTransportType,
-                        CloseDate = lot.CloseDate
-                    };
+                {
+                    Carrier = lot.Carrier,
+                    LotArrivalLocation = lot.LotArrivalLocation,
+                    LotAta = lot.LotAta,
+                    LotAtd = lot.LotAtd,
+                    LotComment = lot.LotComment,
+                    LotCustomsLocation = lot.LotCustomsLocation,
+                    LotDepartureLocation = lot.LotDepartureLocation,
+                    LotEta = lot.LotEta,
+                    LotEtd = lot.LotEtd,
+                    LotNumber = lot.LotNumber,
+                    LotPurchaseOrder = lot.LotPurchaseOrder,
+                    LotTransport = lot.LotTransport,
+                    LotTransportDocument = lot.LotTransportDocument,
+                    Shipper = lot.Shipper,
+                    TermsOfDelivery = lot.DeliveryTerms,
+                    TypeOfTransport = lot.LotTransportType,
+                    CloseDate = lot.CloseDate
+                };
 
-                ContainersLoaded?.Invoke(this, await GetContainersAsync(lot.Id));
+                ContainersLoaded?.Invoke(this, await GetContainersAsync(lot.LotId));
             }
         }
 

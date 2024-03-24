@@ -4,6 +4,9 @@ CHANGELOG
 
 ### Added 
 
+ - e09d15f - Added models - ALEKSANDR FELYUGIN
+ - d703232 - Added init ef core - ALEKSANDR FELYUGIN
+ - e1803ee - Added logging - ALEKSANDR FELYUGIN
  - a27c426 - Added observable prop - ALEKSANDR FELYUGIN
  - d963523 - Added logging - ALEKSANDR FELYUGIN
  - 372f1d7 - Added multilang bll - ALEKSANDR FELYUGIN
@@ -76,6 +79,14 @@ CHANGELOG
 
 ### Changed 
 
+ - c34002c - Changed models - ALEKSANDR FELYUGIN
+ - ef279a8 - Changed proj - ALEKSANDR FELYUGIN
+ - e47d073 - Changed enums - ALEKSANDR FELYUGIN
+ - ac31774 - Changed enums - ALEKSANDR FELYUGIN
+ - bd0ac65 - Changed data - ALEKSANDR FELYUGIN
+ - 2e28e1e - Changed params - ALEKSANDR FELYUGIN
+ - c2ab1ef - changed BLL - ALEKSANDR FELYUGIN
+ - 5d1fa91 - Changed UI - ALEKSANDR FELYUGIN
  - c42c162 - Changed bom service - ALEKSANDR FELYUGIN
  - 74ae0f1 - Changed viewmodel - ALEKSANDR FELYUGIN
  - 1f924db - Changed wrap panel position - ALEKSANDR FELYUGIN

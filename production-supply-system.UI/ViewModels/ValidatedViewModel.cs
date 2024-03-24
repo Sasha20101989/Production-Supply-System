@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Reflection;
+
 using BLL.Helpers;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 
-using DAL.Models.Document;
-
 using Microsoft.Extensions.Logging;
 
-using UI_Interface.Properties;
+using production_supply_system.EntityFramework.DAL.DocumentMapperContext.Models;
 
-using Windows.Foundation;
+using UI_Interface.Properties;
 
 namespace UI_Interface.ViewModels
 {
@@ -65,31 +63,31 @@ namespace UI_Interface.ViewModels
                 {
                     object propertyValue = propertyViewModelInfo.GetValue(this);
 
-                    if (propertyValue is not null)
+                    //if (propertyValue is not null)
+                    // {
+                    logger.LogInformation(string.Format(Resources.LogValueValidation, propertyValue, columnName));
+
+                    validatedCollection = ValidationHelper.ValidatePropertyInCollection(columnName, propertyValue, Models);
+
+                    if (validatedCollection is not null)
                     {
-                        logger.LogInformation(string.Format(Resources.LogValueValidation, propertyValue, columnName));
+                        customErrors.AddRange(validatedCollection);
+                    }
 
-                        validatedCollection = ValidationHelper.ValidatePropertyInCollection(columnName, propertyValue, Models);
-
-                        if (validatedCollection is not null)
+                    if (customErrors.Count > 0)
+                    {
+                        foreach (CustomError error in customErrors)
                         {
-                            customErrors.AddRange(validatedCollection);
-                        }
-
-                        if (customErrors.Count > 0)
-                        {
-                            foreach (CustomError error in customErrors)
-                            {
-                                AddError(columnName, error.ErrorMessage);
-                            }
-                        }
-                        else
-                        {
-                            ClearError(columnName);
-
-                            logger.LogInformation($"{string.Format(Resources.LogValueValidation, propertyValue, columnName)} {Resources.Completed}");
+                            AddError(columnName, error.ErrorMessage);
                         }
                     }
+                    else
+                    {
+                        ClearError(columnName);
+
+                        logger.LogInformation($"{string.Format(Resources.LogValueValidation, propertyValue, columnName)} {Resources.Completed}");
+                    }
+                    // }
                 }
 
                 HasErrorsUpdated?.Invoke(this, HasErrors);

@@ -3,8 +3,6 @@ using System.Collections.Generic;
 
 using CommunityToolkit.Mvvm.ComponentModel;
 
-using DAL.Models.Document;
-
 using Microsoft.Extensions.Logging;
 
 namespace UI_Interface.ViewModels
@@ -20,57 +18,24 @@ namespace UI_Interface.ViewModels
     public partial class DocumentContentViewModel(List<Type> models, ILogger logger) : ValidatedViewModel<DocumentContentViewModel, List<Type>>(models, logger)
     {
         [ObservableProperty]
-        private Docmapper _document;
+        private int _docmapperContentId;
 
         [ObservableProperty]
-        private DocmapperColumn _documentColumn;
+        private int _docmapperColumnId;
 
         [ObservableProperty]
-        private DocmapperContent _documentContent = new();
+        private int _docmapperId;
 
-        /// <summary>
-        /// Возвращает или задает уникальный идентификатор контента документа.
-        /// </summary>
-        public int DocmapperContentId
-        {
-            get => DocumentContent.Id;
-            set => _ = SetProperty(DocumentContent.Id, value, DocumentContent, (model, docmapperContentId) => model.Id = docmapperContentId);
-        }
+        [ObservableProperty]
+        private string _elementName;
 
-        /// <summary>
-        /// Возвращает или задает уникальный идентификатор документа.
-        /// </summary>
-        public int DocmapperId
-        {
-            get => DocumentContent.DocmapperId;
-            set => _ = SetProperty(DocumentContent.DocmapperId, value, DocumentContent, (model, docmapperId) => model.DocmapperId = docmapperId);
-        }
+        [ObservableProperty]
+        private string _systemColumnName;
 
-        /// <summary>
-        /// Возвращает или задает уникальный идентификатор колонки.
-        /// </summary>
-        public int DocmapperColumnId
-        {
-            get => DocumentContent.DocmapperColumnId;
-            set => _ = SetProperty(DocumentContent.DocmapperColumnId, value, DocumentContent, (model, docmapperColumnId) => model.DocmapperColumnId = docmapperColumnId);
-        }
+        [ObservableProperty]
+        private int _columnNr;
 
-        /// <summary>
-        /// Возвращает или задает значение строки.
-        /// </summary>
-        public int? RowNumber
-        {
-            get => DocumentContent.RowNr;
-            set => _ = SetProperty(DocumentContent.RowNr, value, DocumentContent, (model, row) => model.RowNr = row);
-        }
-
-        /// <summary>
-        /// Возвращает или задает значение колонки.
-        /// </summary>
-        public int ColumnNumber
-        {
-            get => DocumentContent.ColumnNr;
-            set => _ = SetProperty(DocumentContent.ColumnNr, value, DocumentContent, (model, col) => model.ColumnNr = col);
-        }
+        [ObservableProperty]
+        private int? _rowNr;
     }
 }

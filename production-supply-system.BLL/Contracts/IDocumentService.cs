@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using DAL.Models.Document;
+
+using production_supply_system.EntityFramework.DAL.DocumentMapperContext.Models;
 
 namespace BLL.Contracts
 {
@@ -15,13 +16,19 @@ namespace BLL.Contracts
         /// <param name="document"></param>
         /// <param name="documentContent"></param>
         /// <returns>Задача, представляющая асинхронную операцию, добавляющую документ и возвращающую документ с текущим Id.</returns>
-        Task<Docmapper> CreateDocumentAsync(Docmapper document, List<DocmapperContent> documentContent);
+        Task CreateDocumentAsync(Docmapper document);
 
         /// <summary>
         /// Асинхронно получает список карт документов.
         /// </summary>
         /// <returns>Задача, представляющая асинхронную операцию, возвращающую список документов.</returns>
-        Task<IEnumerable<Docmapper>> GetAllDocumentsAsync();
+        Task<List<Docmapper>> GetAllDocumentsAsync();
+
+        /// <summary>
+        /// Асинхронно получает список карт документов.
+        /// </summary>
+        /// <returns>Задача, представляющая асинхронную операцию, возвращающую список документов.</returns>
+        Task<List<Docmapper>> GetFilteredDocumentsAsync(string docmapperName);
 
         /// <summary>
         /// Получает карту по ее уникальному идентификатору
@@ -37,25 +44,20 @@ namespace BLL.Contracts
         Task<IEnumerable<DocmapperColumn>> GetAllColumnsAsync();
 
         /// <summary>
-        /// Асинхронно получает список контента документа.
-        /// </summary>
-        /// <param name="mapId">Уникальный идентификатор карты документа</param>
-        /// <returns>Задача, представляющая асинхронную операцию, возвращающую список контента документа.</returns>
-        Task<List<DocmapperContent>> GetAllDocumentContentItemsByIdAsync(int mapId);
-
-        /// <summary>
         /// Асинхронно обновляет документ.
         /// </summary>
         /// <param name="document"></param>
         /// <param name="documentContent"></param>
         /// <returns>Задача, представляющая асинхронную операцию, обновляющую документ.</returns>
-        Task UpdateDocumentAsync(Docmapper document, List<DocmapperContent> documentContent);
+        Task UpdateDocumentAsync(Docmapper document);
 
         /// <summary>
         /// Асинхронно добавляет элемент используемый в элементе контента документа
         /// </summary>
         /// <param name="documentColumn">Информация о элементе используемом в элементе контента документа</param>
         /// <returns>Задача, представляющая асинхронную операцию, добавляющую элемент используемый в элементе контента документа.</returns>
-        Task<DocmapperColumn> AddDocumentColumnAsync(DocmapperColumn documentColumn);
+        Task AddDocumentColumnAsync(DocmapperColumn documentColumn);
+
+        Task UpdateDocumentContentsAsync(ICollection<DocmapperContent> docmapperContents, int docmapperId);
     }
 }

@@ -1,13 +1,12 @@
 ﻿using CommunityToolkit.WinUI.Notifications;
 
-using File.Manager;
-
 using UI_Interface.Contracts;
 
 using Windows.Data.Xml.Dom;
 using Windows.UI.Notifications;
 
-namespace UI_Interface.Services {
+namespace UI_Interface.Services
+{
     public partial class ToastNotificationsService
     {
         private readonly ISystemService _systemService;

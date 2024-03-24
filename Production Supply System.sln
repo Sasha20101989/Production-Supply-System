@@ -5,18 +5,14 @@ VisualStudioVersion = 17.9.34701.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "production-supply-system.UI", "production-supply-system.UI\production-supply-system.UI.csproj", "{F4512183-14E7-4247-B9A3-118E6CA1DDF5}"
 	ProjectSection(ProjectDependencies) = postProject
-		{5D831426-DEA5-423E-8A2F-5A0521418155} = {5D831426-DEA5-423E-8A2F-5A0521418155}
 		{7264D42E-8D91-4143-AD07-DF3A0320E483} = {7264D42E-8D91-4143-AD07-DF3A0320E483}
 		{CECB628C-D2F4-4C1B-8180-419F35B30158} = {CECB628C-D2F4-4C1B-8180-419F35B30158}
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "production-supply-system.BLL", "production-supply-system.BLL\production-supply-system.BLL.csproj", "{CECB628C-D2F4-4C1B-8180-419F35B30158}"
 	ProjectSection(ProjectDependencies) = postProject
-		{5D831426-DEA5-423E-8A2F-5A0521418155} = {5D831426-DEA5-423E-8A2F-5A0521418155}
 		{7264D42E-8D91-4143-AD07-DF3A0320E483} = {7264D42E-8D91-4143-AD07-DF3A0320E483}
 	EndProjectSection
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "production-supply-system.DAL", "production-supply-system.DAL\production-supply-system.DAL.csproj", "{5D831426-DEA5-423E-8A2F-5A0521418155}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8ACA62FB-B212-4EBB-8330-63C4AE3BA5A4}"
 	ProjectSection(SolutionItems) = preProject
@@ -29,7 +25,7 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "db-production-supply-system
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "db-Build-Of-Materials", "..\db-build-of-materials\db-Build-Of-Materials.sqlproj", "{A0FA42D6-CE31-4C33-9960-2A3AD531A360}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "production-supply-system.EntityFramework.DAL", "production-supply-system.EntityFramework.DAL\production-supply-system.EntityFramework.DAL.csproj", "{7264D42E-8D91-4143-AD07-DF3A0320E483}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "production-supply-system.EntityFramework.DAL", "production-supply-system.EntityFramework.DAL\production-supply-system.EntityFramework.DAL.csproj", "{7264D42E-8D91-4143-AD07-DF3A0320E483}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,10 +41,6 @@ Global
 		{CECB628C-D2F4-4C1B-8180-419F35B30158}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CECB628C-D2F4-4C1B-8180-419F35B30158}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CECB628C-D2F4-4C1B-8180-419F35B30158}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5D831426-DEA5-423E-8A2F-5A0521418155}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5D831426-DEA5-423E-8A2F-5A0521418155}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5D831426-DEA5-423E-8A2F-5A0521418155}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5D831426-DEA5-423E-8A2F-5A0521418155}.Release|Any CPU.Build.0 = Release|Any CPU
 		{68C89890-4E28-411E-9978-D7B87797AA46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{68C89890-4E28-411E-9978-D7B87797AA46}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68C89890-4E28-411E-9978-D7B87797AA46}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows;
 using System.Windows.Media;
 
 using BLL.Contracts;
@@ -10,13 +8,11 @@ using BLL.Contracts;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
-using DAL.Models.Document;
-
-using MahApps.Metro.Controls;
-
 using Microsoft.Extensions.Logging;
 
 using NavigationManager.Frame.Extension.WPF;
+
+using production_supply_system.EntityFramework.DAL.DocumentMapperContext.Models;
 
 using UI_Interface.Properties;
 
@@ -28,7 +24,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
     /// </summary>
     public partial class DocumentMapperViewModel(
         IDocumentService documentService,
-        INavigationManager navigationManager, 
+        INavigationManager navigationManager,
         ILogger<DocumentMapperViewModel> logger) : ControlledViewModel(logger), INavigationAware
     {
         private string _searchText;
@@ -66,11 +62,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
                 logger.LogInformation(string.Format(Resources.LogDocmapperFilter, SearchText));
 
-                IEnumerable<Docmapper> filteredDocuments = (await documentService.GetAllDocumentsAsync())
-                        .ToList()
-                        .Where(document =>
-                              document.DocmapperName.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
-                        .ToList();
+                List<Docmapper> filteredDocuments = await documentService.GetFilteredDocumentsAsync(SearchText);
 
                 Source.Clear();
 
@@ -113,12 +105,13 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         [RelayCommand]
         private void NavigateToDetail(object parameter)
         {
-            if(parameter is null)
+            if (parameter is null)
             {
                 _ = navigationManager.NavigateTo(
                 typeof(DocumentMapperDetailViewModel).FullName,
                 null);
-            }else if (parameter is Docmapper document)
+            }
+            else if (parameter is Docmapper document)
             {
                 _ = navigationManager.NavigateTo(
                 typeof(DocumentMapperDetailViewModel).FullName,

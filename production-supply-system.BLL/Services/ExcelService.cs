@@ -9,9 +9,6 @@ using BLL.Properties;
 
 using ClosedXML.Excel;
 
-using DAL.Models;
-using DAL.Models.Document;
-
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
@@ -19,6 +16,8 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
+
+using production_supply_system.EntityFramework.DAL.DocumentMapperContext.Models;
 
 namespace BLL.Services
 {
@@ -213,7 +212,7 @@ namespace BLL.Services
                     if (!string.Equals(cell?.ToString(), contentItem?.DocmapperColumn?.ElementName, StringComparison.OrdinalIgnoreCase))
                     {
                         string message = $"{Resources.Error} {string.Format(Resources.LogExcelHeaderValidation, firstRow)}: {string.Format(Resources.LogExceptionExpectedPlace, contentItem?.DocmapperColumn?.ElementName, cell?.ToString())}";
-                        
+
                         logger.LogError(message);
 
                         throw new Exception(message);

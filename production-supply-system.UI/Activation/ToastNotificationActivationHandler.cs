@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Navigation;
 using System.Windows;
 
 using Microsoft.Extensions.Configuration;
 
-using UI_Interface.Contracts.Views;
-using NavigationManager.Frame.Extension.WPF;
 using UI_Interface.Contracts.Activation;
+using UI_Interface.Contracts.Views;
 
 namespace UI_Interface.Activation
 {

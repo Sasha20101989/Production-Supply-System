@@ -1,21 +1,24 @@
 ﻿using System;
-using DAL.Models.Master;
-using System.Threading.Tasks;
-using System.Linq;
-using BLL.Contracts;
-using MahApps.Metro.Controls;
-using System.Windows.Media;
-using UI_Interface.Properties;
-using System.IO;
-using Microsoft.Extensions.Logging;
-using Microsoft.WindowsAPICodePack.Dialogs;
-using DAL.Enums;
 using System.Collections.Generic;
-using DAL.Models.Document;
-using UI_Interface.Contracts;
-using CommunityToolkit.Mvvm.Input;
+using System.IO;
+using System.Threading.Tasks;
+using System.Windows.Media;
+
+using BLL.Contracts;
+
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+
+using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
+
+using production_supply_system.EntityFramework.DAL.DocumentMapperContext.Models;
+using production_supply_system.EntityFramework.DAL.Enums;
+using production_supply_system.EntityFramework.DAL.Models.MasterSchema;
+
+using UI_Interface.Contracts;
+using UI_Interface.Properties;
 
 namespace UI_Interface.ViewModels
 {
@@ -28,17 +31,17 @@ namespace UI_Interface.ViewModels
     /// <param name="documentService">Сервис для работы с документами.</param>
     /// <param name="excelService">Сервис для работы с Excel-файлами.</param>
     public partial class StepViewModel(
-        IExcelService excelService, 
-        ILogger logger, 
+        IExcelService excelService,
+        ILogger logger,
         IExportProceduresService exportProcedures,
-        IToastNotificationsService toastNotificationsService, 
-        ProcessStep masterItem) : ControlledViewModel(logger)
+        IToastNotificationsService toastNotificationsService,
+        ProcessesStep masterItem) : ControlledViewModel(logger)
     {
         [ObservableProperty]
         private bool? _hasError;
 
         [ObservableProperty]
-        private ProcessStep _processStep = masterItem;
+        private ProcessesStep _processStep = masterItem;
 
         /// <summary>
         /// Обработчик команды экспорта в файл.
@@ -65,7 +68,7 @@ namespace UI_Interface.ViewModels
                                 ProcessStep.StepName,
                                 ProcessStep.Docmapper.Folder,
                                 ProcessStep.Docmapper.SheetName,
-                                ProcessStep.Docmapper.DocmapperContents);
+                                [.. ProcessStep.Docmapper.DocmapperContents]);
                 }
                 catch (Exception ex)
                 {
@@ -167,17 +170,20 @@ namespace UI_Interface.ViewModels
         /// <param name="folder">Путь к файлу.</param>
         /// <param name="sheetName">Имя листа в Excel.</param>
         /// <param name="firstDataRow">Номер первой строки с данными.</param>
-        private void ReadAndValidateFileAsync(string folder, string sheetName, int firstDataRow)
+        private void ReadAndValidateFileAsync(string folder, string sheetName, int? firstDataRow)
         {
             try
             {
-                logger.LogInformation(string.Format(Resources.LogValidatingHeaders, folder));
+                if (firstDataRow is not null)
+                {
+                    logger.LogInformation(string.Format(Resources.LogValidatingHeaders, folder));
 
-                ProcessStep.Docmapper.Data = excelService.ValidateExcelDataHeaders(firstDataRow, [.. ProcessStep.Docmapper.DocmapperContents], folder, sheetName);
+                    ProcessStep.Docmapper.Data = excelService.ValidateExcelDataHeaders((int)firstDataRow, [.. ProcessStep.Docmapper.DocmapperContents], folder, sheetName);
 
-                HasError = ProcessStep.Docmapper.Data is null;
+                    HasError = ProcessStep.Docmapper.Data is null;
 
-                logger.LogInformation($"{string.Format(Resources.LogValidatingHeaders, folder)} {Resources.Completed} {string.Format(Resources.LogWithResult, HasError)}");
+                    logger.LogInformation($"{string.Format(Resources.LogValidatingHeaders, folder)} {Resources.Completed} {string.Format(Resources.LogWithResult, HasError)}");
+                }
             }
             catch (Exception)
             {
