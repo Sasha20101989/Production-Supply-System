@@ -1,16 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 using BLL.Contracts;
+using BLL.Properties;
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+
+using Newtonsoft.Json;
 
 using production_supply_system.EntityFramework.DAL.Context;
 using production_supply_system.EntityFramework.DAL.Enums;
+using production_supply_system.EntityFramework.DAL.Extensions;
+using production_supply_system.EntityFramework.DAL.LotContext;
 using production_supply_system.EntityFramework.DAL.LotContext.Models;
+using production_supply_system.EntityFramework.DAL.MasterProcessContext.Models;
 using production_supply_system.EntityFramework.DAL.Models.dboSchema;
-using production_supply_system.EntityFramework.DAL.Models.MasterSchema;
 using production_supply_system.EntityFramework.DAL.Models.UsersSchema;
 
 
@@ -29,7 +36,8 @@ namespace BLL.Services
     /// <param name="containerTypeRepository">Репозиторий для доступа к информации о типах контейнеров.</param>
     /// <param name="logger">Регистратор для отслеживания информации и ошибок.</param>
     public class StaticDataService(
-        PSSContext db,
+        LotContext lotContext,
+        MasterProcessContext masterProcessContext,
         ILogger<StaticDataService> logger) : IStaticDataService
     {
 
@@ -427,103 +435,97 @@ namespace BLL.Services
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<Shipper>> GetAllShippersAsync()
+        public async Task<List<Shipper>> GetAllShippersAsync()
         {
-            //try
-            //{
-            //    logger.LogTrace(Resources.LogShipperGet);
+            try
+            {
+                logger.LogTrace(Resources.LogShipperGet);
 
-            //    IEnumerable<Shipper> shippers = await shipperRepository.GetAllAsync();
+                List<Shipper> shippers = await lotContext.Shippers.ToListAsync();
 
-            //    logger.LogTrace($"{Resources.LogShipperGet} {Resources.Completed}");
+                logger.LogTrace($"{Resources.LogShipperGet} {Resources.Completed}");
 
-            //    return shippers;
-            //}
-            //catch (Exception ex)
-            //{
-            //    string message = $"{Resources.Error} {Resources.LogShipperGet}: {JsonConvert.SerializeObject(ex)}";
+                return shippers;
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {Resources.LogShipperGet}: {JsonConvert.SerializeObject(ex)}";
 
-            //    logger.LogError(message);
+                logger.LogError(message);
 
-            //    throw new Exception(message);
-            //}
+                throw new Exception(message);
+            }
 
             throw new NotImplementedException();
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<Carrier>> GetAllCarriersAsync()
+        public async Task<List<Carrier>> GetAllCarriersAsync()
         {
-            //try
-            //{
-            //    logger.LogTrace(Resources.LogCarrierGet);
+            try
+            {
+                logger.LogTrace(Resources.LogCarrierGet);
 
-            //    IEnumerable<Carrier> carriers = await carrierRepository.GetAllAsync();
+                List<Carrier> carriers = await lotContext.Carriers.ToListAsync();
 
-            //    logger.LogTrace($"{Resources.LogCarrierGet} {Resources.Completed}");
+                logger.LogTrace($"{Resources.LogCarrierGet} {Resources.Completed}");
 
-            //    return carriers;
-            //}
-            //catch (Exception ex)
-            //{
-            //    string message = $"{Resources.Error} {Resources.LogCarrierGet}: {JsonConvert.SerializeObject(ex)}";
+                return carriers;
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {Resources.LogCarrierGet}: {JsonConvert.SerializeObject(ex)}";
 
-            //    logger.LogError(message);
+                logger.LogError(message);
 
-            //    throw new Exception(message);
-            //}
-
-            throw new NotImplementedException();
+                throw new Exception(message);
+            }
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TermsOfDelivery>> GetAllTermsOfDeliveryAsync()
+        public async Task<List<TermsOfDelivery>> GetAllTermsOfDeliveryAsync()
         {
-            //try
-            //{
-            //    logger.LogTrace(Resources.LogTermsOfDeliveryGet);
+            try
+            {
+                logger.LogTrace(Resources.LogTermsOfDeliveryGet);
 
-            //    IEnumerable<TermsOfDelivery> termsOfDelivery = await termsOfDeliveryRepository.GetAllAsync();
+                List<TermsOfDelivery> termsOfDelivery = await lotContext.TermsOfDeliveries.ToListAsync();
 
-            //    logger.LogTrace($"{Resources.LogTermsOfDeliveryGet} {Resources.Completed}");
+                logger.LogTrace($"{Resources.LogTermsOfDeliveryGet} {Resources.Completed}");
 
-            //    return termsOfDelivery;
-            //}
-            //catch (Exception ex)
-            //{
-            //    string message = $"{Resources.Error} {Resources.LogTermsOfDeliveryGet}: {JsonConvert.SerializeObject(ex)}";
+                return termsOfDelivery;
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {Resources.LogTermsOfDeliveryGet}: {JsonConvert.SerializeObject(ex)}";
 
-            //    logger.LogError(message);
+                logger.LogError(message);
 
-            //    throw new Exception(message);
-            //}
-
-            throw new NotImplementedException();
+                throw new Exception(message);
+            }
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<TypesOfTransport>> GetAllTransportTypesAsync()
+        public async Task<List<TypesOfTransport>> GetAllTransportTypesAsync()
         {
-            //try
-            //{
-            //    logger.LogTrace(Resources.LogTypesOfTransportGet);
+            try
+            {
+                logger.LogTrace(Resources.LogTypesOfTransportGet);
 
-            //    IEnumerable<TypesOfTransport> typesOfTransports = await transportTypeRepository.GetAllAsync();
+                List<TypesOfTransport> typesOfTransports = await lotContext.TypesOfTransports.ToListAsync();
 
-            //    logger.LogTrace($"{Resources.LogTypesOfTransportGet} {Resources.Completed}");
+                logger.LogTrace($"{Resources.LogTypesOfTransportGet} {Resources.Completed}");
 
-            //    return typesOfTransports;
-            //}
-            //catch (Exception ex)
-            //{
-            //    string message = $"{Resources.Error} {Resources.LogTypesOfTransportGet}: {JsonConvert.SerializeObject(ex)}";
+                return typesOfTransports;
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {Resources.LogTypesOfTransportGet}: {JsonConvert.SerializeObject(ex)}";
 
-            //    logger.LogError(message);
+                logger.LogError(message);
 
-            //    throw new Exception(message);
-            //}
-
-            throw new NotImplementedException();
+                throw new Exception(message);
+            }
         }
 
         /// <inheritdoc />
@@ -559,28 +561,26 @@ namespace BLL.Services
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<Transport>> GetAllTransportsAsync()
+        public async Task<List<Transport>> GetAllTransportsAsync()
         {
-            //try
-            //{
-            //    logger.LogTrace(Resources.LogTransportGet);
+            try
+            {
+                logger.LogTrace(Resources.LogTransportGet);
 
-            //    IEnumerable<Transport> transports = await transportRepository.GetAllAsync();
+                List<Transport> transports = await lotContext.Transports.ToListAsync();
 
-            //    logger.LogTrace($"{Resources.LogTransportGet} {Resources.Completed}");
+                logger.LogTrace($"{Resources.LogTransportGet} {Resources.Completed}");
 
-            //    return transports;
-            //}
-            //catch (Exception ex)
-            //{
-            //    string message = $"{Resources.Error} {Resources.LogTransportGet}: {JsonConvert.SerializeObject(ex)}";
+                return transports;
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {Resources.LogTransportGet}: {JsonConvert.SerializeObject(ex)}";
 
-            //    logger.LogError(message);
+                logger.LogError(message);
 
-            //    throw new Exception(message);
-            //}
-
-            throw new NotImplementedException();
+                throw new Exception(message);
+            }
         }
 
         /// <inheritdoc />
@@ -613,15 +613,24 @@ namespace BLL.Services
         /// <inheritdoc />
         public async Task<TypesOfPacking> GetExistingPackingTypeByTypeAsync(string packingType)
         {
-            //logger.LogInformation(string.Format(Resources.LogTypesOfPackingGetByTypeName, packingType));
+            try
+            {
+                logger.LogInformation(string.Format(Resources.LogTypesOfPackingGetByTypeName, packingType));
 
-            //TypesOfPacking result = (await GetAllPackingTypesAsync()).FirstOrDefault(c => c.SupplierPackingType == packingType);
+                TypesOfPacking result = await lotContext.TypesOfPackings.FirstOrDefaultAsync(c => c.SupplierPackingType == packingType);
 
-            //logger.LogInformation($"{string.Format(Resources.LogTypesOfPackingGetByTypeName, packingType)} {Resources.Completed}, {string.Format(Resources.LogWithResult, result)}");
+                logger.LogInformation($"{string.Format(Resources.LogTypesOfPackingGetByTypeName, packingType)} {Resources.Completed}, {string.Format(Resources.LogWithResult, result)}");
 
-            //return result;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {string.Format(Resources.LogTypesOfPackingGetByTypeName, packingType)}: {JsonConvert.SerializeObject(ex)}";
 
-            throw new NotImplementedException();
+                logger.LogError(message);
+
+                throw new Exception(message);
+            }
         }
 
         /// <inheritdoc />
@@ -654,36 +663,55 @@ namespace BLL.Services
         }
 
         /// <inheritdoc />
-        public async Task<IEnumerable<Location>> GetLocationsByTypeAsync(LocationType locationType)
+        public async Task<List<Location>> GetLocationsByTypeAsync(LocationType locationType)
         {
-            //IEnumerable<Location> locations = await GetAllLocationsAsync();
+            try
+            {
+                string locationTypeName = EnumExtensions.GetDescription(locationType);
 
-            //string locationTypeName = EnumExtensions.GetDescription(locationType);
+                logger.LogInformation($"{string.Format(Resources.LogLocationFilterByType, locationTypeName)}");
 
-            //logger.LogInformation($"{string.Format(Resources.LogLocationFilterByType, locationTypeName)}");
+                List<Location> filteredLocations = await lotContext.Locations
+                    .Where(location => location.LocationType.LocationType == locationTypeName)
+                    .Include(location => location.LocationType)
+                    .ToListAsync();
 
-            //IEnumerable<Location> filteredLocations = locations.Where(location => location.LocationType.LocationType == locationTypeName);
+                logger.LogInformation($"{string.Format(Resources.LogLocationFilterByType, locationTypeName)} {Resources.Completed}");
 
-            //logger.LogInformation($"{string.Format(Resources.LogLocationFilterByType, locationTypeName)} {Resources.Completed}");
+                return filteredLocations;
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {string.Format(Resources.LogLocationFilterByType, locationType)}: {JsonConvert.SerializeObject(ex)}";
 
-            //return filteredLocations;
+                logger.LogError(message);
 
-            throw new NotImplementedException();
+                throw new Exception(message);
+            }
         }
 
         /// <inheritdoc />
         public async Task<TypesOfContainer> GetContainerTypeByName(string containerTypeName)
         {
-            //logger.LogInformation($"{string.Format(Resources.LogTypesOfContainerGetByTypeName, containerTypeName)}");
+            try
+            {
+                logger.LogInformation($"{string.Format(Resources.LogTypesOfContainerGetByTypeName, containerTypeName)}");
 
-            //TypesOfContainer result = (await GetAllContainerTypes())
-            //          .FirstOrDefault(ct => ct.ContainerType == containerTypeName);
+                TypesOfContainer containerType = await lotContext.TypesOfContainers
+                    .FirstOrDefaultAsync(c => c.ContainerType == containerTypeName);
 
-            //logger.LogInformation($"{string.Format(Resources.LogTypesOfContainerGetByTypeName, containerTypeName)} {Resources.Completed} {string.Format(Resources.LogWithResult, result)}");
+                logger.LogInformation($"{string.Format(Resources.LogTypesOfContainerGetByTypeName, containerTypeName)} {Resources.Completed} {string.Format(Resources.LogWithResult, containerType)}");
 
-            //return result;
+                return containerType;
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {string.Format(Resources.LogTypesOfContainerGetByTypeName, containerTypeName)}: {JsonConvert.SerializeObject(ex)}";
 
-            throw new NotImplementedException();
+                logger.LogError(message);
+
+                throw new Exception(message);
+            }
         }
 
         /// <inheritdoc />
@@ -704,15 +732,24 @@ namespace BLL.Services
         /// <inheritdoc />
         public async Task<TypesOfPart> GetPartTypeByNameAsync(PartTypes partType)
         {
-            //logger.LogInformation($"{string.Format(Resources.LogTypesOfPartGetByPartTypeName, partType)}");
+            try
+            {
+                logger.LogInformation($"{string.Format(Resources.LogTypesOfPartGetByPartTypeName, partType)}");
 
-            //TypesOfPart result = (await GetAllPartTypesAsync()).FirstOrDefault(pt => pt.PartType == partType);
+                TypesOfPart result = await lotContext.TypesOfParts.FirstOrDefaultAsync(pt => pt.PartType == partType.ToString());
 
-            //logger.LogInformation($"{string.Format(Resources.LogTypesOfPartGetByPartTypeName, partType)} {Resources.Completed} {string.Format(Resources.LogWithResult, result)}");
+                logger.LogInformation($"{string.Format(Resources.LogTypesOfPartGetByPartTypeName, partType)} {Resources.Completed} {string.Format(Resources.LogWithResult, result)}");
 
-            //return result;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {string.Format(Resources.LogTypesOfPartGetByPartTypeName, partType)}: {JsonConvert.SerializeObject(ex)}";
 
-            throw new NotImplementedException();
+                logger.LogError(message);
+
+                throw new Exception(message);
+            }
         }
 
         /// <inheritdoc />
@@ -722,7 +759,7 @@ namespace BLL.Services
             //{
             //    logger.LogTrace($"{string.Format(Resources.LogProcessStepGetBySectionId, user.SectionId)}");
 
-            //    List<ProcessesStep> steps = await db.ProcessesSteps.Where(c => c.SectionId == user.SectionId).ToListAsync();
+            //    List<ProcessesStep> steps = await masterProcessContext.ProcessesSteps.Where(c => c.SectionId == user.SectionId).ToListAsync();
 
             //    IEnumerable<ProcessesStep> steps1 = (await processStepsRepository.GetAllAsync())
             //        .Where(c => c.SectionId == user.SectionId);
@@ -734,28 +771,6 @@ namespace BLL.Services
             //catch (Exception ex)
             //{
             //    string message = $"{Resources.Error} {string.Format(Resources.LogProcessStepGetBySectionId, user.SectionId)}: {JsonConvert.SerializeObject(ex)}";
-
-            //    logger.LogError(message);
-
-            //    throw new Exception(message);
-            //}
-
-            throw new NotImplementedException();
-        }
-
-        private void RefreshTransport()
-        {
-            //try
-            //{
-            //    logger.LogTrace(Resources.LogTransportRefresh);
-
-            //    transportRepository.RefreshData();
-
-            //    logger.LogTrace($"{Resources.LogTransportRefresh} {Resources.Completed}");
-            //}
-            //catch (Exception ex)
-            //{
-            //    string message = $"{Resources.Error} {Resources.LogTransportRefresh}: {JsonConvert.SerializeObject(ex)}";
 
             //    logger.LogError(message);
 

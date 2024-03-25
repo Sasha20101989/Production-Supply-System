@@ -32,6 +32,14 @@ namespace BLL.Services
 
                 User user = await db.Users
                     .Include(u => u.Section)
+                    .ThenInclude(s => s.ProcessesSteps)
+                    .ThenInclude(s => s.Process)
+                    .Include(u => u.Section)
+                    .ThenInclude(s => s.ProcessesSteps)
+                    .ThenInclude(s => s.Docmapper)
+                    .ThenInclude(s => s.DocmapperContents)
+                    .ThenInclude(s => s.DocmapperColumn)
+
                     .FirstOrDefaultAsync(u => u.Account == userAccount);
 
                 logger.LogInformation($"{string.Format(Resources.LogUsersGetByAccount, userAccount)} {Resources.Completed}");

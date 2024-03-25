@@ -19,6 +19,7 @@ using NavigationManager.Frame.Extension.WPF;
 using production_supply_system.EntityFramework.DAL.LotContext.Models;
 
 using UI_Interface.Contracts;
+using UI_Interface.Extensions;
 using UI_Interface.Filters;
 using UI_Interface.Properties;
 
@@ -98,7 +99,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
                     TitleParts += SelectedContainer.ContainerNumber;
 
-                    LoadPartsForContainerAsync(SelectedContainer.ContainerInLotId);
+                    CreatePartsForContainer();
                 }
                 else
                 {
@@ -300,18 +301,18 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
         public async void OnNavigatedTo(object parameter)
         {
-            LotLoaded += OnLotLoadedAsync;
-
-            ContainersLoaded += OnContainersLoaded;
-
             if (parameter is int lotId)
             {
                 Lot lot = await GetLotByIdAsync(lotId);
 
-                LotLoaded?.Invoke(this, lot);
+                if (lot is not null)
+                {
+                    CreateContainers(lot);
+
+                    CreateDetails(lot);
+                }
             }
         }
-
 
         /// <summary>
         /// Редактирует детальную информацию
@@ -323,7 +324,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
             {
                 await CreateController(Resources.EditDeliveryPageTitle);
 
-                throw new Exception("Этот функционал находится в разработке.");
+                throw new Exception("Этот функционал находится в разработке");
 
             }
             catch (Exception ex)
@@ -359,51 +360,101 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         }
 
         /// <summary>
-        /// Згружает детали для выбранного контейнера
-        /// </summary>    
-        private async void LoadPartsForContainerAsync(int containerId)
+        /// Получает лот по уникальному идентификатору
+        /// </summary>
+        /// <param name="lotId">уникальный идентификатор лота</param>
+        /// <returns>Задача представляющая асинхронную операцию возвращающую лот по уникальному идентификатору</returns>
+        private async Task<Lot> GetLotByIdAsync(int lotId)
         {
             try
             {
-                await CreateController(Resources.BllLoadPartsForContainer);
+                logger.LogInformation(string.Format(Resources.LogLotGetById, lotId));
 
-                if (Parts.Count != 0)
-                {
-                    Parts.Clear();
-                }
+                await CreateController(Resources.BllDownloadLot);
 
-                logger.LogInformation(string.Format(Resources.LogGetPartsForContainer, containerId));
+                Lot lot = await deliveryService.GetLotByIdAsync(lotId);
 
-                foreach (PartsInContainer part in await deliveryService.GetPartsForContainerAsync(containerId))
-                {
-                    if (part is not null)
-                    {
-                        Parts.Add(part);
-                    }
-                }
+                logger.LogInformation($"{string.Format(Resources.LogLotGetById, lotId)} {Resources.Completed}");
 
-                TotalQuantityGrossWeight = Parts.Sum(p => p.Case.GrossWeight);
-
-                TotalQuantityNetWeight = Parts.Sum(p => p.Case.NetWeight);
-
-                TotalQuantityParts = Parts.Sum(p => p.Quantity);
-
-                logger.LogInformation($"{string.Format(Resources.LogGetPartsForContainer, containerId)} {Resources.Completed}");
-
-                PartsView = CollectionViewSource.GetDefaultView(Parts);
-
-                UpdatePartsFilters();
+                return lot;
             }
             catch (Exception ex)
             {
                 await WaitForMessageUnlock(Resources.ShellError, ex.Message, Brushes.IndianRed);
 
-                return;
+                return null;
             }
             finally
             {
                 await ControllerPostProcess();
             }
+        }
+
+        /// <summary>
+        /// Устанавливает детали для выбранного контейнера
+        /// </summary>    
+        private void CreatePartsForContainer()
+        {
+            if (Parts.Count != 0)
+            {
+                Parts.Clear();
+            }
+
+            Parts.AddRange(SelectedContainer.PartsInContainers);
+
+            TotalQuantityGrossWeight = Parts.Sum(p => p.Case.GrossWeight);
+
+            TotalQuantityNetWeight = Parts.Sum(p => p.Case.NetWeight);
+
+            TotalQuantityParts = Parts.Sum(p => p.Quantity);
+
+            PartsView = CollectionViewSource.GetDefaultView(Parts);
+
+            UpdatePartsFilters();
+        }
+
+        /// <summary>
+        /// Устанавливает контейнеры для выбранного лота
+        /// </summary> 
+        private void CreateContainers(Lot lot)
+        {
+            if (Containers.Count != 0)
+            {
+                Containers.Clear();
+            }
+
+            Containers.AddRange(lot.ContainersInLots);
+
+            ContainersView = CollectionViewSource.GetDefaultView(Containers);
+
+            UpdateContainersFilters();
+        }
+
+        /// <summary>
+        /// Устанавливает детальную информацию для выбранного лота
+        /// </summary> 
+        private void CreateDetails(Lot lot)
+        {
+            DeliveryDetailViewModel ??= new DeliveryDetailViewModel([], staticDataService, deliveryService, logger, _progressController)
+            {
+                Carrier = lot.Carrier,
+                LotArrivalLocation = lot.LotArrivalLocation,
+                LotAta = lot.LotAta,
+                LotAtd = lot.LotAtd,
+                LotComment = lot.LotComment,
+                LotCustomsLocation = lot.LotCustomsLocation,
+                LotDepartureLocation = lot.LotDepartureLocation,
+                LotEta = lot.LotEta,
+                LotEtd = lot.LotEtd,
+                LotNumber = lot.LotNumber,
+                LotPurchaseOrder = lot.LotPurchaseOrder,
+                LotTransport = lot.LotTransport,
+                LotTransportDocument = lot.LotTransportDocument,
+                Shipper = lot.Shipper,
+                DeliveryTerms = lot.DeliveryTerms,
+                LotTransportType = lot.LotTransportType,
+                CloseDate = lot.CloseDate
+            };
         }
 
         /// <summary>
@@ -538,132 +589,5 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
             logger.LogInformation($"{Resources.LogUpplyFiltersForContainers} {Resources.Completed}");
         }
-
-        /// <summary>
-        /// Получает список контейнеров по уникальному идентификатору лота
-        /// </summary>
-        /// <param name="lotId">уникальный идентификатор лота</param>
-        /// <returns>Затача представляющая асинхронную операцию, возвращающую список контейнеров по уникальному идентификатору лота</returns>
-        private async Task<List<ContainersInLot>> GetContainersAsync(int lotId)
-        {
-            try
-            {
-                await CreateController(Resources.BllDownloadContainers);
-
-                logger.LogInformation(string.Format(Resources.LogGetContainersByLotId, lotId));
-
-                List<ContainersInLot> result = await deliveryService.GetAllContainersByLotIdAsync(lotId);
-
-                logger.LogInformation($"{string.Format(Resources.LogGetContainersByLotId, lotId)} {Resources.Completed}");
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                await WaitForMessageUnlock(Resources.ShellError, ex.Message, Brushes.IndianRed);
-
-                return null;
-            }
-            finally
-            {
-                await ControllerPostProcess();
-            }
-        }
-
-        /// <summary>
-        /// Получает лот по уникальному идентификатору
-        /// </summary>
-        /// <param name="lotId">уникальный идентификатор лота</param>
-        /// <returns>Задача представляющая асинхронную операцию возвращающую лот по уникальному идентификатору</returns>
-        private async Task<Lot> GetLotByIdAsync(int lotId)
-        {
-            try
-            {
-                logger.LogInformation(string.Format(Resources.LogLotGetById, lotId));
-
-                await CreateController(Resources.BllDownloadLot);
-
-                Lot result = await deliveryService.GetLotByIdAsync(lotId);
-
-                logger.LogInformation($"{string.Format(Resources.LogLotGetById, lotId)} {Resources.Completed}");
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                await WaitForMessageUnlock(Resources.ShellError, ex.Message, Brushes.IndianRed);
-
-                return null;
-            }
-            finally
-            {
-                await ControllerPostProcess();
-            }
-        }
-
-        /// <summary>
-        /// Обработчик события загрузки контейнеров
-        /// </summary>
-        private void OnContainersLoaded(object sender, List<ContainersInLot> containers)
-        {
-            if (Containers.Count != 0)
-            {
-                Containers.Clear();
-            }
-
-            foreach (ContainersInLot container in containers)
-            {
-                if (container is not null)
-                {
-                    Containers.Add(container);
-                }
-            }
-
-            ContainersView = CollectionViewSource.GetDefaultView(Containers);
-
-            UpdateContainersFilters();
-        }
-
-        /// <summary>
-        /// Обработчик события загрузки лотов
-        /// </summary>
-        private async void OnLotLoadedAsync(object sender, Lot lot)
-        {
-            if (lot is not null)
-            {
-                DeliveryDetailViewModel ??= new DeliveryDetailViewModel([], staticDataService, deliveryService, logger, _progressController)
-                {
-                    Carrier = lot.Carrier,
-                    LotArrivalLocation = lot.LotArrivalLocation,
-                    LotAta = lot.LotAta,
-                    LotAtd = lot.LotAtd,
-                    LotComment = lot.LotComment,
-                    LotCustomsLocation = lot.LotCustomsLocation,
-                    LotDepartureLocation = lot.LotDepartureLocation,
-                    LotEta = lot.LotEta,
-                    LotEtd = lot.LotEtd,
-                    LotNumber = lot.LotNumber,
-                    LotPurchaseOrder = lot.LotPurchaseOrder,
-                    LotTransport = lot.LotTransport,
-                    LotTransportDocument = lot.LotTransportDocument,
-                    Shipper = lot.Shipper,
-                    TermsOfDelivery = lot.DeliveryTerms,
-                    TypeOfTransport = lot.LotTransportType,
-                    CloseDate = lot.CloseDate
-                };
-
-                ContainersLoaded?.Invoke(this, await GetContainersAsync(lot.LotId));
-            }
-        }
-
-        /// <summary>
-        /// Событие, уведомляющее о загрузке лота.
-        /// </summary>
-        public event EventHandler<Lot> LotLoaded;
-
-        /// <summary>
-        /// Событие, уведомляющее о загрузке контейнеров.
-        /// </summary>
-        public event EventHandler<List<ContainersInLot>> ContainersLoaded;
     }
 }

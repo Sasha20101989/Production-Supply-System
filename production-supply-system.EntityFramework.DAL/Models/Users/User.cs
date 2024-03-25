@@ -1,6 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+
+using production_supply_system.EntityFramework.DAL.MasterProcessContext.Models;
 using production_supply_system.EntityFramework.DAL.Models.dboSchema;
 
 namespace production_supply_system.EntityFramework.DAL.Models.UsersSchema;
@@ -34,7 +36,6 @@ public partial class User
     public int SectionId { get; set; }
 
     [ForeignKey("SectionId")]
-    [InverseProperty("Users")]
     public virtual Section Section { get; set; } = null!;
 
     [NotMapped]

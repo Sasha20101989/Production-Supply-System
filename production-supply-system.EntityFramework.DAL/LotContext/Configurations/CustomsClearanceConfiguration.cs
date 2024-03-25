@@ -9,8 +9,6 @@ public partial class CustomsClearanceConfiguration : IEntityTypeConfiguration<Cu
 {
     public void Configure(EntityTypeBuilder<CustomsClearance> entity)
     {
-        _ = entity.HasOne(d => d.PartType).WithMany(p => p.CustomsClearances).HasConstraintName("FK_tbd_Customs_Clearance_tbd_Types_Of_Part");
-
         OnConfigurePartial(entity);
     }
 

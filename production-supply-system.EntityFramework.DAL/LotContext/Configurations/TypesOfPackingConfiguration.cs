@@ -9,7 +9,7 @@ public partial class TypesOfPackingConfiguration : IEntityTypeConfiguration<Type
 {
     public void Configure(EntityTypeBuilder<TypesOfPacking> entity)
     {
-        entity.HasKey(e => e.PackingTypeId).HasName("PK_tbd_PackingTypes");
+        _ = entity.HasKey(e => e.Id).HasName("PK_tbd_PackingTypes");
 
         OnConfigurePartial(entity);
     }

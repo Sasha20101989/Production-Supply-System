@@ -8,7 +8,7 @@ public partial class Location
 {
     [Key]
     [Column("Location_Id")]
-    public int LocationId { get; set; }
+    public int Id { get; set; }
 
     [Column("Location_Type_Id")]
     public int LocationTypeId { get; set; }

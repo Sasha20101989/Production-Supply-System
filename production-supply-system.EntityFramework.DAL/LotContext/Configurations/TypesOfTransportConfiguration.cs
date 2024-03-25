@@ -7,7 +7,7 @@ public partial class TypesOfTransportConfiguration : IEntityTypeConfiguration<Ty
 {
     public void Configure(EntityTypeBuilder<TypesOfTransport> entity)
     {
-        _ = entity.HasKey(e => e.TransportTypeId).HasName("PK_tbd_Type_Of_Transportation");
+        _ = entity.HasKey(e => e.Id).HasName("PK_tbd_Type_Of_Transportation");
 
         OnConfigurePartial(entity);
     }

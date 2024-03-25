@@ -8,7 +8,7 @@ public partial class Case
 {
     [Key]
     [Column("Case_Id")]
-    public int CaseId { get; set; }
+    public int Id { get; set; }
 
     [Column("Case_No")]
     [StringLength(10)]
@@ -23,16 +23,16 @@ public partial class Case
     [Column("Packing_Type_Id")]
     public int? PackingTypeId { get; set; }
 
-    [Column(TypeName = "decimal(6, 2)")]
+    [Column("Length", TypeName = "decimal(6, 2)")]
     public decimal? Length { get; set; }
 
-    [Column(TypeName = "decimal(6, 2)")]
+    [Column("Width", TypeName = "decimal(6, 2)")]
     public decimal? Width { get; set; }
 
-    [Column(TypeName = "decimal(6, 2)")]
+    [Column("Height", TypeName = "decimal(6, 2)")]
     public decimal? Height { get; set; }
 
-    [Column(TypeName = "decimal(6, 2)")]
+    [Column("Volume", TypeName = "decimal(6, 2)")]
     public decimal? Volume { get; set; }
 
     [ForeignKey("PackingTypeId")]

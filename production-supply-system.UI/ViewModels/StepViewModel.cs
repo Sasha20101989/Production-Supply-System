@@ -15,7 +15,7 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 
 using production_supply_system.EntityFramework.DAL.DocumentMapperContext.Models;
 using production_supply_system.EntityFramework.DAL.Enums;
-using production_supply_system.EntityFramework.DAL.Models.MasterSchema;
+using production_supply_system.EntityFramework.DAL.MasterProcessContext.Models;
 
 using UI_Interface.Contracts;
 using UI_Interface.Properties;
@@ -50,35 +50,37 @@ namespace UI_Interface.ViewModels
         [RelayCommand]
         private async Task ExportFileAsync(StepViewModel masterItem)
         {
-            CommonOpenFileDialog dialog = new()
-            {
-                IsFolderPicker = true
-            };
+            //CommonOpenFileDialog dialog = new()
+            //{
+            //    IsFolderPicker = true
+            //};
 
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            {
-                ProcessStep.Docmapper.Folder = dialog.FileName;
+            //if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            //{
+            //    ProcessStep.Docmapper.Folder = dialog.FileName;
 
-                try
-                {
-                    await CreateController(Resources.ShellExportFiles);
+            //    try
+            //    {
+            //        await CreateController(Resources.ShellExportFiles);
 
-                    await ExportToExcelFileAsync(
-                                ProcessStep.Process.ProcessName,
-                                ProcessStep.StepName,
-                                ProcessStep.Docmapper.Folder,
-                                ProcessStep.Docmapper.SheetName,
-                                [.. ProcessStep.Docmapper.DocmapperContents]);
-                }
-                catch (Exception ex)
-                {
-                    await WaitForMessageUnlock(Resources.ShellError, ex.Message, Brushes.IndianRed);
-                }
-                finally
-                {
-                    await ControllerPostProcess();
-                }
-            }
+            //        await ExportToExcelFileAsync(
+            //                    ProcessStep.Process.ProcessName,
+            //                    ProcessStep.StepName,
+            //                    ProcessStep.Docmapper.Folder,
+            //                    ProcessStep.Docmapper.SheetName,
+            //                    [.. ProcessStep.Docmapper.DocmapperContents]);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        await WaitForMessageUnlock(Resources.ShellError, ex.Message, Brushes.IndianRed);
+            //    }
+            //    finally
+            //    {
+            //        await ControllerPostProcess();
+            //    }
+            //}
+
+            throw new NotImplementedException();
         }
 
         /// <summary>

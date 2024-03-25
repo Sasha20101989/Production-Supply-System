@@ -11,14 +11,14 @@ public partial class Invoice
 {
     [Key]
     [Column("Invoice_Id")]
-    public int InvoiceId { get; set; }
+    public int Id { get; set; }
 
     [Column("Invoice_Number")]
-    [StringLength(20)]
-    public string InvoiceNumber { get; set; } = null!;
+    [MaxLength(20, ErrorMessage = "Invoice number must not exceed 20 characters.")]
+    public string? InvoiceNumber { get; set; }
 
     [Column("Invoice_Date")]
-    public DateOnly InvoiceDate { get; set; }
+    public DateTime InvoiceDate { get; set; }
 
     [Column("Shipper_Id")]
     public int ShipperId { get; set; }

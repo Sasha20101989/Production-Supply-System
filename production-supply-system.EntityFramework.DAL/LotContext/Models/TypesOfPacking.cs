@@ -8,7 +8,7 @@ public partial class TypesOfPacking
 {
     [Key]
     [Column("Packing_Type_Id")]
-    public int PackingTypeId { get; set; }
+    public int Id { get; set; }
 
     [Column("Supplier_Packing_Type")]
     [StringLength(150)]

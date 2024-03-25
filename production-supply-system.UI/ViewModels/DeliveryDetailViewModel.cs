@@ -13,6 +13,7 @@ using CommunityToolkit.Mvvm.Input;
 using MahApps.Metro.Controls.Dialogs;
 
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 using Newtonsoft.Json;
 
@@ -38,18 +39,19 @@ namespace UI_Interface.ViewModels
 
         private readonly IDeliveryService _deliveryService;
 
+        private string _transportName;
+
+        private string _newTransportName;
+
+        private Shipper _shipper;
+
+        private Transport _lotTransport;
+
         [ObservableProperty]
         private bool _isTransportDropDownOpen;
 
         [ObservableProperty]
         private bool _isAddTransportVisible = false;
-
-        private string _transportName;
-
-        private string _newTransportName;
-
-        [ObservableProperty]
-        private Lot _lot;
 
         [ObservableProperty]
         private List<Location> _departureLocations;
@@ -81,6 +83,51 @@ namespace UI_Interface.ViewModels
         [ObservableProperty]
         private ObservableCollection<Transport> _transports;
 
+        [ObservableProperty]
+        private string _lotTransportDocument;
+
+        [ObservableProperty]
+        private DateTime? _closeDate;
+
+        [ObservableProperty]
+        private DateTime? _lotEtd;
+
+        [ObservableProperty]
+        private DateTime? _lotAtd;
+
+        [ObservableProperty]
+        private DateTime? _lotEta;
+
+        [ObservableProperty]
+        private DateTime? _lotAta;
+
+        [ObservableProperty]
+        private TypesOfTransport _lotTransportType;
+
+        [ObservableProperty]
+        private TermsOfDelivery _deliveryTerms;
+
+        [ObservableProperty]
+        private PurchaseOrder _lotPurchaseOrder;
+
+        [ObservableProperty]
+        private Carrier _carrier;
+
+        [ObservableProperty]
+        private string _lotNumber;
+
+        [ObservableProperty]
+        private string _lotComment;
+
+        [ObservableProperty]
+        private Location _lotDepartureLocation;
+
+        [ObservableProperty]
+        private Location _lotCustomsLocation;
+
+        [ObservableProperty]
+        private Location _lotArrivalLocation;
+
         /// <summary>
         /// Инициализирует новый экземпляр класса <see cref="DeliveryDetailViewModel"/>.
         /// </summary>
@@ -96,84 +143,7 @@ namespace UI_Interface.ViewModels
 
             _progressController = progressController;
 
-            _lot = new()
-            {
-                LotTransport = new()
-            };
-
             _ = Init();
-        }
-
-        /// <summary>
-        /// Получает или задает номер документа.
-        /// </summary>
-        public string LotTransportDocument
-        {
-            get => Lot.LotTransportDocument;
-            set => _ = SetProperty(Lot.LotTransportDocument, value, Lot, (model, name) => model.LotTransportDocument = name);
-        }
-
-        /// <summary>
-        /// Получает или задает дату закрытия лота.
-        /// </summary>
-        public DateOnly? CloseDate
-        {
-            get => Lot.CloseDate;
-            set => _ = SetProperty(Lot.CloseDate, value, Lot, (model, date) => model.CloseDate = date);
-        }
-
-        /// <summary>
-        /// Получает или задает Expected time Delivery.
-        /// </summary>
-        public DateOnly? LotEtd
-        {
-            get => Lot.LotEtd;
-            set => _ = SetProperty(Lot.LotEtd, value, Lot, (model, date) => model.LotEtd = date);
-        }
-
-        /// <summary>
-        /// Получает или задает Actual time Delivery.
-        /// </summary>
-        public DateOnly? LotAtd
-        {
-            get => Lot.LotAtd;
-            set => _ = SetProperty(Lot.LotAtd, value, Lot, (model, date) => model.LotAtd = date);
-        }
-
-        /// <summary>
-        /// Получает или задает Expected time Arrival.
-        /// </summary>
-        public DateOnly LotEta
-        {
-            get => Lot.LotEta;
-            set => _ = SetProperty(Lot.LotEta, value, Lot, (model, date) => model.LotEta = date);
-        }
-
-        /// <summary>
-        /// Получает или задает Actual time Arrival.
-        /// </summary>
-        public DateOnly? LotAta
-        {
-            get => Lot.LotAta;
-            set => _ = SetProperty(Lot.LotAta, value, Lot, (model, date) => model.LotAta = date);
-        }
-
-        /// <summary>
-        /// Получает или задает тип транспорта.
-        /// </summary>
-        public TypesOfTransport TypeOfTransport
-        {
-            get => Lot.LotTransportType;
-            set => _ = SetProperty(Lot.LotTransportType, value, Lot, (model, type) => model.LotTransportType = type);
-        }
-
-        /// <summary>
-        /// Получает или задает условия поставки.
-        /// </summary>
-        public TermsOfDelivery TermsOfDelivery
-        {
-            get => Lot.DeliveryTerms;
-            set => _ = SetProperty(Lot.DeliveryTerms, value, Lot, (model, terms) => model.DeliveryTerms = terms);
         }
 
         /// <summary>
@@ -195,7 +165,7 @@ namespace UI_Interface.ViewModels
         /// </summary>
         public Transport LotTransport
         {
-            get => Lot.LotTransport;
+            get => _lotTransport;
             set
             {
                 IsAddTransportVisible = IsExistsTransport(value);
@@ -204,7 +174,7 @@ namespace UI_Interface.ViewModels
                 {
                     if (value is not null)
                     {
-                        _ = SetProperty(Lot.LotTransport, value, Lot, (model, transport) => model.LotTransport = transport);
+                        _ = SetProperty(ref _lotTransport, value);
                         _ = SetProperty(ref _transportName, value.TransportName);
                     }
                 }
@@ -216,76 +186,18 @@ namespace UI_Interface.ViewModels
         /// </summary>
         public Shipper Shipper
         {
-            get => Lot.Shipper;
+            get => _shipper;
             set
             {
-                _ = SetProperty(Lot.Shipper, value, Lot, (model, shipper) => model.Shipper = shipper);
+                _ = SetProperty(ref _shipper, value);
 
-                LoadPurchaseOrdersForShipper();
+                if (value is not null)
+                {
+                    PurchaseOrdersForShipper = Shipper.PurchaseOrders.Count == 0 ?
+                        _deliveryService.GetPurchaseOrdersForShipper(Shipper) :
+                        [.. Shipper.PurchaseOrders];
+                }
             }
-        }
-
-        /// <summary>
-        /// Получает или задает заказ.
-        /// </summary>
-        public PurchaseOrder LotPurchaseOrder
-        {
-            get => Lot.LotPurchaseOrder;
-            set => _ = SetProperty(Lot.LotPurchaseOrder, value, Lot, (model, order) => model.LotPurchaseOrder = order);
-        }
-
-        /// <summary>
-        /// Получает или задает перевозчика.
-        /// </summary>
-        public Carrier Carrier
-        {
-            get => Lot.Carrier;
-            set => _ = SetProperty(Lot.Carrier, value, Lot, (model, carrier) => model.Carrier = carrier);
-        }
-
-        /// <summary>
-        /// Получает или задает значение номера лота.
-        /// </summary>
-        public string LotNumber
-        {
-            get => Lot.LotNumber;
-            set => _ = SetProperty(Lot.LotNumber, value, Lot, (model, number) => model.LotNumber = number);
-        }
-
-        /// <summary>
-        /// Получает или задает комментарий для лота.
-        /// </summary>
-        public string LotComment
-        {
-            get => Lot.LotComment;
-            set => _ = SetProperty(Lot.LotComment, value, Lot, (model, comment) => model.LotComment = comment);
-        }
-
-        /// <summary>
-        /// Получает или задает место отправления лота.
-        /// </summary>
-        public Location LotDepartureLocation
-        {
-            get => Lot.LotDepartureLocation;
-            set => _ = SetProperty(Lot.LotDepartureLocation, value, Lot, (model, number) => model.LotDepartureLocation = number);
-        }
-
-        /// <summary>
-        /// Получает или задает местонахождение участка таможни.
-        /// </summary>
-        public Location LotCustomsLocation
-        {
-            get => Lot.LotCustomsLocation;
-            set => _ = SetProperty(Lot.LotCustomsLocation, value, Lot, (model, number) => model.LotCustomsLocation = number);
-        }
-
-        /// <summary>
-        /// Получает или задает место прибытия лота.
-        /// </summary>
-        public Location LotArrivalLocation
-        {
-            get => Lot.LotArrivalLocation;
-            set => _ = SetProperty(Lot.LotArrivalLocation, value, Lot, (model, number) => model.LotArrivalLocation = number);
         }
 
         /// <summary>
@@ -314,7 +226,7 @@ namespace UI_Interface.ViewModels
 
                 Transports.Add(newTransport);
 
-                Lot.LotTransport = newTransport;
+                LotTransport = newTransport;
 
                 IsAddTransportVisible = false;
             }
@@ -327,21 +239,6 @@ namespace UI_Interface.ViewModels
             finally
             {
                 await ControllerPostProcess();
-            }
-        }
-
-        /// <summary>
-        /// Получает заказы для отправителя
-        /// </summary>
-        private void LoadPurchaseOrdersForShipper()
-        {
-            if (Shipper is not null)
-            {
-                _logger.LogInformation(string.Format(Resources.LogOrdersGetForShipper, Shipper.ShipperId));
-
-                PurchaseOrdersForShipper = AllPurchaseOrders.Where(shipper => shipper.ShipperId == Shipper.ShipperId).ToList();
-
-                _logger.LogInformation($"{string.Format(Resources.LogOrdersGetForShipper, Shipper.ShipperId)} {Resources.Completed}");
             }
         }
 
@@ -384,23 +281,21 @@ namespace UI_Interface.ViewModels
             {
                 _logger.LogInformation(Resources.LogLoadStaticData);
 
-                Shippers = (await _staticDataService.GetAllShippersAsync()).ToList();
+                Shippers = await _staticDataService.GetAllShippersAsync();
 
-                Carriers = (await _staticDataService.GetAllCarriersAsync()).ToList();
+                Carriers = await _staticDataService.GetAllCarriersAsync();
 
-                TermsOfDeliveryItems = (await _staticDataService.GetAllTermsOfDeliveryAsync()).ToList();
+                TermsOfDeliveryItems = await _staticDataService.GetAllTermsOfDeliveryAsync();
 
-                TypesOfTransport = (await _staticDataService.GetAllTransportTypesAsync()).ToList();
+                TypesOfTransport = await _staticDataService.GetAllTransportTypesAsync();
 
-                CustomsLocations = (await _staticDataService.GetLocationsByTypeAsync(LocationType.CustomsTerminal)).ToList();
+                CustomsLocations = await _staticDataService.GetLocationsByTypeAsync(LocationType.CustomsTerminal);
 
-                ArrivalLocations = (await _staticDataService.GetLocationsByTypeAsync(LocationType.ArrivalTerminal)).ToList();
+                ArrivalLocations = await _staticDataService.GetLocationsByTypeAsync(LocationType.ArrivalTerminal);
 
-                DepartureLocations = (await _staticDataService.GetLocationsByTypeAsync(LocationType.DepartureTerminal)).ToList();
+                DepartureLocations = await _staticDataService.GetLocationsByTypeAsync(LocationType.DepartureTerminal);
 
                 _logger.LogInformation($"{Resources.LogLoadStaticData} {Resources.Completed}");
-
-                AllPurchaseOrders = (await _deliveryService.GetAllPurchaseOrdersAsync()).ToList();
 
                 Transports = new(await _staticDataService.GetAllTransportsAsync());
             }

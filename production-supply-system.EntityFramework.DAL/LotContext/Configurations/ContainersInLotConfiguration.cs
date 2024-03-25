@@ -8,7 +8,7 @@ public partial class ContainersInLotConfiguration : IEntityTypeConfiguration<Con
 {
     public void Configure(EntityTypeBuilder<ContainersInLot> entity)
     {
-        _ = entity.HasKey(e => e.ContainerInLotId).HasName("PK_tbd_ContainersInLot");
+        _ = entity.HasKey(e => e.Id).HasName("PK_tbd_ContainersInLot");
 
         OnConfigurePartial(entity);
     }

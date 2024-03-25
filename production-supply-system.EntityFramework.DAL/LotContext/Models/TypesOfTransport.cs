@@ -8,7 +8,7 @@ public partial class TypesOfTransport
 {
     [Key]
     [Column("Transport_Type_Id")]
-    public int TransportTypeId { get; set; }
+    public int Id { get; set; }
 
     [Column("Transport_Type")]
     [StringLength(10)]

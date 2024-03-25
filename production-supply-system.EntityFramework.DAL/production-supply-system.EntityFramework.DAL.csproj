@@ -23,8 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Models\Master\" />
     <Folder Include="Models\Planning\" />
-    <Folder Include="Triggers\" />
   </ItemGroup>
 
 </Project>

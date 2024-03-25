@@ -8,7 +8,7 @@ public partial class CustomsClearance
 {
     [Key]
     [Column("Customs_Clearance_Id")]
-    public int CustomsClearanceId { get; set; }
+    public int Id { get; set; }
 
     [Column("Container_In_Lot_Id")]
     public int ContainerInLotId { get; set; }
@@ -50,6 +50,5 @@ public partial class CustomsClearance
     public virtual ContainersInLot ContainerInLot { get; set; } = null!;
 
     [ForeignKey("PartTypeId")]
-    [InverseProperty("CustomsClearances")]
     public virtual TypesOfPart? PartType { get; set; }
 }

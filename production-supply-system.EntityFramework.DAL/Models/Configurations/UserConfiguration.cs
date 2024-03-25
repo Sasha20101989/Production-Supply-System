@@ -8,8 +8,6 @@ namespace production_supply_system.EntityFramework.DAL.Models.Configurations
     {
         public void Configure(EntityTypeBuilder<User> entity)
         {
-            _ = entity.HasOne(d => d.Section).WithMany(p => p.Users).OnDelete(DeleteBehavior.ClientSetNull).HasConstraintName("FK_tbd_Users_Sections");
-
             OnConfigurePartial(entity);
         }
 

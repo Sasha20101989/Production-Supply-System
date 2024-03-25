@@ -17,7 +17,7 @@ using NavigationManager.Frame.Extension.WPF;
 
 using production_supply_system.EntityFramework.DAL.Enums;
 using production_supply_system.EntityFramework.DAL.LotContext.Models;
-using production_supply_system.EntityFramework.DAL.Models.MasterSchema;
+using production_supply_system.EntityFramework.DAL.MasterProcessContext.Models;
 
 using UI_Interface.Contracts;
 using UI_Interface.Properties;
@@ -79,7 +79,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
             {
                 steps.Add(new()
                 {
-                    ProcessStepId = stepViewModel.ProcessStep.ProcessStepId,
+                    Id = stepViewModel.ProcessStep.Id,
                     Docmapper = stepViewModel.ProcessStep.Docmapper,
                     DocmapperId = stepViewModel.ProcessStep.DocmapperId,
                     Process = stepViewModel.ProcessStep.Process,
@@ -139,11 +139,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
 
                 foreach (Lot lot in await deliveryService.GetAllLotsAsync())
                 {
-                    int quantityContainers = await deliveryService.GetquantityContainersForLotId(lot.LotId);
-
-                    LotViewModel lotViewModel = new(lot, quantityContainers);
-
-                    Lots.Add(lotViewModel);
+                    Lots.Add(new(lot));
                 }
 
                 IsLotListEmpty = Lots.Count == 0;
@@ -190,19 +186,53 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         {
             try
             {
-                logger.LogInformation(Resources.LogUploadLot);
+                if (DeliveryDetailViewModel is not null)
+                {
+                    logger.LogInformation(Resources.LogUploadLot);
 
-                await CreateController(Resources.BllUploadLot);
+                    await CreateController(Resources.BllUploadLot);
 
-                deliveryService.DeliveryLoadProgressUpdated += OnDeliveryLoadProgressUpdated;
+                    Lot details = new()
+                    {
+                        LotNumber = DeliveryDetailViewModel.LotNumber,
+                        ShipperId = DeliveryDetailViewModel.Shipper.Id,
+                        LotPurchaseOrderId = DeliveryDetailViewModel.LotPurchaseOrder.Id,
+                        CarrierId = DeliveryDetailViewModel.Carrier.Id,
+                        DeliveryTermsId = DeliveryDetailViewModel.DeliveryTerms.Id,
+                        LotTransportId = DeliveryDetailViewModel.LotTransport?.Id,
+                        LotTransportTypeId = DeliveryDetailViewModel.LotTransportType.Id,
+                        LotTransportDocument = DeliveryDetailViewModel.LotTransportDocument,
+                        LotEtd = DeliveryDetailViewModel.LotEtd,
+                        LotAtd = DeliveryDetailViewModel.LotAtd,
+                        LotEta = (DateTime)DeliveryDetailViewModel.LotEta,
+                        LotAta = DeliveryDetailViewModel.LotAta,
+                        LotDepartureLocationId = DeliveryDetailViewModel.LotDepartureLocation.Id,
+                        LotCustomsLocationId = DeliveryDetailViewModel.LotCustomsLocation?.Id,
+                        LotArrivalLocationId = DeliveryDetailViewModel.LotArrivalLocation.Id,
+                        CloseDate = DeliveryDetailViewModel.CloseDate,
+                        LotComment = DeliveryDetailViewModel.LotComment,
+                        Carrier = DeliveryDetailViewModel.Carrier,
+                        DeliveryTerms = DeliveryDetailViewModel.DeliveryTerms,
+                        LotDepartureLocation = DeliveryDetailViewModel.LotDepartureLocation,
+                        LotCustomsLocation = DeliveryDetailViewModel.LotCustomsLocation,
+                        LotArrivalLocation = DeliveryDetailViewModel.LotArrivalLocation,
+                        LotPurchaseOrder = DeliveryDetailViewModel.LotPurchaseOrder,
+                        LotTransport = DeliveryDetailViewModel.LotTransport,
+                        LotTransportType = DeliveryDetailViewModel.LotTransportType,
+                        Shipper = DeliveryDetailViewModel.Shipper
+                    };
 
-                Lot lot = await deliveryService.StartUploadLotAsync(AdaptStepsToService([.. MasterCollection]), DeliveryDetailViewModel.Lot);
+                    deliveryService.DeliveryLoadProgressUpdated += OnDeliveryLoadProgressUpdated;
 
-                await WaitForMessageUnlock(Resources.BllUploadLot, Resources.ShellUploadSuccess, Brushes.Green);
+                    Lot lot = await deliveryService.StartUploadLotAsync(AdaptStepsToService([.. MasterCollection]), details);
 
-                logger.LogInformation(string.Format(Resources.LogUploadLotCompleted, lot.LotId));
+                    await WaitForMessageUnlock(Resources.BllUploadLot, Resources.ShellUploadSuccess, Brushes.Green);
 
-                NavigateToDetails(lot);
+                    logger.LogInformation(string.Format(Resources.LogUploadLotCompleted, lot.Id));
+
+                    NavigateToDetails(lot);
+
+                }
             }
             catch (Exception ex)
             {
@@ -227,7 +257,7 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
             {
                 logger.LogInformation(Resources.LogRedirectToEditingLot);
 
-                _ = navigationManager.NavigateTo(typeof(EditDeliveryViewModel).FullName, lot.LotId);
+                _ = navigationManager.NavigateTo(typeof(EditDeliveryViewModel).FullName, lot.Id);
 
                 logger.LogInformation($"{Resources.LogRedirectToEditingLot} {Resources.Completed}");
             }
@@ -384,38 +414,36 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
         /// <param name="result">значение наличия ошибок в детальной информации</param>
         private bool HasErrorsInLotDetails(bool result)
         {
-            //if (DeliveryDetailViewModel is not null)
-            //{
-            //    bool hasErrorsInDetails = DeliveryDetailViewModel.HasErrors;
-            //    bool hasShipperNotSelected = DeliveryDetailViewModel.Lot.Shipper is null;
-            //    bool hasCarrierNotSelected = DeliveryDetailViewModel.Lot.Carrier is null;
-            //    bool hasDeliveryTermNotSelected = DeliveryDetailViewModel.Lot.DeliveryTerms is null;
-            //    bool hasTransportTypeNotSelected = DeliveryDetailViewModel.Lot.LotTransportType is null;
-            //    bool hasArrivalLocationNotSelected = DeliveryDetailViewModel.Lot.LotArrivalLocation is null;
-            //    bool hasDepartureLocationNotSelected = DeliveryDetailViewModel.Lot.LotDepartureLocation is null;
-            //    bool hasEtaNotSelected = DeliveryDetailViewModel.Lot.LotEta is null;
-            //    bool hasPurchaseOrderNotSelected = DeliveryDetailViewModel.Lot.LotPurchaseOrder is null;
-            //    bool hasTransportNameNotSelected = DeliveryDetailViewModel.Lot.LotTransport.TransportName is null;
-            //    bool hasTransportNameNotAdded = DeliveryDetailViewModel.IsAddTransportVisible;
+            if (DeliveryDetailViewModel is not null)
+            {
+                bool hasErrorsInDetails = DeliveryDetailViewModel.HasErrors;
+                bool hasShipperNotSelected = DeliveryDetailViewModel.Shipper is null;
+                bool hasCarrierNotSelected = DeliveryDetailViewModel.Carrier is null;
+                bool hasDeliveryTermNotSelected = DeliveryDetailViewModel.DeliveryTerms is null;
+                bool hasTransportTypeNotSelected = DeliveryDetailViewModel.LotTransportType is null;
+                bool hasArrivalLocationNotSelected = DeliveryDetailViewModel.LotArrivalLocation is null;
+                bool hasDepartureLocationNotSelected = DeliveryDetailViewModel.LotDepartureLocation is null;
+                bool hasEtaNotSelected = DeliveryDetailViewModel.LotEta is null;
+                bool hasPurchaseOrderNotSelected = DeliveryDetailViewModel.LotPurchaseOrder is null;
+                bool hasTransportNameNotSelected = DeliveryDetailViewModel.LotTransport.TransportName is null;
+                bool hasTransportNameNotAdded = DeliveryDetailViewModel.IsAddTransportVisible;
 
-            //    return
-            //        hasErrorsInDetails ||
-            //        hasShipperNotSelected ||
-            //        hasCarrierNotSelected ||
-            //        hasDeliveryTermNotSelected ||
-            //        hasTransportTypeNotSelected ||
-            //        hasArrivalLocationNotSelected ||
-            //        hasDepartureLocationNotSelected ||
-            //        hasEtaNotSelected ||
-            //        hasPurchaseOrderNotSelected ||
-            //        hasTransportNameNotSelected ||
-            //        hasTransportNameNotAdded ||
-            //        result;
-            //}
+                return
+                    hasErrorsInDetails ||
+                    hasShipperNotSelected ||
+                    hasCarrierNotSelected ||
+                    hasDeliveryTermNotSelected ||
+                    hasTransportTypeNotSelected ||
+                    hasArrivalLocationNotSelected ||
+                    hasDepartureLocationNotSelected ||
+                    hasEtaNotSelected ||
+                    hasPurchaseOrderNotSelected ||
+                    hasTransportNameNotSelected ||
+                    hasTransportNameNotAdded ||
+                    result;
+            }
 
-            //return true;
-
-            throw new NotImplementedException();
+            return true;
         }
 
         private async Task<List<ProcessesStep>> GetProcessStepsAsync(AppProcess appProcess)

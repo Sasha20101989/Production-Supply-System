@@ -16,13 +16,14 @@ using Microsoft.Extensions.Logging;
 
 using Newtonsoft.Json;
 
+using production_supply_system.EntityFramework.DAL.BomContext.Models;
 using production_supply_system.EntityFramework.DAL.BomModels;
 using production_supply_system.EntityFramework.DAL.DocumentMapperContext.Models;
 using production_supply_system.EntityFramework.DAL.Enums;
 using production_supply_system.EntityFramework.DAL.Extensions;
 using production_supply_system.EntityFramework.DAL.LotContext;
 using production_supply_system.EntityFramework.DAL.LotContext.Models;
-using production_supply_system.EntityFramework.DAL.Models.MasterSchema;
+using production_supply_system.EntityFramework.DAL.MasterProcessContext.Models;
 using production_supply_system.EntityFramework.DAL.Models.UsersSchema;
 
 namespace BLL.Services
@@ -39,14 +40,17 @@ namespace BLL.Services
         private List<ProcessesStep> _stepCollection;
         private List<VinsInContainer> _vinContainers;
         private List<CustomsClearance> _customsClearances;
-        private List<ContainersInLot> _containers;
         private List<Case> _cases;
         private List<CustomsPart> _customsParts;
-        private List<PartsInContainer> _partsInContainer;
 
         public EventHandler<List<ProcessesStep>> NavigatedWithStepCollection { get; set; }
 
         private static string ConvertDateTimeToString(DateOnly? date)
+        {
+            return date is null ? null : (date?.ToString(Resources.ExportFormatDate));
+        }
+
+        private static string ConvertDateTimeToString(DateTime? date)
         {
             return date is null ? null : (date?.ToString(Resources.ExportFormatDate));
         }
@@ -67,13 +71,13 @@ namespace BLL.Services
             return VinRegex().IsMatch(vin);
         }
 
-        private static CustomsClearance CreateCustomsClearance(ContainersInLot container, PartsInContainer partInContainer, Lot lot)
+        private static CustomsClearance CreateCustomsClearance(ContainersInLot container, PartsInContainer partInContainer)
         {
             CustomsClearance customsClearance = new()
             {
                 ContainerInLot = container,
                 PartType = partInContainer.PartNumber.PartType,
-                InvoceNumber = CreateCustomsClearanceNumber(lot, partInContainer)
+                InvoceNumber = CreateCustomsClearanceNumber(container.Lot, partInContainer)
             };
 
             return customsClearance.InvoceNumber is null
@@ -125,7 +129,7 @@ namespace BLL.Services
 
         private static string CreateCustomsClearanceNumber(Lot lot, PartsInContainer partInContainer)
         {
-            string symbol = partInContainer?.PartNumber?.PartType?.PartType == PartTypes.Body ? Resources.SymbolBody : partInContainer?.PartNumber?.PartType?.PartType == PartTypes.Parts ? Resources.SymbolParts : null;
+            string symbol = partInContainer?.PartNumber?.PartType?.PartType == PartTypes.Body.ToString() ? Resources.SymbolBody : partInContainer?.PartNumber?.PartType?.PartType == PartTypes.Parts.ToString() ? Resources.SymbolParts : null;
 
             return symbol != null ? $"{lot.LotNumber}-{symbol}" : null;
         }
@@ -142,37 +146,141 @@ namespace BLL.Services
             return totalQuantities;
         }
 
-        private static VinsInContainer TryCreateVinsInContainer(ContainersInLot container, Lot lot, Dictionary<string, CellInfo> validationErrors, Docmapper document, int? row)
+        private static VinsInContainer TryCreateVinsInContainer(ContainersInLot container, Dictionary<string, CellInfo> validationErrors, Docmapper document, int? row)
         {
-            //VinsInContainer vinsInContainer = new()
-            //{
-            //    ContainerInLot = container,
-            //    Lot = lot
-            //};
+            VinsInContainer vinsInContainer = new()
+            {
+                ContainerInLot = container
+            };
 
-            //CustomsPart customsPart = new();
+            CustomsPart customsPart = new();
 
-            //DocmapperContent contentPartNumber = document.DocmapperContents.FirstOrDefault(dc => dc.DocmapperColumn.SystemColumnName == typeof(CustomsPart).GetSystemColumnName(nameof(CustomsPart.PartNumber)));
+            DocmapperContent contentPartNumber = document.DocmapperContents.FirstOrDefault(dc => dc.DocmapperColumn.SystemColumnName == typeof(CustomsPart).GetSystemColumnName(nameof(CustomsPart.PartNumber)));
 
-            //if (!customsPart.TrySetAndValidateProperty(nameof(CustomsPart.PartNumber), GraftValueFromRow(document, row, typeof(CustomsPart), nameof(CustomsPart.PartNumber)), row + 1, contentPartNumber.ColumnNr, out Dictionary<string, CellInfo> result))
-            //{
-            //    validationErrors.Merge(result);
-            //}
+            if (!customsPart.TrySetAndValidateProperty(nameof(CustomsPart.PartNumber), GraftValueFromRow(document, row, typeof(CustomsPart), nameof(CustomsPart.PartNumber)), row + 1, contentPartNumber.ColumnNr, out Dictionary<string, CellInfo> result))
+            {
+                validationErrors.Merge(result);
+            }
 
-            //DocmapperContent content = document.DocmapperContents.FirstOrDefault(dc => dc.DocmapperColumn.SystemColumnName == typeof(VinsInContainer).GetSystemColumnName(nameof(VinsInContainer.SupplierVinNumber)));
+            DocmapperContent content = document.DocmapperContents.FirstOrDefault(dc => dc.DocmapperColumn.SystemColumnName == typeof(VinsInContainer).GetSystemColumnName(nameof(VinsInContainer.SupplierVinNumber)));
 
-            //int col = content.ColumnNr;
+            int col = content.ColumnNr;
 
-            //if (!vinsInContainer.TrySetAndValidateProperty(nameof(VinsInContainer.SupplierVinNumber), GraftValueFromRow(document, row, typeof(VinsInContainer), nameof(VinsInContainer.SupplierVinNumber)), row + 1, col, out result))
-            //{
-            //    validationErrors.Merge(result);
-            //}
+            if (!vinsInContainer.TrySetAndValidateProperty(nameof(VinsInContainer.SupplierVinNumber), GraftValueFromRow(document, row, typeof(VinsInContainer), nameof(VinsInContainer.SupplierVinNumber)), row + 1, col, out result))
+            {
+                validationErrors.Merge(result);
+            }
 
-            //return !string.IsNullOrWhiteSpace(vinsInContainer.SupplierVinNumber) && !IsValidVinNumber(vinsInContainer.SupplierVinNumber)
-            //    ? throw new Exception(string.Format(Resources.NotValidVIN, vinsInContainer.SupplierVinNumber))
-            //    : vinsInContainer;
+            return !string.IsNullOrWhiteSpace(vinsInContainer.SupplierVinNumber) && !IsValidVinNumber(vinsInContainer.SupplierVinNumber)
+                ? throw new Exception(string.Format(Resources.NotValidVIN, vinsInContainer.SupplierVinNumber))
+                : vinsInContainer;
 
             throw new NotImplementedException();
+        }
+
+        private static List<PartPrice> UploadPartPrices(List<ProcessesStep> steps, User currentUser)
+        {
+            List<PartPrice> partPrices = [];
+
+            IEnumerable<ProcessesStep> accessibleSteps = steps
+                .Where(step => step.StepName == Steps.UploadPrice.ToString())
+                .Where(step => HasAccess(step, currentUser));
+
+            foreach (ProcessesStep step in accessibleSteps)
+            {
+                if (step.Docmapper.FirstDataRow is not null)
+                {
+                    List<IGrouping<string, PartPrice>> groupedPartPrices = Enumerable.Range((int)step.Docmapper.FirstDataRow, step.Docmapper.Data.GetLength(0) - (int)step.Docmapper.FirstDataRow)
+                    .Select(i => CreatePartPrice(step.Docmapper, i))
+                    .Where(pp => pp != null)
+                    .GroupBy(pp => pp.PartNumber)
+                    .ToList();
+
+                    foreach (IGrouping<string, PartPrice> group in groupedPartPrices)
+                    {
+                        PartPrice previousPartPrice = null;
+
+                        foreach (PartPrice partPrice in group)
+                        {
+                            if (previousPartPrice != null && partPrice.Price != previousPartPrice.Price)
+                            {
+                                throw new Exception(string.Format(Resources.PartNumberDifferentPrice, group.Key));
+                            }
+                            else
+                            {
+                                if (!partPrices.Any(pp => pp.PartNumber == partPrice.PartNumber))
+                                {
+                                    partPrices.Add(partPrice);
+                                }
+
+                                previousPartPrice = partPrice;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return partPrices;
+        }
+
+        private static List<ContainersInLot> UploadContainerTypes(List<ProcessesStep> stepCollection, User currentUser)
+        {
+            List<ContainersInLot> containers = [];
+
+            IEnumerable<ProcessesStep> accessibleSteps = stepCollection
+                .Where(step => step.StepName == Steps.UploadContainerTypes.ToString())
+                .Where(step => HasAccess(step, currentUser));
+
+            foreach (ProcessesStep step in accessibleSteps)
+            {
+                if (step.Docmapper.FirstDataRow is not null)
+                {
+                    containers.AddRange(
+                    Enumerable.Range((int)step.Docmapper.FirstDataRow, step.Docmapper.Data.GetLength(0) - (int)step.Docmapper.FirstDataRow)
+                              .Select(i => CreateContainerWithType(step.Docmapper, i))
+                              .Where(container => container != null));
+                }
+            }
+
+            return containers;
+
+            throw new NotImplementedException();
+        }
+
+        private static Invoice TryCreateInvoiceAsync(Docmapper document, Lot lot, Dictionary<string, CellInfo> validationErrors)
+        {
+            Invoice invoice = new()
+            {
+                InvoiceDate = DateTime.Now,
+                PurchaseOrder = lot.LotPurchaseOrder,
+                PurchaseOrderId = lot.LotPurchaseOrder.Id,
+                Shipper = lot.Shipper,
+                ShipperId = lot.Shipper.Id
+            };
+
+            DocmapperContent content = document.DocmapperContents.FirstOrDefault(dc => dc.DocmapperColumn.SystemColumnName == typeof(Invoice).GetSystemColumnName(nameof(Invoice.InvoiceNumber)));
+
+            if (content is null)
+            {
+                return null;
+            }
+
+            if (content.RowNr is null)
+            {
+                return null;
+            }
+
+            int row = (int)content.RowNr;
+            int col = content.ColumnNr;
+
+            if (!lot.TrySetAndValidateProperty(nameof(Lot.LotNumber), GraftLotNumber(lot, document), row, col, out Dictionary<string, CellInfo> result))
+            {
+                validationErrors.Merge(result);
+            }
+
+            invoice.InvoiceNumber = lot.LotNumber;
+
+            return invoice;
         }
 
         public async Task<SheetData> GetAllTracingForPartner2ToExport(List<DocmapperContent> content)
@@ -296,22 +404,24 @@ namespace BLL.Services
 
         public async Task<CargoTypes> GetContainerCargoType(int containerInLotId)
         {
-            IEnumerable<IGrouping<int, PartsInContainer>> groupingParts = (await GetAllPartsInContainer())
-                .Where(p => p.ContainerInLotId == containerInLotId)
-                .GroupBy(p => p.ContainerInLotId);
+            //IEnumerable<IGrouping<int, PartsInContainer>> groupingParts = (await GetAllPartsInContainer())
+            //    .Where(p => p.ContainerInLotId == containerInLotId)
+            //    .GroupBy(p => p.ContainerInLotId);
 
-            IGrouping<int, PartsInContainer> containerGroup = groupingParts.FirstOrDefault();
+            //IGrouping<int, PartsInContainer> containerGroup = groupingParts.FirstOrDefault();
 
-            if (containerGroup != null)
-            {
-                bool hasBody = containerGroup.Any(p => p.PartNumber.PartType.PartType == PartTypes.Body);
+            //if (containerGroup != null)
+            //{
+            //    bool hasBody = containerGroup.Any(p => p.PartNumber.PartType.PartType == PartTypes.Body);
 
-                bool hasParts = containerGroup.Any(p => p.PartNumber.PartType.PartType == PartTypes.Parts);
+            //    bool hasParts = containerGroup.Any(p => p.PartNumber.PartType.PartType == PartTypes.Parts);
 
-                return hasBody && hasParts ? CargoTypes.Mix :
-                                                hasBody ? CargoTypes.Body :
-                                                hasParts ? CargoTypes.Parts : CargoTypes.Unknown;
-            }
+            //    return hasBody && hasParts ? CargoTypes.Mix :
+            //                                    hasBody ? CargoTypes.Body :
+            //                                    hasParts ? CargoTypes.Parts : CargoTypes.Unknown;
+            //}
+
+            throw new NotImplementedException();
 
             return CargoTypes.Unknown;
         }
@@ -320,228 +430,117 @@ namespace BLL.Services
         {
             _stepCollection ??= [.. steps.OrderBy(collection => collection.Step)];
 
-            return await UploadLotContentAsync(lotDetails, _stepCollection);
-        }
-
-        private async Task<Lot> UploadLotContentAsync(Lot lotDetails, List<ProcessesStep> stepCollection)
-        {
-            Lot lot = new();
-
             User currentUser = await userService.GetCurrentUser(Environment.UserName);
 
-            IEnumerable<ProcessesStep> accessibleSteps = stepCollection
-                .Where(step => step.StepName == Steps.UploadLotContent)
+            return await UploadLotContentAsync(lotDetails, _stepCollection, currentUser);
+        }
+
+        private async Task<Lot> UploadLotContentAsync(Lot lot, List<ProcessesStep> steps, User currentUser)
+        {
+            IEnumerable<ProcessesStep> accessibleSteps = steps
+                .Where(step => step.StepName == Steps.UploadLotContent.ToString())
                 .Where(step => HasAccess(step, currentUser));
 
             foreach (ProcessesStep step in accessibleSteps)
             {
-                List<PartPrice> uploadedPartPrices = await UploadPartPrices(_stepCollection);
+                List<PartPrice> uploadedPartPrices = UploadPartPrices(steps, currentUser);
 
-                lot = await CreateLotAndTryCreateInvoiceAsync(lotDetails, step.ValidationErrors, step.Docmapper);
-
-                HandleValidationErrors(step);
-
-                await ProcessContainersInLotAsync(step, lot);
+                lot.LotInvoice = TryCreateInvoiceAsync(step.Docmapper, lot, step.ValidationErrors);
 
                 HandleValidationErrors(step);
 
-                lot.LotInvoice = await SaveInvoiceAsync(lot);
+                await ProcessContainersInLotAsync(step, lot, currentUser);
+
+                HandleValidationErrors(step);
+
+                _ = await SaveInvoiceAsync(lot.LotInvoice);
+
+                lot.LotInvoiceId = lot.LotInvoice.Id;
 
                 lot = await SaveLotAsync(lot);
 
-                await SaveContainers(_containers, lot);
+                await SaveContainers(lot);
 
-                await SaveCases(_cases);
+                //    await SaveCases(_cases);
 
-                await SaveCustomsParts(_customsParts);
+                //    await SaveCustomsParts(_customsParts);
 
-                await SavePartInContainers(_partsInContainer, lot);
+                //    await SavePartInContainers(_partsInContainer, lot);
 
-                await SaveVinContainers(_vinContainers, lot);
+                //    await SaveVinContainers(_vinContainers, lot);
 
-                await SaveCustomsClearance(_customsClearances);
+                //    await SaveCustomsClearance(_customsClearances);
 
-                await SavePartsInInvoice(await CreateUniquePartsInInvoiceAsync(_partsInContainer, lot, uploadedPartPrices));
+                //    await SavePartsInInvoice(await CreateUniquePartsInInvoiceAsync(_partsInContainer, lot, uploadedPartPrices));
 
-                await SaveTracing(await CreateUniqueContainersTracingAsync(lot, _containers));
+                //    await SaveTracing(await CreateUniqueContainersTracingAsync(lot, _containers));
             }
 
-            return lot;
-        }
-
-        private async Task<List<PartPrice>> UploadPartPrices(List<ProcessesStep> stepCollection)
-        {
-            List<PartPrice> partPrices = [];
-
-            User currentUser = await userService.GetCurrentUser(Environment.UserName);
-
-            IEnumerable<ProcessesStep> accessibleSteps = stepCollection
-                .Where(step => step.StepName == Steps.UploadPrice)
-                .Where(step => HasAccess(step, currentUser));
-
-            foreach (ProcessesStep step in accessibleSteps)
-            {
-                if (step.Docmapper.FirstDataRow is not null)
-                {
-                    List<IGrouping<string, PartPrice>> groupedPartPrices = Enumerable.Range((int)step.Docmapper.FirstDataRow, step.Docmapper.Data.GetLength(0) - (int)step.Docmapper.FirstDataRow)
-                    .Select(i => CreatePartPrice(step.Docmapper, i))
-                    .Where(pp => pp != null)
-                    .GroupBy(pp => pp.PartNumber)
-                    .ToList();
-
-                    foreach (IGrouping<string, PartPrice> group in groupedPartPrices)
-                    {
-                        PartPrice previousPartPrice = null;
-
-                        foreach (PartPrice partPrice in group)
-                        {
-                            if (previousPartPrice != null && partPrice.Price != previousPartPrice.Price)
-                            {
-                                throw new Exception(string.Format(Resources.PartNumberDifferentPrice, group.Key));
-                            }
-                            else
-                            {
-                                if (!partPrices.Any(pp => pp.PartNumber == partPrice.PartNumber))
-                                {
-                                    partPrices.Add(partPrice);
-                                }
-
-                                previousPartPrice = partPrice;
-                            }
-                        }
-                    }
-                }
-            }
-
-            return partPrices;
-        }
-
-        private async Task<List<ContainersInLot>> UploadContainerTypes(List<ProcessesStep> stepCollection)
-        {
-            List<ContainersInLot> containers = [];
-
-            User currentUser = await userService.GetCurrentUser(Environment.UserName);
-
-            IEnumerable<ProcessesStep> accessibleSteps = stepCollection
-                .Where(step => step.StepName == Steps.UploadContainerTypes)
-                .Where(step => HasAccess(step, currentUser));
-
-            foreach (ProcessesStep step in accessibleSteps)
-            {
-                if (step.Docmapper.FirstDataRow is not null)
-                {
-                    containers.AddRange(
-                    Enumerable.Range((int)step.Docmapper.FirstDataRow, step.Docmapper.Data.GetLength(0) - (int)step.Docmapper.FirstDataRow)
-                              .Select(i => CreateContainerWithType(step.Docmapper, i))
-                              .Where(container => container != null)
-                );
-                }
-            }
-
-            return containers;
-        }
-
-        private async Task<Lot> CreateLotAndTryCreateInvoiceAsync(Lot lotDetails, Dictionary<string, CellInfo> validationErrors, Docmapper document)
-        {
-            Lot lot = new()
-            {
-                LotPurchaseOrder = lotDetails.LotPurchaseOrder,
-                Shipper = lotDetails.Shipper,
-                Carrier = lotDetails.Carrier,
-                LotTransport = lotDetails.LotTransport,
-                DeliveryTerms = lotDetails.DeliveryTerms,
-                LotTransportType = lotDetails.LotTransportType,
-                LotArrivalLocation = lotDetails.LotArrivalLocation,
-                LotDepartureLocation = lotDetails.LotDepartureLocation,
-                LotCustomsLocation = lotDetails.LotCustomsLocation,
-                LotEta = lotDetails.LotEta,
-                LotAta = lotDetails.LotAta,
-                LotEtd = lotDetails.LotEtd,
-                LotAtd = lotDetails.LotAtd,
-                LotTransportDocument = lotDetails.LotTransportDocument,
-                LotComment = lotDetails.LotComment
-            };
-
-            DateOnly initialDate = new();
-
-            lot.LotInvoice = await TryCreateInvoiceAsync(initialDate, document, lot, validationErrors);
-
-            return lot;
-        }
-
-        private async Task<Invoice> TryCreateInvoiceAsync(DateOnly initialDate, Docmapper document, Lot lot, Dictionary<string, CellInfo> validationErrors)
-        {
-            //Invoice invoice = new()
-            //{
-            //    InvoiceDate = initialDate,
-            //    PurchaseOrder = await GetPurchaseOrderByIdAsync(lot.LotPurchaseOrderId),
-            //    Shipper = await staticDataService.GetShipperByIdAsync(lot.ShipperId)
-            //};
-
-            //DocmapperContent content = document.DocmapperContents.FirstOrDefault(dc => dc.DocmapperColumn.SystemColumnName == typeof(Invoice).GetSystemColumnName(nameof(Invoice.InvoiceNumber)));
-
-            //int row = (int)content.RowNr;
-            //int col = content.ColumnNr;
-
-            //if (!lot.TrySetAndValidateProperty(nameof(Lot.LotNumber), GraftLotNumber(lot, document), row, col, out Dictionary<string, CellInfo> result))
-            //{
-            //    validationErrors.Merge(result);
-            //}
-
-            //invoice.InvoiceNumber = lot.LotNumber;
-
-            //return invoice;
+            //return lot;
 
             throw new NotImplementedException();
         }
-
-        private async Task ProcessContainersInLotAsync(ProcessesStep step, Lot lot)
+       
+        private async Task ProcessContainersInLotAsync(ProcessesStep step, Lot lot, User currentUser)
         {
-            _partsInContainer = [];
-            _containers = [];
-            _cases = [];
             _customsClearances = [];
-            _vinContainers = [];
             _customsParts = [];
 
-            List<ContainersInLot> uploadedContainers = await UploadContainerTypes(_stepCollection);
+            lot.ContainersInLots = UploadContainerTypes(_stepCollection, currentUser);
 
-            int? totalProgress = step.Docmapper.Data.GetLength(0) - step.Docmapper.FirstDataRow;
-
-            double currentProgress = 0.0;
-
-            for (int? row = step.Docmapper.FirstDataRow; row < step.Docmapper.Data.GetLength(0); row++)
+            if (step.Docmapper.FirstDataRow is not null)
             {
-                double progress = currentProgress += 1.0;
+                int totalProgress = step.Docmapper.Data.GetLength(0) - (int)step.Docmapper.FirstDataRow;
 
-                ControllerDetails controller = new()
+                double currentProgress = 0.0;
+
+                for (int row = (int)step.Docmapper.FirstDataRow; row < step.Docmapper.Data.GetLength(0); row++)
                 {
-                    ProgressValue = Convert.ToDouble(progress / totalProgress),
-                    Title = Resources.PleaseWait,
-                    Message = string.Format(Resources.CheckingProgress, progress, totalProgress)
-                };
+                    double progress = currentProgress += 1.0;
 
-                DeliveryLoadProgressUpdated?.Invoke(this, controller);
+                    ControllerDetails controller = new()
+                    {
+                        ProgressValue = Convert.ToDouble(progress / totalProgress),
+                        Title = Resources.PleaseWait,
+                        Message = string.Format(Resources.CheckingProgress, progress, totalProgress)
+                    };
 
-                ContainersInLot container = await TryCreateContainer(uploadedContainers, step.ValidationErrors, step.Docmapper, row);
+                    DeliveryLoadProgressUpdated?.Invoke(this, controller);
 
-                _containers.Add(container);
+                    ContainersInLot draftContainer = await TryCreateContainer(lot, step.ValidationErrors, step.Docmapper, row);
 
-                Case caseItem = await TryCreateCase(step.ValidationErrors, step.Docmapper, row);
+                    ContainersInLot foundedContainer = lot.ContainersInLots.First(c => c.ContainerNumber == draftContainer.ContainerNumber);
 
-                _cases.Add(caseItem);
+                    foundedContainer.ContainerNumber = draftContainer.ContainerNumber;
+                    foundedContainer.SealNumber = draftContainer.SealNumber;
+                    foundedContainer.ContainerType = draftContainer.ContainerType;
+                    foundedContainer.ContainerTypeId = draftContainer.ContainerTypeId;
+                    foundedContainer.Lot = lot;
 
-                VinsInContainer vinsInContainer = TryCreateVinsInContainer(container, lot, step.ValidationErrors, step.Docmapper, row);
+                    VinsInContainer vinsInContainer = TryCreateVinsInContainer(foundedContainer, step.ValidationErrors, step.Docmapper, row);
 
-                PartsInContainer partInContainer = await TryCreatePartInContainerAsync(vinsInContainer, container, lot, caseItem, step.ValidationErrors, step.Docmapper, row);
+                    Case caseItem = await TryCreateCase(step.ValidationErrors, step.Docmapper, row);
 
-                _partsInContainer.Add(partInContainer);
+                    PartsInContainer partInContainer = await TryCreatePartInContainerAsync(foundedContainer, vinsInContainer, caseItem, step.ValidationErrors, step.Docmapper, row);
 
-                _customsClearances.Add(CreateCustomsClearance(container, partInContainer, lot));
+                    foundedContainer.PartsInContainers.Add(partInContainer);
+
+                    if (!string.IsNullOrEmpty(vinsInContainer.SupplierVinNumber))
+                    {
+                        if (partInContainer.PartNumber.PartType.PartType == PartTypes.Body.ToString())
+                        {
+                            foundedContainer.VinsInContainers.Add(vinsInContainer);
+                        }
+                    }
+
+                    _customsParts.Add(partInContainer.PartNumber);
+
+                    _customsClearances.Add(CreateCustomsClearance(foundedContainer, partInContainer));
+                }
             }
         }
 
-        private async Task<ContainersInLot> TryCreateContainer(List<ContainersInLot> uploadedContainers, Dictionary<string, CellInfo> validationErrors, Docmapper document, int? row)
+        private async Task<ContainersInLot> TryCreateContainer(Lot lot, Dictionary<string, CellInfo> validationErrors, Docmapper document, int? row)
         {
             ContainersInLot container = new();
 
@@ -560,13 +559,16 @@ namespace BLL.Services
             }
             else
             {
-                ContainersInLot containerWithType = uploadedContainers.FirstOrDefault(c => c.ContainerNumber == container.ContainerNumber) ?? throw new Exception(string.Format(Resources.ContainerTypeMissing, container.ContainerNumber));
+                ContainersInLot containerWithType = lot.ContainersInLots.FirstOrDefault(c => c.ContainerNumber == container.ContainerNumber) ?? throw new Exception(string.Format(Resources.ContainerTypeMissing, container.ContainerNumber));
+
                 container.ContainerType = await staticDataService.GetContainerTypeByName(containerWithType.ContainerType.ContainerType);
 
                 if (container.ContainerType is null)
                 {
                     throw new Exception(string.Format(Resources.ContainerTypeMissingInStaticData, containerWithType.ContainerType.ContainerType));
                 }
+
+                container.ContainerTypeId = container.ContainerType.Id;
             }
 
             return container;
@@ -647,51 +649,49 @@ namespace BLL.Services
                 {
                     throw new Exception(string.Format(Resources.PackingTypeMissingInStaticData, packingType));
                 }
+
+                partCase.PackingTypeId = partCase.PackingType.Id;
             }
 
             return partCase;
         }
 
-        private async Task<PartsInContainer> TryCreatePartInContainerAsync(VinsInContainer vinsInContainer, ContainersInLot container, Lot lot, Case caseItem, Dictionary<string, CellInfo> validationErrors, Docmapper document, int? row)
+        private async Task<PartsInContainer> TryCreatePartInContainerAsync(ContainersInLot container, VinsInContainer vinsInContainer, Case caseItem, Dictionary<string, CellInfo> validationErrors, Docmapper document, int row)
         {
-            //PartsInContainer part = new()
-            //{
-            //    ContainerInLot = container,
-            //    PartInvoice = lot.LotInvoice,
-            //    Case = caseItem,
-            //    PartNumber = new()
-            //};
+            PartsInContainer part = new()
+            {
+                ContainerInLot = container,
+                ContainerInLotId = container.Id,
+                PartInvoice = container.Lot.LotInvoice,
+                PartInvoiceId = container.Lot.LotInvoice.Id,
+                Case = caseItem,
+                CaseId = caseItem.Id,
+                PartNumber = new()
+            };
 
-            //DocmapperContent contentPartsInContainer = document.DocmapperContents.FirstOrDefault(dc => dc.DocmapperColumn.SystemColumnName == typeof(PartsInContainer).GetSystemColumnName(nameof(PartsInContainer.Quantity)));
+            DocmapperContent contentPartsInContainer = document.DocmapperContents.FirstOrDefault(dc => dc.DocmapperColumn.SystemColumnName == typeof(PartsInContainer).GetSystemColumnName(nameof(PartsInContainer.Quantity)));
 
-            //if (!part.TrySetAndValidateProperty(nameof(PartsInContainer.Quantity), GraftValueFromRow(document, row, typeof(PartsInContainer), nameof(PartsInContainer.Quantity)), row + 1, contentPartsInContainer.ColumnNr, out Dictionary<string, CellInfo> result))
-            //{
-            //    validationErrors.Merge(result);
-            //}
+            if (!part.TrySetAndValidateProperty(nameof(PartsInContainer.Quantity), GraftValueFromRow(document, row, typeof(PartsInContainer), nameof(PartsInContainer.Quantity)), row + 1, contentPartsInContainer.ColumnNr, out Dictionary<string, CellInfo> result))
+            {
+                validationErrors.Merge(result);
+            }
 
-            //part.PartNumber = await TryCreateCustomsPart(validationErrors, document, row);
+            part.PartNumber = await TryCreateCustomsPart(validationErrors, document, row);
 
-            //part.PartNumber.PartType = string.IsNullOrWhiteSpace(vinsInContainer.SupplierVinNumber)
-            //    ? await staticDataService.GetPartTypeByNameAsync(PartTypes.Parts)
-            //    : await staticDataService.GetPartTypeByNameAsync(PartTypes.Body);
+            part.PartNumberId = part.PartNumber.PartNumberId;
 
-            //if (part.PartNumber.PartType is null)
-            //{
-            //    throw new Exception(Resources.ErrorGettingTypeForPart);
-            //}
+            part.PartNumber.PartType = string.IsNullOrWhiteSpace(vinsInContainer.SupplierVinNumber)
+                ? await staticDataService.GetPartTypeByNameAsync(PartTypes.Parts)
+                : await staticDataService.GetPartTypeByNameAsync(PartTypes.Body);
 
-            //_customsParts.Add(part.PartNumber);
+            if (part.PartNumber.PartType is null)
+            {
+                throw new Exception(Resources.ErrorGettingTypeForPart);
+            }
 
-            //if (part.PartNumber.PartType.PartType == PartTypes.Body)
-            //{
-            //    vinsInContainer.PartNumber = part.PartNumber.PartNumber;
+            part.PartNumber.PartTypeId = part.PartNumber.PartType.Id;
 
-            //    _vinContainers.Add(vinsInContainer);
-            //}
-
-            //return part;
-
-            throw new NotImplementedException();
+            return part;
         }
 
         private async Task<List<Tracing>> CreateTracing(Lot lot, ContainersInLot container)
@@ -796,15 +796,17 @@ namespace BLL.Services
             }
             else
             {
-                BomPart newBomPart = new()
+                Part newBomPart = new()
                 {
                     PartNumber = customsPart.PartNumber,
                     PartName = customsPart.PartNameEng
                 };
 
-                BomPart bomPart = await bomService.GetExistingBomPartByPartNumberAsync(customsPart.PartNumber) ?? await bomService.SaveNewBomPartAsync(newBomPart);
+                Part bomPart = await bomService.GetExistingBomPartByPartNumberAsync(customsPart.PartNumber) ?? await bomService.SaveNewBomPartAsync(newBomPart);
 
                 customsPart.PartNumberId = bomPart.Id;
+                customsPart.DateAdd = bomPart.DateAdd;
+                customsPart.HsCode = bomPart.Hscode;
             }
 
             return customsPart;
@@ -864,11 +866,11 @@ namespace BLL.Services
 
         #region Save data
 
-        private async Task<Invoice> SaveInvoiceAsync(Lot lot)
+        private async Task<Invoice> SaveInvoiceAsync(Invoice invoice)
         {
-            return await GetExistingInvoiceAsync(lot) is null
-                ? await SaveNewInvoiceAsync(lot)
-                : throw new Exception(string.Format(Resources.InvoiceNumberHasBeenUploaded, lot.LotInvoice.InvoiceNumber));
+            return await GetExistingInvoiceAsync(invoice) is null
+                ? await SaveNewInvoiceAsync(invoice)
+                : throw new Exception(string.Format(Resources.InvoiceNumberHasBeenUploaded, invoice.InvoiceNumber));
         }
 
         private async Task<Lot> SaveLotAsync(Lot lot)
@@ -901,17 +903,17 @@ namespace BLL.Services
 
                 if (existingPart is not null)
                 {
-                    partInContainer.PartInContainerId = existingPart.PartInContainerId;
-                    partInContainer.ContainerInLotId = partInContainer.ContainerInLot.ContainerInLotId;
-                    partInContainer.CaseId = partInContainer.Case.CaseId;
+                    partInContainer.Id = existingPart.Id;
+                    partInContainer.ContainerInLotId = partInContainer.ContainerInLot.Id;
+                    partInContainer.CaseId = partInContainer.Case.Id;
                     partInContainer.PartNumberId = partInContainer.PartNumber.PartNumberId;
                 }
                 else
                 {
                     _ = await SaveNewPartInContainer(partInContainer);
 
-                    partInContainer.ContainerInLotId = partInContainer.ContainerInLot.ContainerInLotId;
-                    partInContainer.CaseId = partInContainer.Case.CaseId;
+                    partInContainer.ContainerInLotId = partInContainer.ContainerInLot.Id;
+                    partInContainer.CaseId = partInContainer.Case.Id;
                     partInContainer.PartNumberId = partInContainer.PartNumber.PartNumberId;
                 }
             }
@@ -963,7 +965,7 @@ namespace BLL.Services
 
                 if (existingCase is not null)
                 {
-                    caseItem.CaseId = existingCase.CaseId;
+                    caseItem.Id = existingCase.Id;
                 }
                 else
                 {
@@ -972,13 +974,13 @@ namespace BLL.Services
             }
         }
 
-        private async Task SaveContainers(List<ContainersInLot> containers, Lot lot)
+        private async Task SaveContainers(Lot lot)
         {
-            double totalProgress = containers.Count;
+            double totalProgress = lot.ContainersInLots.Count;
 
             double currentProgress = 0.0;
 
-            foreach (ContainersInLot container in containers)
+            foreach (ContainersInLot container in lot.ContainersInLots)
             {
                 double progress = currentProgress += 1.0;
 
@@ -995,13 +997,11 @@ namespace BLL.Services
 
                 if (containerInOpenLot is not null)
                 {
-                    container.ContainerInLotId = containerInOpenLot.ContainerInLotId;
+                    container.Id = containerInOpenLot.Id;
                     container.Lot = await GetLotByIdAsync(containerInOpenLot.LotId);
                 }
                 else
                 {
-                    container.Lot = lot;
-
                     _ = await SaveNewContainerAsync(container);
                 }
             }
@@ -1065,7 +1065,7 @@ namespace BLL.Services
 
                 if (existingCustomsClearance is not null)
                 {
-                    сustomsClearance.ContainerInLotId = сustomsClearance.ContainerInLot.ContainerInLotId;
+                    сustomsClearance.ContainerInLotId = сustomsClearance.ContainerInLot.Id;
                 }
                 else
                 {
@@ -1125,7 +1125,7 @@ namespace BLL.Services
         #region Get Existing data
         private static bool HasAccess(ProcessesStep step, User user)
         {
-            return step.Section.SectionId == user.Section.SectionId;
+            return step.Section.Id == user.Section.Id;
         }
 
         private async Task<Tracing> GetExistingTraceAsync(Tracing trace)
@@ -1148,11 +1148,11 @@ namespace BLL.Services
         {
             PartsInContainer partInContainer = (await GetAllPartsInContainer())
                 .FirstOrDefault(
-                pc => pc.ContainerInLotId == part.ContainerInLot.ContainerInLotId &&
-                pc.CaseId == part.Case.CaseId &&
+                pc => pc.ContainerInLotId == part.ContainerInLot.Id &&
+                pc.CaseId == part.Case.Id &&
                 pc.PartNumberId == part.PartNumber.PartNumberId &&
                 pc.Quantity == part.Quantity &&
-                pc.PartInvoiceId == part.PartInvoice.InvoiceId);
+                pc.PartInvoiceId == part.PartInvoice.Id);
 
             if (partInContainer is null)
             {
@@ -1180,45 +1180,45 @@ namespace BLL.Services
 
         private async Task<CustomsClearance> GetExistingCustomsClearanceItemAsync(CustomsClearance customsClearance)
         {
-            return (await GetAllCustomsClearanceAsync()).FirstOrDefault(cc => cc.ContainerInLotId == customsClearance.ContainerInLot.ContainerInLotId);
+            return (await GetAllCustomsClearanceAsync()).FirstOrDefault(cc => cc.ContainerInLotId == customsClearance.ContainerInLot.Id);
         }
 
-        private async Task<Invoice> GetExistingInvoiceAsync(Lot lot)
+        private async Task<Invoice> GetExistingInvoiceAsync(Invoice invoice)
         {
-            IEnumerable<Invoice> invoices = await GetAllInvoiceItemsAsync();
-
-            return invoices.FirstOrDefault(l => l.InvoiceNumber == lot.LotInvoice.InvoiceNumber);
+            return await lotContext.Invoices.FirstOrDefaultAsync(l => l.InvoiceNumber == invoice.InvoiceNumber);
         }
 
         private async Task<Lot> GetExistingLotAsync(Lot lot)
         {
-            Lot existingLot = (await GetAllLotsAsync()).FirstOrDefault(l => l.LotNumber == lot.LotNumber);
+            Lot existingLot = await lotContext.Lots
+                .Include(l => l.Carrier)
+                .Include(l => l.ContainersInLots)
+                .ThenInclude(l => l.VinsInContainers)
+                .Include(l => l.ContainersInLots)
+                .ThenInclude(l => l.PartsInContainers)
+                .ThenInclude(l => l.Case)
+                .ThenInclude(l => l.PackingType)
+                .Include(l => l.ContainersInLots)
+                .ThenInclude(l => l.PartsInContainers)
+                .ThenInclude(l => l.PartNumber)
+                .ThenInclude(l => l.PartType)
+                .Include(l => l.ContainersInLots)
+                .ThenInclude(l => l.ContainerType)
+                .Include(l => l.DeliveryTerms)
+                .Include(l => l.LotArrivalLocation)
+                .ThenInclude(l => l.LocationType)
+                .Include(l => l.LotCustomsLocation)
+                .ThenInclude(l => l.LocationType)
+                .Include(l => l.LotDepartureLocation)
+                .ThenInclude(l => l.LocationType)
+                .Include(l => l.Shipper)
+                .ThenInclude(l => l.PurchaseOrders)
+                .Include(l => l.LotPurchaseOrder)
+                .ThenInclude(l => l.OrderType)
+                .Include(l => l.LotInvoice)
+                .FirstOrDefaultAsync(l => l.LotNumber == lot.LotNumber);
 
-            if (existingLot is not null)
-            {
-                existingLot.LotInvoice ??= await GetInvoiceByIdAsync(lot.LotInvoiceId);
-                existingLot.Carrier ??= await staticDataService.GetCarrierByIdAsync(lot.CarrierId);
-                existingLot.DeliveryTerms ??= await staticDataService.GetDeliveryTermByIdAsync(lot.DeliveryTermsId);
-                existingLot.LotArrivalLocation ??= await staticDataService.GetLocationByIdAsync(lot.LotArrivalLocationId);
-                existingLot.LotDepartureLocation ??= await staticDataService.GetLocationByIdAsync(lot.LotDepartureLocationId);
-                existingLot.LotTransportType ??= await staticDataService.GetTransportTypeByIdAsync(lot.LotTransportTypeId);
-                existingLot.Shipper ??= await staticDataService.GetShipperByIdAsync(lot.ShipperId);
-                existingLot.LotPurchaseOrder ??= await GetPurchaseOrderByIdAsync(lot.LotPurchaseOrderId);
-
-                if (lot.LotTransportId is not null)
-                {
-                    existingLot.LotTransport = await staticDataService.GetTransportByIdAsync((int)lot.LotTransportId);
-                }
-
-                if (lot.LotCustomsLocationId is not null)
-                {
-                    existingLot.LotCustomsLocation = await staticDataService.GetLocationByIdAsync((int)lot.LotCustomsLocationId);
-                }
-
-                return existingLot;
-            }
-
-            return null;
+            return existingLot is null ? null : existingLot;
         }
 
         private async Task<VinsInContainer> GetExistingVinContainerAsync(string supplierVinNumber)
@@ -1395,80 +1395,52 @@ namespace BLL.Services
             throw new NotImplementedException();
         }
 
-        private async Task<Invoice> SaveNewInvoiceAsync(Lot lot)
+        private async Task<Invoice> SaveNewInvoiceAsync(Invoice invoice)
         {
-            //try
-            //{
-            //    CreateInvoiceParameters parameters = new(lot.LotInvoice);
+            try
+            {
+                logger.LogInformation($"{Resources.LogInvoiceAdd}: '{JsonConvert.SerializeObject(invoice)}'");
 
-            //    logger.LogInformation($"{Resources.LogInvoiceAdd}: '{JsonConvert.SerializeObject(lot.LotInvoice)}'");
+                _ = await lotContext.Invoices.AddAsync(invoice);
 
-            //    Invoice invoice = await invoiceRepository.CreateAsync(lot.LotInvoice, StoredProcedureInbound.AddNewInvoice, parameters);
+                _ = await lotContext.SaveChangesAsync();
 
-            //    logger.LogInformation($"{Resources.LogInvoiceAdd} {Resources.Completed}");
+                logger.LogInformation($"{Resources.LogInvoiceAdd} {Resources.Completed}");
 
-            //    return invoice;
-            //}
-            //catch (Exception ex)
-            //{
-            //    string message = $"{Resources.Error} {Resources.LogInvoiceAdd}: {JsonConvert.SerializeObject(ex)}";
+                return invoice;
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {Resources.LogInvoiceAdd}: {JsonConvert.SerializeObject(ex)}";
 
-            //    logger.LogError(message);
+                logger.LogError(message);
 
-            //    throw new Exception(message);
-            //}
-
-            throw new NotImplementedException();
+                throw new Exception(message);
+            }
         }
 
         private async Task<Lot> SaveNewLotAsync(Lot newLot)
         {
-            //try
-            //{
-            //    CreateLotParameters parameters = new(newLot);
+            try
+            {
+                logger.LogInformation($"{Resources.LogLotAdd}: '{JsonConvert.SerializeObject(newLot)}'");
 
-            //    logger.LogInformation($"{Resources.LogLotAdd}: '{JsonConvert.SerializeObject(newLot)}'");
+                lotContext.Entry(newLot).State = EntityState.Added;
 
-            //    Lot lot = await lotRepository.CreateAsync(newLot, StoredProcedureInbound.AddNewLot, parameters);
+                _ = await lotContext.SaveChangesAsync();
 
-            //    logger.LogInformation($"{Resources.LogLotAdd} {Resources.Completed}");
+                logger.LogInformation($"{Resources.LogLotAdd} {Resources.Completed}");
 
-            //    if (lot is not null)
-            //    {
-            //        lot.LotInvoice ??= await GetInvoiceByIdAsync(lot.LotInvoiceId);
-            //        lot.Carrier ??= await staticDataService.GetCarrierByIdAsync(lot.CarrierId);
-            //        lot.DeliveryTerms ??= await staticDataService.GetDeliveryTermByIdAsync(lot.DeliveryTermsId);
-            //        lot.LotArrivalLocation ??= await staticDataService.GetLocationByIdAsync(lot.LotArrivalLocationId);
-            //        lot.LotDepartureLocation ??= await staticDataService.GetLocationByIdAsync(lot.LotDepartureLocationId);
-            //        lot.LotTransportType ??= await staticDataService.GetTransportTypeByIdAsync(lot.LotTransportTypeId);
-            //        lot.Shipper ??= await staticDataService.GetShipperByIdAsync(lot.ShipperId);
-            //        lot.LotPurchaseOrder ??= await GetPurchaseOrderByIdAsync(lot.LotPurchaseOrderId);
+                return newLot;
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {Resources.LogLotAdd}: {JsonConvert.SerializeObject(ex)}";
 
-            //        if (lot.LotTransportId is not null)
-            //        {
-            //            lot.LotTransport = await staticDataService.GetTransportByIdAsync((int)lot.LotTransportId);
-            //        }
+                logger.LogError(message);
 
-            //        if (lot.LotCustomsLocationId is not null)
-            //        {
-            //            lot.LotCustomsLocation = await staticDataService.GetLocationByIdAsync((int)lot.LotCustomsLocationId);
-            //        }
-
-            //        return lot;
-            //    }
-
-            //    return null;
-            //}
-            //catch (Exception ex)
-            //{
-            //    string message = $"{Resources.Error} {Resources.LogLotAdd}: {JsonConvert.SerializeObject(ex)}";
-
-            //    logger.LogError(message);
-
-            //    throw new Exception(message);
-            //}
-
-            throw new NotImplementedException();
+                throw new Exception(message);
+            }
         }
 
         private async Task<CustomsPart> SaveNewCustomsPart(CustomsPart newCustomsPart)
@@ -1525,28 +1497,26 @@ namespace BLL.Services
 
         private async Task<ContainersInLot> SaveNewContainerAsync(ContainersInLot newContainer)
         {
-            //try
-            //{
-            //    CreateContainerParameters parameters = new(newContainer);
+            try
+            {
+                logger.LogInformation($"{Resources.LogContainersInLotAdd}: '{JsonConvert.SerializeObject(newContainer)}'");
 
-            //    logger.LogInformation($"{Resources.LogContainersInLotAdd}: '{JsonConvert.SerializeObject(newContainer)}'");
+                lotContext.Entry(newContainer).State = EntityState.Added;
 
-            //    ContainersInLot containerInLot = await containerRepository.CreateAsync(newContainer, StoredProcedureInbound.AddNewContainer, parameters);
+                _ = await lotContext.SaveChangesAsync();
 
-            //    logger.LogInformation($"{Resources.LogContainersInLotAdd} {Resources.Completed}");
+                logger.LogInformation($"{Resources.LogContainersInLotAdd} {Resources.Completed}");
 
-            //    return containerInLot;
-            //}
-            //catch (Exception ex)
-            //{
-            //    string message = $"{Resources.Error} {Resources.LogContainersInLotAdd}: {JsonConvert.SerializeObject(ex)}";
+                return newContainer;
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {Resources.LogContainersInLotAdd}: {JsonConvert.SerializeObject(ex)}";
 
-            //    logger.LogError(message);
+                logger.LogError(message);
 
-            //    throw new Exception(message);
-            //}
-
-            throw new NotImplementedException();
+                throw new Exception(message);
+            }
         }
 
         #endregion
@@ -1556,95 +1526,24 @@ namespace BLL.Services
         /// <inheritdoc />
         public async Task<Lot> GetLotByIdAsync(int lotId)
         {
-            //Lot lot;
-            //Carrier carrier;
-            //Shipper shipper;
-            //Invoice invoice;
-            //PurchaseOrder order;
-            //TypesOfOrder orderType;
-            //TermsOfDelivery termsOfDelivery;
+            try
+            {
+                logger.LogTrace($"{string.Format(Resources.LogLotGetById, lotId)}");
 
-            //try
-            //{
-            //    logger.LogTrace($"{string.Format(Resources.LogLotGetById, lotId)}");
+                Lot lot = (await GetAllLotsAsync()).FirstOrDefault(l => l.Id == lotId);
 
-            //    lot = await lotRepository.GetByIdAsync(lotId);
+                logger.LogTrace($"{string.Format(Resources.LogLotGetById, lotId)} {Resources.Completed}");
 
-            //    logger.LogTrace($"{string.Format(Resources.LogLotGetById, lotId)} {Resources.Completed}");
-            //}
-            //catch (Exception ex)
-            //{
-            //    string message = $"{Resources.Error} {string.Format(Resources.LogLotGetById, lotId)}: {JsonConvert.SerializeObject(ex)}";
+                return lot;
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {string.Format(Resources.LogLotGetById, lotId)}: {JsonConvert.SerializeObject(ex)}";
 
-            //    logger.LogError(message);
+                logger.LogError(message);
 
-            //    throw new Exception(message);
-            //}
-
-            //carrier = await staticDataService.GetCarrierByIdAsync(lot.CarrierId);
-
-            //lot.Carrier = carrier;
-
-            //order = await GetPurchaseOrderByIdAsync(lot.LotPurchaseOrderId);
-
-            //lot.LotPurchaseOrder = order;
-
-            //orderType = await staticDataService.GetPurchaseOrderTypeById(lot.LotPurchaseOrder.OrderTypeId);
-
-            //lot.LotPurchaseOrder.OrderType = orderType;
-
-            //invoice = await GetInvoiceByIdAsync(lot.LotInvoiceId);
-
-            //lot.LotInvoice = invoice;
-
-            //shipper = await staticDataService.GetShipperByIdAsync(lot.LotInvoice.ShipperId);
-
-            //lot.Shipper = shipper;
-            //lot.LotPurchaseOrder.Shipper = shipper;
-            //invoice.Shipper = shipper;
-            //invoice.PurchaseOrder = order;
-
-            //termsOfDelivery = await staticDataService.GetDeliveryTermByIdAsync(lot.DeliveryTermsId);
-
-            //lot.DeliveryTerms = termsOfDelivery;
-
-            //lot.LotArrivalLocation = await staticDataService.GetLocationByIdAsync(lot.LotArrivalLocationId);
-
-            //if (lot.LotArrivalLocation is not null)
-            //{
-            //    lot.LotArrivalLocation.LocationType = await staticDataService.GetLocationTypeByIdAsync(lot.LotArrivalLocation.LocationTypeId);
-            //}
-
-            //if (lot.LotCustomsLocationId is not null)
-            //{
-            //    lot.LotCustomsLocation = await staticDataService.GetLocationByIdAsync((int)lot.LotCustomsLocationId);
-
-            //    if (lot.LotCustomsLocation is not null)
-            //    {
-            //        lot.LotCustomsLocation.LocationType = await staticDataService.GetLocationTypeByIdAsync(lot.LotCustomsLocation.LocationTypeId);
-            //    }
-            //}
-
-            //lot.LotDepartureLocation = await staticDataService.GetLocationByIdAsync(lot.LotDepartureLocationId);
-
-            //if (lot.LotDepartureLocation is not null)
-            //{
-            //    lot.LotDepartureLocation.LocationType = await staticDataService.GetLocationTypeByIdAsync(lot.LotDepartureLocation.LocationTypeId);
-            //}
-
-            //if (lot.LotTransportId is not null)
-            //{
-            //    lot.LotTransport = await staticDataService.GetTransportByIdAsync((int)lot.LotTransportId);
-
-            //    if (lot.LotTransport is not null)
-            //    {
-            //        lot.LotTransportType = await staticDataService.GetTransportTypeByIdAsync(lot.LotTransportTypeId);
-            //    }
-            //}
-
-            //return lot;
-
-            throw new NotImplementedException();
+                throw new Exception(message);
+            }
         }
 
         /// <inheritdoc />
@@ -1749,6 +1648,31 @@ namespace BLL.Services
         public async Task<int> GetquantityContainersForLotId(int lotId)
         {
             return (await GetAllContainersByLotIdAsync(lotId)).Count;
+        }
+
+        /// <inheritdoc />
+        public List<PurchaseOrder> GetPurchaseOrdersForShipper(Shipper shipper)
+        {
+            try
+            {
+                logger.LogTrace($"{string.Format(Resources.LogPurchaseOrderGet, shipper.Id)}");
+
+                List<PurchaseOrder> orders = lotContext.PurchaseOrders
+                    .Include(p => p.OrderType)
+                    .Where(p => p.ShipperId == shipper.Id).ToList();
+
+                logger.LogTrace($"{string.Format(Resources.LogPurchaseOrderGet, shipper.Id)} {Resources.Completed}");
+
+                return orders;
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {string.Format(Resources.LogPurchaseOrderGet, shipper.Id)}: {JsonConvert.SerializeObject(ex)}";
+
+                logger.LogError(message);
+
+                throw new Exception(message);
+            }
         }
 
         private async Task<CustomsPart> GetPartNumberByIdAsync(int partNumberId)
@@ -2137,6 +2061,7 @@ namespace BLL.Services
                     .Include(l => l.LotDepartureLocation)
                     .ThenInclude(l => l.LocationType)
                     .Include(l => l.Shipper)
+                    .ThenInclude(l => l.PurchaseOrders)
                     .Include(l => l.LotPurchaseOrder)
                     .ThenInclude(l => l.OrderType)
                     .Include(l => l.LotInvoice)
@@ -2220,11 +2145,16 @@ namespace BLL.Services
             {
                 logger.LogTrace($"{string.Format(Resources.LogContainersInLotByOpenLot, containerNumber)}");
 
-                IEnumerable<Lot> cachedLots = await GetAllLotsAsync();
+                //List<Lot> cachedLots = await lotContext.Lots.ToListAsync();
 
-                ContainersInLot container = (await GetAllContainersAsync())
-                    .FirstOrDefault(c => c.ContainerNumber == containerNumber &&
-                    cachedLots.Any(lot => lot.CloseDate == null && lot.LotId == c.LotId));
+                //ContainersInLot container = await lotContext.ContainersInLots
+                //    .FirstOrDefaultAsync(c => c.ContainerNumber == containerNumber &&
+                //    cachedLots.Any(lot => lot.CloseDate == null && lot.Id == c.LotId));
+
+                ContainersInLot container = await lotContext.ContainersInLots
+                     .Include(c => c.Lot)
+                     .Where(c => c.ContainerNumber == containerNumber && c.Lot.CloseDate == null)
+                     .FirstOrDefaultAsync();
 
                 logger.LogTrace($"{string.Format(Resources.LogContainersInLotByOpenLot, containerNumber)} {Resources.Completed}");
 
@@ -2239,6 +2169,7 @@ namespace BLL.Services
                 throw new Exception(message);
             }
         }
+
         #endregion
 
         #region Rollback

@@ -12,7 +12,7 @@ namespace production_supply_system.EntityFramework.DAL.Models.Configurations
     {
         public void Configure(EntityTypeBuilder<Section> entity)
         {
-            entity.HasKey(e => e.SectionId).HasName("PK_Sections");
+            entity.HasKey(e => e.Id).HasName("PK_Sections");
 
             OnConfigurePartial(entity);
         }

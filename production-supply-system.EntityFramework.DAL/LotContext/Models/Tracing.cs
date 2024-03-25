@@ -30,16 +30,16 @@ public partial class Tracing
     public string? TraceTransportDocument { get; set; }
 
     [Column("Trace_ETA")]
-    public DateOnly? TraceEta { get; set; }
+    public DateTime? TraceEta { get; set; }
 
     [Column("Trace_ATA")]
-    public DateOnly? TraceAta { get; set; }
+    public DateTime? TraceAta { get; set; }
 
     [Column("Trace_ETD")]
-    public DateOnly? TraceEtd { get; set; }
+    public DateTime? TraceEtd { get; set; }
 
     [Column("Trace_ATD")]
-    public DateOnly? TraceAtd { get; set; }
+    public DateTime? TraceAtd { get; set; }
 
     [ForeignKey("CarrierId")]
     public virtual Carrier? Carrier { get; set; }

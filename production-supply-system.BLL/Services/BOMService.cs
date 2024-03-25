@@ -3,20 +3,26 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 using BLL.Contracts;
+using BLL.Properties;
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
+using Newtonsoft.Json;
+
+using production_supply_system.EntityFramework.DAL.BomContext;
+using production_supply_system.EntityFramework.DAL.BomContext.Models;
 using production_supply_system.EntityFramework.DAL.BomModels;
 using production_supply_system.EntityFramework.DAL.Context;
 using production_supply_system.EntityFramework.DAL.LotContext;
 
 namespace BLL.Services
 {
-    public class BOMService(LotContext db, ILogger<DeliveryService> logger) : IBOMService
+    public class BOMService(BomContext bomContext, ILogger<DeliveryService> logger) : IBOMService
     {
 
         /// <inheritdoc />
-        public async Task<BomPart> SaveNewBomPartAsync(BomPart newBomPart)
+        public async Task<Part> SaveNewBomPartAsync(Part newBomPart)
         {
             //CreateBomPartParameters parameters = new(newBomPart);
 
@@ -43,45 +49,33 @@ namespace BLL.Services
         }
 
         /// <inheritdoc />
-        public async Task<BomPart> GetExistingBomPartByPartNumberAsync(string partNumber)
+        public async Task<Part> GetExistingBomPartByPartNumberAsync(string partNumber)
         {
-            //string message = string.Format(Resources.LogBomPartGetExisting, partNumber);
+            try
+            {
+                string message = string.Format(Resources.LogBomPartGetExisting, partNumber);
 
-            //logger.LogInformation(message);
+                logger.LogInformation(message);
 
-            //IEnumerable<BomPart> parts = await GetAllBomPartsAsync();
+                Part part = await bomContext.Parts
+                    .Include(x => x.ExtColorNavigation)
+                    .Include(x => x.IntColorNavigation)
+                    .Include(x => x.PartType)
+                    .Include(x => x.SupplierCode)
+                    .FirstOrDefaultAsync(c => c.PartNumber == partNumber);
 
-            //BomPart part = parts.FirstOrDefault(c => c.PartNumber == partNumber);
+                logger.LogInformation($"{message} {Resources.Completed} {string.Format(Resources.LogWithResult, JsonConvert.SerializeObject(part))}");
 
-            //logger.LogInformation($"{message} {Resources.Completed} {string.Format(Resources.LogWithResult, JsonConvert.SerializeObject(part))}");
+                return part;
+            }
+            catch (Exception ex)
+            {
+                string message = $"{Resources.Error} {Resources.LogBomPartAdd}: {JsonConvert.SerializeObject(ex)}";
 
-            //return part;
+                logger.LogError(message);
 
-            throw new NotImplementedException();
-        }
-
-        private async Task<IEnumerable<BomPart>> GetAllBomPartsAsync()
-        {
-            //try
-            //{
-            //    logger.LogInformation(Resources.LogBomPartsGet);
-
-            //    IEnumerable<BomPart> parts = await bomPartRepository.GetAllAsync();
-
-            //    logger.LogInformation($"{Resources.LogBomPartsGet} {Resources.Completed}");
-
-            //    return parts;
-            //}
-            //catch (Exception ex)
-            //{
-            //    string message = $"{Resources.Error} {Resources.LogBomPartsGet}: {JsonConvert.SerializeObject(ex)}";
-
-            //    logger.LogError(message);
-
-            //    throw new Exception(message);
-            //}
-
-            throw new NotImplementedException();
+                throw new Exception(message);
+            }
         }
     }
 }

@@ -8,7 +8,7 @@ namespace production_supply_system.EntityFramework.DAL.LotContext.Configurations
     {
         public void Configure(EntityTypeBuilder<Location> entity)
         {
-            _ = entity.HasKey(e => e.LocationId).HasName("PK_tbd_Terminals");
+            _ = entity.HasKey(e => e.Id).HasName("PK_tbd_Terminals");
 
             OnConfigurePartial(entity);
         }

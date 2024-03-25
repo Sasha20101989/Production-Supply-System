@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 using production_supply_system.EntityFramework.DAL.Enums;
 using production_supply_system.EntityFramework.DAL.LotContext.Models;
+using production_supply_system.EntityFramework.DAL.MasterProcessContext.Models;
 using production_supply_system.EntityFramework.DAL.Models.dboSchema;
-using production_supply_system.EntityFramework.DAL.Models.MasterSchema;
 using production_supply_system.EntityFramework.DAL.Models.UsersSchema;
 
 namespace BLL.Contracts
@@ -18,25 +18,25 @@ namespace BLL.Contracts
         /// Получает всех отправителей
         /// </summary>
         /// <returns>Задача, представляющая асинхронную операцию, возвращающая всех отправителей</returns>
-        Task<IEnumerable<Shipper>> GetAllShippersAsync();
+        Task<List<Shipper>> GetAllShippersAsync();
 
         /// <summary>
         /// Получает всех перевозчиков
         /// </summary>
         /// <returns>Задача, представляющая асинхронную операцию, возвращающая всех перевозчиков</returns>
-        Task<IEnumerable<Carrier>> GetAllCarriersAsync();
+        Task<List<Carrier>> GetAllCarriersAsync();
 
         /// <summary>
         /// Получает все варианты условий поставки
         /// </summary>
         /// <returns>Задача, представляющая асинхронную операцию, возвращающая все варианты условий поставки.</returns>
-        Task<IEnumerable<TermsOfDelivery>> GetAllTermsOfDeliveryAsync();
+        Task<List<TermsOfDelivery>> GetAllTermsOfDeliveryAsync();
 
         /// <summary>
         /// Получает все типы транспорта
         /// </summary>
         /// <returns>Задача, представляющая асинхронную операцию, возвращающая все типы транспорта.</returns>
-        Task<IEnumerable<TypesOfTransport>> GetAllTransportTypesAsync();
+        Task<List<TypesOfTransport>> GetAllTransportTypesAsync();
 
         /// <summary>
         /// Получает все локации
@@ -48,7 +48,7 @@ namespace BLL.Contracts
         /// Получает весь транспорт
         /// </summary>
         /// <returns>Задача, представляющая асинхронную операцию, возвращающая весь транспорт.</returns>
-        Task<IEnumerable<Transport>> GetAllTransportsAsync();
+        Task<List<Transport>> GetAllTransportsAsync();
 
         /// <summary>
         /// Добавляет новый транспорт
@@ -62,7 +62,7 @@ namespace BLL.Contracts
         /// </summary>
         /// <param name="locationType">Тип локации</param>
         /// <returns>Задача, представляющая асинхронную операцию, возвращающая локации по типу локации.</returns>
-        Task<IEnumerable<Location>> GetLocationsByTypeAsync(LocationType locationType);
+        Task<List<Location>> GetLocationsByTypeAsync(LocationType locationType);
 
         /// <summary>
         /// Возвращает тип контейнера по имени типа контейнера

@@ -9,7 +9,11 @@ public partial class PurchaseOrderConfiguration : IEntityTypeConfiguration<Purch
 {
     public void Configure(EntityTypeBuilder<PurchaseOrder> entity)
     {
-        _ = entity.HasKey(e => e.PurchaseOrderId).HasName("PK_tbd_PurchaseOrders");
+        _ = entity.HasKey(e => e.Id).HasName("PK_tbd_PurchaseOrders");
+
+        _ = entity.HasOne(e => e.Shipper).WithMany(p => p.PurchaseOrders)
+            .OnDelete(DeleteBehavior.ClientSetNull)
+            .HasConstraintName("FK_tbd_Purchase_Orders_tbd_Shippers");
 
         OnConfigurePartial(entity);
     }

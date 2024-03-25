@@ -8,7 +8,7 @@ public partial class TermsOfDelivery
 {
     [Key]
     [Column("Delivery_Terms_Id")]
-    public int DeliveryTermsId { get; set; }
+    public int Id { get; set; }
 
     [Column("Delivery_Term")]
     [MaxLength(5, ErrorMessage = "DeliveryTerm must not exceed 5 characters.")]

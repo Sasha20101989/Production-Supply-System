@@ -11,7 +11,7 @@ public partial class PurchaseOrder
 {
     [Key]
     [Column("Purchase_Order_Id")]
-    public int PurchaseOrderId { get; set; }
+    public int Id { get; set; }
 
     [Column("Shipper_Id")]
     public int ShipperId { get; set; }
@@ -30,5 +30,6 @@ public partial class PurchaseOrder
     public virtual TypesOfOrder OrderType { get; set; } = null!;
 
     [ForeignKey("ShipperId")]
+    [InverseProperty("PurchaseOrders")]
     public virtual Shipper Shipper { get; set; } = null!;
 }

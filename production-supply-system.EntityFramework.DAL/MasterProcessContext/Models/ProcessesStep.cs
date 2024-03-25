@@ -1,17 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+
 using production_supply_system.EntityFramework.DAL.DocumentMapperContext.Models;
 using production_supply_system.EntityFramework.DAL.Enums;
 using production_supply_system.EntityFramework.DAL.Models.dboSchema;
 
-namespace production_supply_system.EntityFramework.DAL.Models.MasterSchema;
+namespace production_supply_system.EntityFramework.DAL.MasterProcessContext.Models;
 
 [Table("tbd_Processes_Steps", Schema = "Master")]
 public partial class ProcessesStep
 {
     [Key]
     [Column("Process_Step_Id")]
-    public int ProcessStepId { get; set; }
+    public int Id { get; set; }
 
     [Required(ErrorMessage = "Process Id is required.")]
     [Column("Process_Id")]
@@ -32,7 +33,7 @@ public partial class ProcessesStep
     [Required(ErrorMessage = "Step name is required.")]
     [Column("Step_Name")]
     [MaxLength(50, ErrorMessage = "Step name must not exceed 50 characters.")]
-    public Steps StepName { get; set; }
+    public string? StepName { get; set; }
 
     [ForeignKey("DocmapperId")]
     public virtual Docmapper Docmapper { get; set; } = null!;

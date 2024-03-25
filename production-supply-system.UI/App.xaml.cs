@@ -17,6 +17,7 @@ using Newtonsoft.Json;
 
 using NLog.Extensions.Logging;
 
+using production_supply_system.EntityFramework.DAL.BomContext;
 using production_supply_system.EntityFramework.DAL.Context;
 using production_supply_system.EntityFramework.DAL.DocumentMapperContext.Context;
 using production_supply_system.EntityFramework.DAL.LotContext;
@@ -94,6 +95,18 @@ namespace UI_Interface
 
         private void ConfigureServices(HostBuilderContext context, IServiceCollection services)
         {
+            _ = services.AddDbContext<BomContext>(options =>
+            {
+                _ = options.UseSqlServer(context.Configuration.GetConnectionString("BOM"));
+                _ = options.EnableSensitiveDataLogging();
+            });
+
+            _ = services.AddDbContext<MasterProcessContext>(options =>
+            {
+                _ = options.UseSqlServer(context.Configuration.GetConnectionString("Default"));
+                _ = options.EnableSensitiveDataLogging();
+            });
+
             _ = services.AddDbContext<PSSContext>(options =>
             {
                 _ = options.UseSqlServer(context.Configuration.GetConnectionString("Default"));

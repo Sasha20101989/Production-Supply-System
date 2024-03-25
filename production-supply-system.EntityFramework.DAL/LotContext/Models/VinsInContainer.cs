@@ -14,8 +14,8 @@ public partial class VinsInContainer
     public int ContainerInLotId { get; set; }
 
     [Column("Supplier_VIN_Number")]
-    [StringLength(50)]
-    public string SupplierVinNumber { get; set; } = null!;
+    [MaxLength(50, ErrorMessage = "Supplier Vin Number must not exceed 50 characters.")]
+    public string? SupplierVinNumber { get; set; }
 
     [Column("Modvar_Id")]
     public int ModvarId { get; set; }

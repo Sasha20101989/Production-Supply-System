@@ -13,3 +13,4 @@
         public int PartTypeId { get; set; }
     }
 }
+

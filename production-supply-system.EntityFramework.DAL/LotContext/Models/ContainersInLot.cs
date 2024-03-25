@@ -8,7 +8,7 @@ public partial class ContainersInLot
 {
     [Key]
     [Column("Container_In_Lot_Id")]
-    public int ContainerInLotId { get; set; }
+    public int Id { get; set; }
 
     [Column("Lot_Id")]
     public int LotId { get; set; }

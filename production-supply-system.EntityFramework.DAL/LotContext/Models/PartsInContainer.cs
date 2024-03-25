@@ -8,7 +8,7 @@ public partial class PartsInContainer
 {
     [Key]
     [Column("Part_In_Container_Id")]
-    public int PartInContainerId { get; set; }
+    public int Id { get; set; }
 
     [Column("Container_In_Lot_Id")]
     public int ContainerInLotId { get; set; }
@@ -19,6 +19,7 @@ public partial class PartsInContainer
     [Column("Part_Number_Id")]
     public int PartNumberId { get; set; }
 
+    [Column("Quantity")]
     public int Quantity { get; set; }
 
     [Column("Part_Invoice_Id")]

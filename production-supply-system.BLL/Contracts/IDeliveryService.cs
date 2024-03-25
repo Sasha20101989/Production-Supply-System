@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
 using BLL.Models;
-
 using DocumentFormat.OpenXml.Spreadsheet;
-
 using production_supply_system.EntityFramework.DAL.DocumentMapperContext.Models;
 using production_supply_system.EntityFramework.DAL.Enums;
 using production_supply_system.EntityFramework.DAL.LotContext.Models;
-using production_supply_system.EntityFramework.DAL.LotContext.Models;
-using production_supply_system.EntityFramework.DAL.Models.MasterSchema;
+using production_supply_system.EntityFramework.DAL.MasterProcessContext.Models;
 
 namespace BLL.Contracts
 {
@@ -81,5 +77,8 @@ namespace BLL.Contracts
         /// </summary>
         /// <returns>Задача, представляющая асинхронную операцию, выгружающая весь трейсинг для партнёра 2 для дальнейшей выгрузки в файл.</returns>
         Task<SheetData> GetAllTracingForPartner2ToExport(List<DocmapperContent> content);
+
+        
+        List<PurchaseOrder> GetPurchaseOrdersForShipper(Shipper shipper);
     }
 }

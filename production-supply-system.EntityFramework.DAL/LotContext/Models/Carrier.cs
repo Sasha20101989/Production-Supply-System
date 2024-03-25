@@ -8,7 +8,7 @@ public partial class Carrier
 {
     [Key]
     [Column("Carrier_Id")]
-    public int CarrierId { get; set; }
+    public int Id { get; set; }
 
     [Column("Carrier_Name")]
     [StringLength(50)]

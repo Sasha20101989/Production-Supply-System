@@ -7,7 +7,7 @@ public partial class TermsOfDeliveryConfiguration : IEntityTypeConfiguration<Ter
 {
     public void Configure(EntityTypeBuilder<TermsOfDelivery> entity)
     {
-        _ = entity.HasKey(e => e.DeliveryTermsId).HasName("PK_tbd_Delivery_Terms");
+        _ = entity.HasKey(e => e.Id).HasName("PK_tbd_Delivery_Terms");
 
         OnConfigurePartial(entity);
     }

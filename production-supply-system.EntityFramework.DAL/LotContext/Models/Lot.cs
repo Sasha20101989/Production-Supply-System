@@ -8,11 +8,11 @@ public partial class Lot
 {
     [Key]
     [Column("Lot_Id")]
-    public int LotId { get; set; }
+    public int Id { get; set; }
 
     [Column("Lot_Number")]
-    [StringLength(20)]
-    public string LotNumber { get; set; } = null!;
+    [MaxLength(20, ErrorMessage = "Lot number must not exceed 20 characters.")]
+    public string? LotNumber { get; set; }
 
     [Column("Shipper_Id")]
     public int ShipperId { get; set; }
@@ -36,20 +36,20 @@ public partial class Lot
     public int LotTransportTypeId { get; set; }
 
     [Column("Lot_Transport_Document")]
-    [StringLength(50)]
+    [MaxLength(50, ErrorMessage = "Lot transport document must not exceed 50 characters.")]
     public string? LotTransportDocument { get; set; }
 
     [Column("Lot_ETD")]
-    public DateOnly? LotEtd { get; set; }
+    public DateTime? LotEtd { get; set; }
 
     [Column("Lot_ATD")]
-    public DateOnly? LotAtd { get; set; }
+    public DateTime? LotAtd { get; set; }
 
     [Column("Lot_ETA")]
-    public DateOnly LotEta { get; set; }
+    public DateTime LotEta { get; set; }
 
     [Column("Lot_ATA")]
-    public DateOnly? LotAta { get; set; }
+    public DateTime? LotAta { get; set; }
 
     [Column("Lot_Departure_Location_Id")]
     public int LotDepartureLocationId { get; set; }
@@ -61,10 +61,10 @@ public partial class Lot
     public int LotArrivalLocationId { get; set; }
 
     [Column("Close_Date")]
-    public DateOnly? CloseDate { get; set; }
+    public DateTime? CloseDate { get; set; }
 
     [Column("Lot_Comment")]
-    [StringLength(250)]
+    [MaxLength(250, ErrorMessage = "Lot comment must not exceed 250 characters.")]
     public string? LotComment { get; set; }
 
     [ForeignKey("CarrierId")]

@@ -8,7 +8,7 @@ public partial class TypesOfContainer
 {
     [Key]
     [Column("Container_Type_Id")]
-    public int ContainerTypeId { get; set; }
+    public int Id { get; set; }
 
     [Column("Container_Type")]
     [StringLength(10)]

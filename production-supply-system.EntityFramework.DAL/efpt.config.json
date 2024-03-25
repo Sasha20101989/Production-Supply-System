@@ -1,13 +1,13 @@
 ﻿{
    "CodeGenerationMode": 4,
-   "ContextClassName": "PSSContext",
+   "ContextClassName": "BomContext",
    "ContextNamespace": null,
    "DefaultDacpacSchema": null,
    "FilterSchemas": false,
    "IncludeConnectionString": true,
    "ModelNamespace": null,
    "OutputContextPath": null,
-   "OutputPath": "Models",
+   "OutputPath": "BomContext",
    "PreserveCasingWithRegex": true,
    "ProjectRootNamespace": "production_supply_system.EntityFramework.DAL",
    "Schemas": null,
@@ -16,11 +16,23 @@
    "T4TemplatePath": null,
    "Tables": [
       {
-         "Name": "[Customs].[tbd_Customs_Clearance]",
+         "Name": "[dbo].[tbd_BomProduction]",
          "ObjectType": 0
       },
       {
-         "Name": "[Customs].[tbd_Customs_Parts]",
+         "Name": "[dbo].[tbd_EndItems]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tbd_ExternalColors]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tbd_HistoryOfChanges]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[tbd_InternalColors]",
          "ObjectType": 0
       },
       {
@@ -28,139 +40,51 @@
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[tbd_Sections]",
+         "Name": "[dbo].[tbd_Models]",
          "ObjectType": 0
       },
       {
-         "Name": "[Docmapper].[tbd_Docmapper]",
+         "Name": "[dbo].[tbd_ModelVariants]",
          "ObjectType": 0
       },
       {
-         "Name": "[Docmapper].[tbd_Docmapper_Columns]",
+         "Name": "[dbo].[tbd_MtcCriteria]",
          "ObjectType": 0
       },
       {
-         "Name": "[Docmapper].[tbd_Docmapper_Content]",
+         "Name": "[dbo].[tbd_MtcForEndItems]",
          "ObjectType": 0
       },
       {
-         "Name": "[Inbound].[tbd_Carriers]",
+         "Name": "[dbo].[tbd_MtcForPartsApplication]",
          "ObjectType": 0
       },
       {
-         "Name": "[Inbound].[tbd_Cases]",
+         "Name": "[dbo].[tbd_MtcGroups]",
          "ObjectType": 0
       },
       {
-         "Name": "[Inbound].[tbd_Containers_In_Lot]",
+         "Name": "[dbo].[tbd_Parts]",
          "ObjectType": 0
       },
       {
-         "Name": "[Inbound].[tbd_Imo_Cargo]",
+         "Name": "[dbo].[tbd_PartsApplication]",
          "ObjectType": 0
       },
       {
-         "Name": "[Inbound].[tbd_Invoices]",
+         "Name": "[dbo].[tbd_PartsType]",
          "ObjectType": 0
       },
       {
-         "Name": "[Inbound].[tbd_Locations]",
+         "Name": "[dbo].[tbd_Suppliers]",
          "ObjectType": 0
       },
       {
-         "Name": "[Inbound].[tbd_Lots]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Inbound].[tbd_Parts_In_Container]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Inbound].[tbd_Parts_In_Invoice]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Inbound].[tbd_Shippers]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Inbound].[tbd_Terms_Of_Container_Use]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Inbound].[tbd_Terms_Of_Delivery]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Inbound].[tbd_Tracing]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Inbound].[tbd_Transports]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Inbound].[tbd_Types_Of_Container]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Inbound].[tbd_Types_Of_Location]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Inbound].[tbd_Types_Of_Packing]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Inbound].[tbd_Types_Of_Part]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Inbound].[tbd_Types_Of_Transport]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Master].[tbd_Processes]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Master].[tbd_Processes_Steps]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Partscontrol].[tbd_Purchase_Orders]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Partscontrol].[tbd_Types_Of_Order]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Planning].[tbd_Bound_VINs]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Planning].[tbd_Planned_Sequence]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Planning].[tbd_Statuses_For_SFS_Upload]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Planning].[tbd_VIN_Numbers_Local]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Planning].[tbd_VINs_In_Container]",
-         "ObjectType": 0
-      },
-      {
-         "Name": "[Users].[tbd_Users]",
+         "Name": "[dbo].[Users]",
          "ObjectType": 0
       }
    ],
-   "UiHint": "ru-nmgr-s0053.PSS.dbo",
+   "UiHint": "asus-sasha.BOM.dbo",
    "UncountableWords": null,
    "UseBoolPropertiesWithoutDefaultSql": false,
    "UseDatabaseNames": false,

@@ -25,7 +25,7 @@ public partial class CustomsPart
 
     [Column("Hs_Code")]
     [StringLength(50)]
-    public string? HsCode { get; set; }
+    public int? HsCode { get; set; }
 
     [Column("Part_Type_Id")]
     public int PartTypeId { get; set; }
@@ -34,6 +34,5 @@ public partial class CustomsPart
     public DateTime? DateAdd { get; set; }
 
     [ForeignKey("PartTypeId")]
-    [InverseProperty("CustomsParts")]
     public virtual TypesOfPart PartType { get; set; } = null!;
 }

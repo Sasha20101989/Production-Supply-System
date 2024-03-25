@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 
 using production_supply_system.EntityFramework.DAL.Enums;
-using production_supply_system.EntityFramework.DAL.Models.MasterSchema;
+using production_supply_system.EntityFramework.DAL.MasterProcessContext.Models;
 
 namespace BLL.Contracts
 {

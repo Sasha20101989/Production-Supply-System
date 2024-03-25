@@ -9,7 +9,7 @@ public partial class TypesOfPartConfiguration : IEntityTypeConfiguration<TypesOf
 {
     public void Configure(EntityTypeBuilder<TypesOfPart> entity)
     {
-        _ = entity.HasKey(e => e.PartTypeId).HasName("PK_tbd_PartTypes");
+        _ = entity.HasKey(e => e.Id).HasName("PK_tbd_PartTypes");
 
         OnConfigurePartial(entity);
     }

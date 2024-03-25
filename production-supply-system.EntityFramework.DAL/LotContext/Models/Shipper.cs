@@ -8,7 +8,7 @@ public partial class Shipper
 {
     [Key]
     [Column("Shipper_Id")]
-    public int ShipperId { get; set; }
+    public int Id { get; set; }
 
     [Column("Shipper_Name")]
     [StringLength(20)]
@@ -23,4 +23,7 @@ public partial class Shipper
 
     [ForeignKey("ShipperDefaultDeliveryLocationId")]
     public virtual Location? ShipperDefaultDeliveryLocation { get; set; }
+
+    [InverseProperty("Shipper")]
+    public virtual ICollection<PurchaseOrder> PurchaseOrders { get; set; } = [];
 }

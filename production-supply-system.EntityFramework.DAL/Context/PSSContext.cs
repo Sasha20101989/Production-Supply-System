@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using production_supply_system.EntityFramework.DAL.Models.dboSchema;
-using production_supply_system.EntityFramework.DAL.Models.MasterSchema;
 using production_supply_system.EntityFramework.DAL.Models.UsersSchema;
 using production_supply_system.EntityFramework.DAL.Models.InboundSchema;
 
@@ -17,10 +16,6 @@ public partial class PSSContext : DbContext
 
     public virtual DbSet<Section> Sections { get; set; }
 
-    public virtual DbSet<Process> Processes { get; set; }
-
-    public virtual DbSet<ProcessesStep> ProcessesSteps { get; set; }
-
     public virtual DbSet<Log> Logs { get; set; }
 
     public virtual DbSet<TermsOfContainerUse> TermsOfContainerUses { get; set; }
@@ -29,8 +24,6 @@ public partial class PSSContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        _ = modelBuilder.ApplyConfiguration(new Models.Configurations.ProcessConfiguration());
-        _ = modelBuilder.ApplyConfiguration(new Models.Configurations.ProcessesStepConfiguration());
         _ = modelBuilder.ApplyConfiguration(new Models.Configurations.SectionConfiguration());
         _ = modelBuilder.ApplyConfiguration(new Models.Configurations.TermsOfContainerUseConfiguration());
         _ = modelBuilder.ApplyConfiguration(new Models.Configurations.UserConfiguration());

@@ -11,7 +11,7 @@ public partial class Transport
 {
     [Key]
     [Column("Transport_Id")]
-    public int TransportId { get; set; }
+    public int Id { get; set; }
 
     [Column("Transport_Name")]
     [StringLength(50)]

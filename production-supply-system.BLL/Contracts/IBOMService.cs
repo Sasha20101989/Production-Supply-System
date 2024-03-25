@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
-
-using production_supply_system.EntityFramework.DAL.BomModels;
+using production_supply_system.EntityFramework.DAL.BomContext.Models;
 
 namespace BLL.Contracts
 {
@@ -14,13 +13,13 @@ namespace BLL.Contracts
         /// </summary>
         /// <param name="newBomPart"></param>
         /// <returns>Задача, представляющая асинхронную операцию, добавляющая детать и возвращающая ее с уникальным идентификатором</returns>
-        Task<BomPart> SaveNewBomPartAsync(BomPart newBomPart);
+        Task<Part> SaveNewBomPartAsync(Part newBomPart);
 
         /// <summary>
         /// Возвращает деталь или null
         /// </summary>
         /// <param name="partNumber"></param>
         /// <returns>Задача, представляющая асинхронную операцию, которая возвращает детать по имени детали или Null если ее не найдёт</returns>
-        Task<BomPart> GetExistingBomPartByPartNumberAsync(string partNumber);
+        Task<Part> GetExistingBomPartByPartNumberAsync(string partNumber);
     }
 }

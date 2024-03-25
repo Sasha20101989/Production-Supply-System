@@ -8,7 +8,7 @@ public partial class PartsInContainerConfiguration : IEntityTypeConfiguration<Pa
 {
     public void Configure(EntityTypeBuilder<PartsInContainer> entity)
     {
-        _ = entity.HasKey(e => e.PartInContainerId).HasName("PK_tbd_PartsInContainer");
+        _ = entity.HasKey(e => e.Id).HasName("PK_tbd_PartsInContainer");
 
         _ = entity.HasOne(d => d.ContainerInLot).WithMany(p => p.PartsInContainers)
             .OnDelete(DeleteBehavior.ClientSetNull)
