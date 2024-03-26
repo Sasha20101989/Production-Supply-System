@@ -1,6 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+using production_supply_system.EntityFramework.DAL.TestContext.CustomsSchema;
+using production_supply_system.EntityFramework.DAL.TestContext.InboundSchema;
+
 namespace production_supply_system.EntityFramework.DAL.LotContext.Models;
 
 [Table("tbd_Containers_In_Lot", Schema = "Inbound")]
@@ -55,4 +58,10 @@ public partial class ContainersInLot
 
     [InverseProperty("ContainerInLot")]
     public virtual ICollection<VinsInContainer> VinsInContainers { get; set; } = [];
+
+    [InverseProperty("ContainerInLot")]
+    public virtual ICollection<CustomsClearance> CustomsClearances { get; set; } = [];
+
+    [InverseProperty("ContainerInLot")]
+    public virtual ICollection<Tracing> Tracings { get; set; } = [];
 }

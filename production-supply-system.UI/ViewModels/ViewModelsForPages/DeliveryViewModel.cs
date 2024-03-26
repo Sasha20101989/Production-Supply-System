@@ -231,7 +231,6 @@ namespace UI_Interface.ViewModels.ViewModelsForPages
                     logger.LogInformation(string.Format(Resources.LogUploadLotCompleted, lot.Id));
 
                     NavigateToDetails(lot);
-
                 }
             }
             catch (Exception ex)

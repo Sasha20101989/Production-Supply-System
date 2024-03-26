@@ -719,7 +719,7 @@
                                 </DataTemplate>
                             </mah:MetroHeader.HeaderTemplate>
                             <ComboBox IsEnabled="False"
-                                      SelectedItem="{Binding DeliveryDetailViewModel.TermsOfDelivery, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                                      SelectedItem="{Binding DeliveryDetailViewModel.DeliveryTerms, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
                                       DisplayMemberPath="DeliveryTerm"
                                       ItemsSource="{Binding DeliveryDetailViewModel.TermsOfDeliveryItems}">
                             </ComboBox>
@@ -742,7 +742,7 @@
                                 </DataTemplate>
                             </mah:MetroHeader.HeaderTemplate>
                             <ComboBox IsEnabled="False"
-                                      SelectedItem="{Binding DeliveryDetailViewModel.TypeOfTransport, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                                      SelectedItem="{Binding DeliveryDetailViewModel.LotTransportType, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
                                       DisplayMemberPath="TransportType"
                                       ItemsSource="{Binding DeliveryDetailViewModel.TypesOfTransport}">
                             </ComboBox>

@@ -10,13 +10,16 @@ public partial class Case
     [Column("Case_Id")]
     public int Id { get; set; }
 
+    [Required(ErrorMessage = "Case number is required")]
     [Column("Case_No")]
-    [StringLength(10)]
+    [MaxLength(10, ErrorMessage = "Case number not exceed 10 characters")]
     public string CaseNo { get; set; } = null!;
 
+    [Required(ErrorMessage = "Net weight is required")]
     [Column("Net_Weight", TypeName = "decimal(6, 3)")]
     public decimal NetWeight { get; set; }
 
+    [Required(ErrorMessage = "Gross weight is required")]
     [Column("Gross_Weight", TypeName = "decimal(6, 3)")]
     public decimal GrossWeight { get; set; }
 

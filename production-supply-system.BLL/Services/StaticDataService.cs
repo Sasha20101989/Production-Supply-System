@@ -37,7 +37,6 @@ namespace BLL.Services
     /// <param name="logger">Регистратор для отслеживания информации и ошибок.</param>
     public class StaticDataService(
         LotContext lotContext,
-        MasterProcessContext masterProcessContext,
         ILogger<StaticDataService> logger) : IStaticDataService
     {
 
@@ -717,16 +716,14 @@ namespace BLL.Services
         /// <inheritdoc />
         public async Task<Location> GetFinalLocationAsync()
         {
-            //logger.LogInformation(Resources.LogLocationFinalGet);
+            logger.LogInformation(Resources.LogLocationFinalGet);
 
-            //Location result = (await GetAllLocationsAsync()).
-            //    FirstOrDefault(l => l.LocationType.LocationType == EnumExtensions.GetDescription(LocationType.FinalLocation));
+            Location result = await lotContext.Locations.
+                FirstOrDefaultAsync(l => l.LocationType.LocationType == EnumExtensions.GetDescription(LocationType.FinalLocation));
 
-            //logger.LogInformation($"{Resources.LogLocationFinalGet} {Resources.Completed} {string.Format(Resources.LogWithResult, JsonConvert.SerializeObject(result))}");
+            logger.LogInformation($"{Resources.LogLocationFinalGet} {Resources.Completed} {string.Format(Resources.LogWithResult, JsonConvert.SerializeObject(result))}");
 
-            //return result;
-
-            throw new NotImplementedException();
+            return result;
         }
 
         /// <inheritdoc />
@@ -750,34 +747,6 @@ namespace BLL.Services
 
                 throw new Exception(message);
             }
-        }
-
-        /// <inheritdoc />
-        public async Task<IEnumerable<ProcessesStep>> GetProcessStepsByUserAsync(User user)
-        {
-            //try
-            //{
-            //    logger.LogTrace($"{string.Format(Resources.LogProcessStepGetBySectionId, user.SectionId)}");
-
-            //    List<ProcessesStep> steps = await masterProcessContext.ProcessesSteps.Where(c => c.SectionId == user.SectionId).ToListAsync();
-
-            //    IEnumerable<ProcessesStep> steps1 = (await processStepsRepository.GetAllAsync())
-            //        .Where(c => c.SectionId == user.SectionId);
-
-            //    logger.LogTrace($"{string.Format(Resources.LogProcessStepGetBySectionId, user.SectionId)} {Resources.Completed}");
-
-            //    return steps1;
-            //}
-            //catch (Exception ex)
-            //{
-            //    string message = $"{Resources.Error} {string.Format(Resources.LogProcessStepGetBySectionId, user.SectionId)}: {JsonConvert.SerializeObject(ex)}";
-
-            //    logger.LogError(message);
-
-            //    throw new Exception(message);
-            //}
-
-            throw new NotImplementedException();
         }
     }
 }

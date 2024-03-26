@@ -460,7 +460,7 @@
     <value>quantity by part number '{0}' not found</value>
   </data>
   <data name="ReleaseNotFound" xml:space="preserve">
-    <value>Release not found for body '{0}' and part '{1}', check the correctness of the input or contact the DSS</value>
+    <value>Release not found for body '{0}', check the correctness of the input or contact the DSS</value>
   </data>
   <data name="SavingProgressCase" xml:space="preserve">
     <value>saving a case to the {0} from {1}</value>

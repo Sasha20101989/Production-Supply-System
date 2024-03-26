@@ -16,12 +16,12 @@ namespace BLL.Services
         IDeliveryService deliveryService,
         ILogger<ExportProceduresService> logger) : IExportProceduresService
     {
-        public async Task ExportTracingForPartner2(AppProcess processName, Steps step, string filePath, string sheetName, List<DocmapperContent> content)
+        public async Task ExportTracingForPartner2Async(string filePath, string sheetName, List<DocmapperContent> content)
         {
             logger.LogInformation(string.Format(Resources.LogExportFile, filePath));
 
             excelService.ExportFile(
-                await deliveryService.GetAllTracingForPartner2ToExport(content),
+                await deliveryService.GetAllTracingForPartner2ToExportAsync(content),
                 filePath,
                 sheetName);
 

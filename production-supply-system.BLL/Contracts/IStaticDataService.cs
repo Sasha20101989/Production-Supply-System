@@ -187,13 +187,6 @@ namespace BLL.Contracts
         Task<TypesOfPart> GetPartTypeByNameAsync(PartTypes partType);
 
         /// <summary>
-        /// Получает процессы для пользователя
-        /// </summary>
-        /// <param name="user">Пользователь для которого будут подобраны процессы</param>
-        /// <returns>Задача, представляющая асинхронную операцию, возвращающая процессы для пользователя по его секции.</returns>
-        Task<IEnumerable<ProcessesStep>> GetProcessStepsByUserAsync(User user);
-
-        /// <summary>
         /// Получает секцию по уникальному идентификатору
         /// </summary>
         /// <param name="sectionId">Уникальный идентификатор секции</param>

@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 using Microsoft.EntityFrameworkCore;
 
+using production_supply_system.EntityFramework.DAL.TestContext.InboundSchema;
+
 namespace production_supply_system.EntityFramework.DAL.LotContext.Models;
 
 [Table("tbd_Invoices", Schema = "Inbound")]
@@ -31,4 +33,7 @@ public partial class Invoice
 
     [ForeignKey("ShipperId")]
     public virtual Shipper? Shipper { get; set; }
+
+    [InverseProperty("Invoice")]
+    public virtual ICollection<PartsInInvoice> PartsInInvoices { get; set; } = [];
 }

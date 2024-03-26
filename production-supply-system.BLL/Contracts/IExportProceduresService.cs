@@ -8,6 +8,6 @@ namespace BLL.Contracts
 {
     public interface IExportProceduresService
     {
-        Task ExportTracingForPartner2(AppProcess processName, Steps step, string filePath, string sheetName, List<DocmapperContent> content);
+        Task ExportTracingForPartner2Async(string filePath, string sheetName, List<DocmapperContent> content);
     }
 }

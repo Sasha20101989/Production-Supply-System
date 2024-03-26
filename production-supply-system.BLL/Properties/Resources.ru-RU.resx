@@ -169,7 +169,7 @@
     <value>количество по номеру детали '{0}' не найдено</value>
   </data>
   <data name="ReleaseNotFound" xml:space="preserve">
-    <value>Релиз не найден для тела '{0}' и части '{1}', проверьте правильность ввода или обратитесь в DSS.</value>
+    <value>Релиз не найден для тела '{0}', проверьте правильность ввода или обратитесь в DSS.</value>
   </data>
   <data name="SavingProgressCase" xml:space="preserve">
     <value>сохранение кейса {0} из {1}</value>

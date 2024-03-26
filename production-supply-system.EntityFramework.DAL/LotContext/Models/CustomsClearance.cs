@@ -14,21 +14,21 @@ public partial class CustomsClearance
     public int ContainerInLotId { get; set; }
 
     [Column("Invoce_Number")]
-    [StringLength(50)]
+    [MaxLength(50)]
     public string? InvoceNumber { get; set; }
 
     [Column("Docs_To_Customs_Date")]
     public DateOnly? DocsToCustomsDate { get; set; }
 
     [Column("AEO_Obbligation_Number")]
-    [StringLength(20)]
+    [MaxLength(20)]
     public string? AeoObbligationNumber { get; set; }
 
     [Column("AEO_Obbligation_Release_Date")]
     public DateOnly? AeoObbligationReleaseDate { get; set; }
 
     [Column("CCD_Number")]
-    [StringLength(20)]
+    [MaxLength(20)]
     public string? CcdNumber { get; set; }
 
     [Column("CCD_Release_Date")]

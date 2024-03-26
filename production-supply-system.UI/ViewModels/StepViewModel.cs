@@ -50,37 +50,35 @@ namespace UI_Interface.ViewModels
         [RelayCommand]
         private async Task ExportFileAsync(StepViewModel masterItem)
         {
-            //CommonOpenFileDialog dialog = new()
-            //{
-            //    IsFolderPicker = true
-            //};
+            CommonOpenFileDialog dialog = new()
+            {
+                IsFolderPicker = true
+            };
 
-            //if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-            //{
-            //    ProcessStep.Docmapper.Folder = dialog.FileName;
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            {
+                ProcessStep.Docmapper.Folder = dialog.FileName;
 
-            //    try
-            //    {
-            //        await CreateController(Resources.ShellExportFiles);
+                try
+                {
+                    await CreateController(Resources.ShellExportFiles);
 
-            //        await ExportToExcelFileAsync(
-            //                    ProcessStep.Process.ProcessName,
-            //                    ProcessStep.StepName,
-            //                    ProcessStep.Docmapper.Folder,
-            //                    ProcessStep.Docmapper.SheetName,
-            //                    [.. ProcessStep.Docmapper.DocmapperContents]);
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        await WaitForMessageUnlock(Resources.ShellError, ex.Message, Brushes.IndianRed);
-            //    }
-            //    finally
-            //    {
-            //        await ControllerPostProcess();
-            //    }
-            //}
-
-            throw new NotImplementedException();
+                    await ExportToExcelFileAsync(
+                                ProcessStep.Process.ProcessName,
+                                ProcessStep.StepName,
+                                ProcessStep.Docmapper.Folder,
+                                ProcessStep.Docmapper.SheetName,
+                                [.. ProcessStep.Docmapper.DocmapperContents]);
+                }
+                catch (Exception ex)
+                {
+                    await WaitForMessageUnlock(Resources.ShellError, ex.Message, Brushes.IndianRed);
+                }
+                finally
+                {
+                    await ControllerPostProcess();
+                }
+            }
         }
 
         /// <summary>
@@ -91,13 +89,13 @@ namespace UI_Interface.ViewModels
         /// <param name="folder">Путь с названием файла и расширением</param>
         /// <param name="sheetName">Имя листа</param>
         /// <param name="content">Колонки из докмаппера</param>
-        private async Task ExportToExcelFileAsync(AppProcess processName, Steps step, string folder, string sheetName, List<DocmapperContent> content)
+        private async Task ExportToExcelFileAsync(string processName, string step, string folder, string sheetName, List<DocmapperContent> content)
         {
-            if (processName == AppProcess.ExportFileToExcelPartner2 && step == Steps.ExportTracing)
+            if (processName == AppProcess.ExportFileToExcelPartner2.ToString() && step == Steps.ExportTracing.ToString())
             {
                 string filePath = $"{folder}\\{Steps.ExportTracing}_{DateTime.Now.ToFileTimeUtc()}{Resources.ShellXLSX}";
 
-                await exportProcedures.ExportTracingForPartner2(processName, step, filePath, sheetName, content);
+                await exportProcedures.ExportTracingForPartner2Async(filePath, sheetName, content);
 
                 toastNotificationsService.ShowToastNotificationMessage(Resources.ShellExportFiles, $"{Resources.ShellExportFileCompleted}", null, null, filePath);
             }

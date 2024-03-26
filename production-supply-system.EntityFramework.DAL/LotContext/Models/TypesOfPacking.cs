@@ -10,11 +10,13 @@ public partial class TypesOfPacking
     [Column("Packing_Type_Id")]
     public int Id { get; set; }
 
+    [Required(ErrorMessage = "Supplier packing type is required")]
+    [MaxLength(150, ErrorMessage = "Supplier packing type not exceed 150 characters")]
     [Column("Supplier_Packing_Type")]
-    [StringLength(150)]
     public string? SupplierPackingType { get; set; }
 
+    [Required(ErrorMessage = "Packing type is required")]
+    [MaxLength(150, ErrorMessage = "Packing type not exceed 150 characters")]
     [Column("Packing_Type")]
-    [StringLength(150)]
     public string? PackingType { get; set; }
 }

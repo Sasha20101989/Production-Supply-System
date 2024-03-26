@@ -46,6 +46,9 @@ public partial class PartsApplication
     [InverseProperty("PartsApplications")]
     public virtual Model? Model { get; set; }
 
+    [ForeignKey("PartId")]
+    public virtual Part? Part { get; set; }
+
     [InverseProperty("PartsApplication")]
     public virtual ICollection<BomProduction> BomProductions { get; set; } = [];
 

@@ -11,6 +11,10 @@ public partial class PartsInInvoiceConfiguration : IEntityTypeConfiguration<Part
     {
         _ = entity.HasKey(e => e.PartInInvoiceId).HasName("PK_tbd_PartsInInvoice");
 
+        _ = entity.HasOne(d => d.Invoice).WithMany(p => p.PartsInInvoices)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_tbd_PartsInInvoice_tbd_Invoices1");
+
         OnConfigurePartial(entity);
     }
 
